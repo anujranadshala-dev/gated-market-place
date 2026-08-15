@@ -1,0 +1,24 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/anujranadshala-dev/gated-market-place#readme",
+  "bugs": {
+    "url": "https://github.com/anujranadshala-dev/gated-market-place/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anujranadshala-dev/gated-market-place.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14"
+  }
+}
