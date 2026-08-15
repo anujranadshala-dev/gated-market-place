@@ -15,11 +15,11 @@ export interface IAddress {
 }
 
 // Main User document interface
-export interface IUser extends Document {
+export interface IShopUser extends Document {
   username: string;
   email: string;
   fullName: string;
-  role: 'SHOP_USER' | 'SHOP_ADMIN' | 'SUPER_ADMIN';
+  role: 'SHOP_USER';
   accessibleStoresId: string[];
   password?: string;
   passwordLastChangedAt?: Date;
@@ -51,14 +51,14 @@ const addressSchema = new Schema<IAddress>({
   phone: String,
 }, { _id: true }); // _id is useful for managing addresses in an array
 
-const userSchema = new Schema<IUser>({
+const shopUserSchema = new Schema<IShopUser>({
   // id is handled by mongoose as _id
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   fullName: { type: String, required: true },
   role: {
     type: String,
-    enum: ['SHOP_USER', 'SHOP_ADMIN', 'SUPER_ADMIN'],
+    enum: ['SHOP_USER'], // Enforce the value at the database level
     default: 'SHOP_USER',
   },
   accessibleStoresId: [String],
@@ -90,4 +90,4 @@ const userSchema = new Schema<IUser>({
   timestamps: true, // Manages createdAt and updatedAt
 });
 
-export default mongoose.model<IUser>('User', userSchema);
+export default mongoose.model<IShopUser>('ShopUser', shopUserSchema);
