@@ -1,0 +1,6 @@
+{
+  "name": "B2B2C Gated Marketplace - Admin & Super Admin Portal",
+  "description": "Angular 21 Zoneless architecture with Signal-based state management and forms for Store Owner & Super Admin portals in a B2B2C gated marketplace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

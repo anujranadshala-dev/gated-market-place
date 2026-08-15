@@ -1,0 +1,289 @@
+<div class="space-y-6 transition-colors duration-200">
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-sm shadow-xl flex items-center space-x-3 animate-in fade-in slide-in-from-bottom-4">
+      <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <span class="font-medium">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Central Logistics & Delivery Board</h1>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        Fulfillment operations hub: monitor merchant 'Packed' orders, assign carriers, and transition shipments to 'Delivered'.
+      </p>
+    </div>
+
+    <!-- Overall Summary -->
+    <div class="flex items-center space-x-3">
+      <div class="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs shadow-xs">
+        <span class="text-slate-500 dark:text-slate-400">Packed Ready: </span>
+        <strong class="text-indigo-600 dark:text-indigo-400 font-mono">{{ orderState.packedReadyForDispatchCount() }}</strong>
+      </div>
+      <div class="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs shadow-xs">
+        <span class="text-slate-500 dark:text-slate-400">In Transit: </span>
+        <strong class="text-indigo-600 dark:text-indigo-400 font-mono">{{ orderState.inTransitCount() }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-Column Logistics Pipeline Board -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+    <!-- COLUMN 1: PACKED (Ready for Dispatch) -->
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800/60 p-5 space-y-4 shadow-xs">
+      <!-- Column Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">1. Packed by Merchant</h2>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-[11px] font-mono font-bold border border-amber-200 dark:border-amber-800/60">
+          {{ orderState.packedOrdersForLogistics().length }}
+        </span>
+      </div>
+
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">
+        Orders packed & sealed by store owners. Ready for Super Admin carrier dispatch.
+      </p>
+
+      <!-- Cards List -->
+      <div class="space-y-3">
+        @if (orderState.packedOrdersForLogistics().length === 0) {
+          <div class="p-8 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+            No orders awaiting carrier assignment.
+          </div>
+        } @else {
+          @for (order of orderState.packedOrdersForLogistics(); track order.id) {
+            <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 hover:bg-white dark:hover:bg-slate-800 transition space-y-3 shadow-xs">
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">{{ order.orderNumber }}</span>
+                  <p class="text-[11px] font-semibold text-slate-800 dark:text-slate-200 mt-0.5">{{ order.storeName }}</p>
+                </div>
+                <app-status-badge [status]="order.status"></app-status-badge>
+              </div>
+
+              <!-- Destination & Customer -->
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 space-y-0.5">
+                <p><strong class="text-slate-800 dark:text-slate-200">{{ order.customer.name }}</strong> ({{ order.customer.tier }})</p>
+                <p class="truncate">{{ order.shippingAddress.city }}, {{ order.shippingAddress.country }}</p>
+              </div>
+
+              <!-- Item count & Amount -->
+              <div class="pt-2 border-t border-slate-200/80 dark:border-slate-700 flex items-center justify-between text-xs">
+                <span class="text-slate-500 dark:text-slate-400">{{ order.items.length }} items</span>
+                <span class="font-bold text-slate-900 dark:text-slate-100 font-mono">${{ order.totalAmount | number:'1.2-2' }}</span>
+              </div>
+
+              <!-- Action: Dispatch Carrier -->
+              <button
+                (click)="openDispatchModal(order)"
+                class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-sm shadow-indigo-600/20"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+                </svg>
+                <span>Assign Carrier & Dispatch</span>
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- COLUMN 2: OUT FOR DELIVERY (In Transit) -->
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/60 p-5 space-y-4 shadow-xs">
+      <!-- Column Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">2. Out for Delivery</h2>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-mono font-bold border border-indigo-200 dark:border-indigo-800/60">
+          {{ orderState.outForDeliveryOrders().length }}
+        </span>
+      </div>
+
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">
+        Active logistics transit. White-glove couriers currently en route to patrons.
+      </p>
+
+      <!-- Cards List -->
+      <div class="space-y-3">
+        @if (orderState.outForDeliveryOrders().length === 0) {
+          <div class="p-8 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+            No shipments currently in transit.
+          </div>
+        } @else {
+          @for (order of orderState.outForDeliveryOrders(); track order.id) {
+            <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-white dark:hover:bg-slate-800 transition space-y-3 shadow-xs">
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">{{ order.orderNumber }}</span>
+                  <p class="text-[11px] font-semibold text-slate-800 dark:text-slate-200 mt-0.5">{{ order.storeName }}</p>
+                </div>
+                <app-status-badge [status]="order.status"></app-status-badge>
+              </div>
+
+              <!-- Carrier Info Box -->
+              <div class="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/60 text-[11px] space-y-1">
+                <div class="flex items-center justify-between text-indigo-950 dark:text-indigo-200 font-semibold">
+                  <span>{{ order.logistics.carrierName }}</span>
+                  <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">ETA: Today</span>
+                </div>
+                <p class="font-mono text-slate-700 dark:text-slate-300 text-[10px]">Track: {{ order.logistics.trackingNumber }}</p>
+                <p class="text-slate-600 dark:text-slate-400 text-[10px]">Driver: {{ order.logistics.driverName }}</p>
+              </div>
+
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                <span>Destination: </span>
+                <strong class="text-slate-800 dark:text-slate-200">{{ order.shippingAddress.recipientName }}</strong>, {{ order.shippingAddress.city }}
+              </div>
+
+              <!-- Action: Mark Delivered -->
+              <button
+                (click)="markAsDelivered(order.id, order.orderNumber)"
+                class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-sm shadow-emerald-600/20"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Confirm & Mark 'Delivered'</span>
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- COLUMN 3: DELIVERED (Fulfilled) -->
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800/60 p-5 space-y-4 shadow-xs">
+      <!-- Column Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">3. Delivered & Fulfilled</h2>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[11px] font-mono font-bold border border-emerald-200 dark:border-emerald-800/60">
+          {{ orderState.deliveredOrders().length }}
+        </span>
+      </div>
+
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">
+        Successfully completed deliveries signed by patrons.
+      </p>
+
+      <!-- Cards List -->
+      <div class="space-y-3">
+        @if (orderState.deliveredOrders().length === 0) {
+          <div class="p-8 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+            No completed deliveries yet.
+          </div>
+        } @else {
+          @for (order of orderState.deliveredOrders(); track order.id) {
+            <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2 text-xs">
+              <div class="flex items-start justify-between">
+                <span class="font-mono font-bold text-emerald-700 dark:text-emerald-400">{{ order.orderNumber }}</span>
+                <app-status-badge [status]="order.status"></app-status-badge>
+              </div>
+
+              <p class="text-slate-800 dark:text-slate-200 font-semibold">{{ order.customer.name }} &bull; {{ order.storeName }}</p>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                Delivered: {{ order.logistics.deliveredAt | date:'MMM d, h:mm a' }}
+              </p>
+
+              <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                <span>{{ order.logistics.carrierName }}</span>
+                <span class="font-bold text-slate-900 dark:text-slate-100 font-mono">${{ order.totalAmount | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Dispatch Modal: Assign Carrier & Tracking -->
+  @if (dispatchingOrder(); as order) {
+    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Carrier Dispatch & Handoff</h2>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Order: {{ order.orderNumber }} &bull; {{ order.storeName }}</p>
+          </div>
+          <button (click)="closeDispatchModal()" class="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 text-2xl font-bold leading-none">&times;</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Carrier / Logistics Provider *</label>
+            <select
+              [value]="carrierName()"
+              (change)="carrierName.set($any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            >
+              <option value="DHL Express Private Courier">DHL Express Private Courier</option>
+              <option value="FedEx Custom Critical White Glove">FedEx Custom Critical White Glove</option>
+              <option value="Armored Private Escort">Armored Private Escort</option>
+              <option value="Alpine Dedicated Logistics">Alpine Dedicated Logistics</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Tracking Number *</label>
+            <input
+              type="text"
+              [value]="trackingNumber()"
+              (input)="trackingNumber.set($any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 font-mono text-indigo-700 dark:text-indigo-400 font-bold focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Driver Name</label>
+              <input
+                type="text"
+                [value]="driverName()"
+                (input)="driverName.set($any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Driver Phone</label>
+              <input
+                type="text"
+                [value]="driverPhone()"
+                (input)="driverPhone.set($any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 font-mono text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button
+            (click)="closeDispatchModal()"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="confirmDispatch()"
+            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition flex items-center space-x-1.5"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+            </svg>
+            <span>Confirm & Dispatch Shipment</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,89 @@
+<div class="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(41,136,200,0.12),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(41,136,200,0.15),rgba(0,0,0,0))] transition-colors duration-200">
+  <div class="w-full max-w-md space-y-8">
+    <!-- Brand Header -->
+    <div class="text-center space-y-2">
+      <div class="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0b3c5d] via-[#2988c8] to-[#d97d10] items-center justify-center text-xl font-extrabold text-white shadow-lg shadow-[#2988c8]/25">
+        GP
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">GatedPulse Portal</h1>
+      <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+        B2B2C Gated Marketplace Architecture &bull; Angular 21 Zoneless
+      </p>
+    </div>
+
+    <!-- Quick Persona Selection Cards -->
+    <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 space-y-4 shadow-xl shadow-slate-200/50 dark:shadow-none">
+      <div class="space-y-1">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Select Interactive Demo Persona</h2>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400">One-click role activation with real-time permissions:</p>
+      </div>
+
+      <div class="space-y-2.5">
+        <!-- Store Owner Option -->
+        <button
+          type="button"
+          (click)="quickSignIn('STORE_OWNER', 'str_vance_01', 'Vance Luxury Atelier')"
+          class="w-full flex items-center space-x-3 p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 hover:bg-amber-50/50 dark:hover:bg-amber-950/30 text-left transition group shadow-xs"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+            class="w-10 h-10 rounded-full object-cover ring-2 ring-amber-400/60"
+          />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <p class="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-800 dark:group-hover:text-amber-300">Eleanor Vance</p>
+              <span class="text-[10px] font-mono font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800/60">
+                STORE OWNER
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Vance Luxury Atelier &bull; Manage catalog & packing</p>
+          </div>
+        </button>
+
+        <!-- Super Admin Option -->
+        <button
+          type="button"
+          (click)="quickSignIn('SUPER_ADMIN')"
+          class="w-full flex items-center space-x-3 p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50/50 dark:hover:bg-purple-950/30 text-left transition group shadow-xs"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+            class="w-10 h-10 rounded-full object-cover ring-2 ring-purple-400/60"
+          />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <p class="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-purple-800 dark:group-hover:text-purple-300">Alexander Sterling</p>
+              <span class="text-[10px] font-mono font-semibold bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-800/60">
+                SUPER ADMIN
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Global Oversight &bull; Central logistics board</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- Credential Form Divider -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+        <form (ngSubmit)="onSubmit()" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Corporate SSO / Email</label>
+            <input
+              type="email"
+              [value]="email()"
+              (input)="email.set($any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition shadow-md shadow-indigo-600/20"
+          >
+            Authenticate Portal Access &rarr;
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

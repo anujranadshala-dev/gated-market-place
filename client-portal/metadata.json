@@ -1,0 +1,6 @@
+{
+  "name": "NexusGate B2B2C Client Portal",
+  "description": "Gated Multi-Tenant B2B2C Marketplace Client Portal with token-based authentication, restricted tenant store access, dynamic tier pricing, and Redux cart management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,788 @@
+<div class="space-y-6 transition-colors duration-200">
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-sm shadow-xl flex items-center space-x-3 animate-in fade-in slide-in-from-bottom-4">
+      <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <span class="font-medium">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Omnipotent Global Oversight</h1>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        Centralized multi-tenant administration: create, edit, or delete any Store, Product, or Client across the platform.
+      </p>
+    </div>
+
+    <!-- Active Entity Tabs -->
+    <div class="flex items-center space-x-1 p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs">
+      <button
+        (click)="setTab('STORES')"
+        [class.bg-indigo-600]="activeTab() === 'STORES'"
+        [class.text-white]="activeTab() === 'STORES'"
+        [class.shadow-xs]="activeTab() === 'STORES'"
+        [class.text-slate-600]="activeTab() !== 'STORES'"
+        [class.dark:text-slate-400]="activeTab() !== 'STORES'"
+        class="px-3.5 py-1.5 rounded-lg font-semibold transition"
+      >
+        All Stores ({{ storeState.stores().length }})
+      </button>
+      <button
+        (click)="setTab('PRODUCTS')"
+        [class.bg-indigo-600]="activeTab() === 'PRODUCTS'"
+        [class.text-white]="activeTab() === 'PRODUCTS'"
+        [class.shadow-xs]="activeTab() === 'PRODUCTS'"
+        [class.text-slate-600]="activeTab() !== 'PRODUCTS'"
+        [class.dark:text-slate-400]="activeTab() !== 'PRODUCTS'"
+        class="px-3.5 py-1.5 rounded-lg font-semibold transition"
+      >
+        All Products ({{ productState.products().length }})
+      </button>
+      <button
+        (click)="setTab('CLIENTS')"
+        [class.bg-indigo-600]="activeTab() === 'CLIENTS'"
+        [class.text-white]="activeTab() === 'CLIENTS'"
+        [class.shadow-xs]="activeTab() === 'CLIENTS'"
+        [class.text-slate-600]="activeTab() !== 'CLIENTS'"
+        [class.dark:text-slate-400]="activeTab() !== 'CLIENTS'"
+        class="px-3.5 py-1.5 rounded-lg font-semibold transition"
+      >
+        Client Access Registry
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB 1: STORES OVERSIGHT -->
+  @if (activeTab() === 'STORES') {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Merchant Storefronts</h2>
+        <button
+          (click)="openCreateStoreModal()"
+          class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition flex items-center space-x-1.5"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span>Register New Store</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (store of storeState.stores(); track store.id) {
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center space-x-3">
+                  <img [src]="store.logoUrl" class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700" />
+                  <div>
+                    <h3 class="font-bold text-slate-900 dark:text-slate-100 text-sm">{{ store.name }}</h3>
+                    <p class="text-[11px] font-mono text-indigo-600 dark:text-indigo-400">ID: {{ store.id }}</p>
+                  </div>
+                </div>
+                <app-status-badge [status]="store.status"></app-status-badge>
+              </div>
+
+              <p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                {{ store.description }}
+              </p>
+
+              <div class="grid grid-cols-2 gap-2 text-xs p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                <div>
+                  <span class="text-[10px] uppercase text-slate-500 dark:text-slate-400 font-semibold">Principal</span>
+                  <p class="text-slate-800 dark:text-slate-200 font-medium">{{ store.ownerName }}</p>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{{ store.ownerEmail }}</p>
+                </div>
+                <div>
+                  <span class="text-[10px] uppercase text-slate-500 dark:text-slate-400 font-semibold">Gating Tier</span>
+                  <p class="text-indigo-600 dark:text-indigo-400 font-mono font-bold">{{ store.tier }}</p>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400">{{ store.gatingConfig.minimumLoyaltyTier }} min</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <button
+                  (click)="toggleStoreStatus(store.id, store.status)"
+                  [class.text-rose-600]="store.status === 'ACTIVE'"
+                  [class.dark:text-rose-400]="store.status === 'ACTIVE'"
+                  [class.text-emerald-600]="store.status !== 'ACTIVE'"
+                  [class.dark:text-emerald-400]="store.status !== 'ACTIVE'"
+                  class="text-xs font-semibold hover:underline"
+                >
+                  {{ store.status === 'ACTIVE' ? 'Suspend Store' : 'Reactivate Store' }}
+                </button>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+                <button
+                  (click)="promptDelete('STORE', store.id, store.name)"
+                  class="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition"
+                >
+                  Delete
+                </button>
+              </div>
+
+              <button
+                (click)="openEditStoreModal(store)"
+                class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition"
+              >
+                Edit Store Entity
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- TAB 2: PRODUCTS OVERSIGHT -->
+  @if (activeTab() === 'PRODUCTS') {
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Global Product Catalog</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Filter and manage inventory across all merchant storefronts.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+            Showing <strong>{{ filteredProducts().length }}</strong> of {{ productState.products().length }} SKUs
+          </span>
+        </div>
+      </div>
+
+      <!-- Store Filter & Search Controls Bar -->
+      <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <!-- Store Selector Filter -->
+        <div class="flex items-center space-x-2 flex-1 max-w-sm">
+          <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap flex items-center space-x-1">
+            <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span>Filter Store:</span>
+          </label>
+          <select
+            [value]="productStoreFilter()"
+            (change)="setProductStoreFilter($any($event.target).value)"
+            class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-xs cursor-pointer"
+          >
+            <option value="ALL">🌐 All Stores ({{ storeState.stores().length }})</option>
+            @for (store of storeState.stores(); track store.id) {
+              <option [value]="store.id">{{ store.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+          <input
+            type="text"
+            [value]="productSearchQuery()"
+            (input)="productSearchQuery.set($any($event.target).value)"
+            placeholder="Search products by title, SKU, category..."
+            class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-xs"
+          />
+          @if (productSearchQuery()) {
+            <button
+              (click)="productSearchQuery.set('')"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold"
+            >
+              &times;
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Products Table -->
+      @if (filteredProducts().length === 0) {
+        <div class="p-12 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 space-y-2">
+          <p class="font-semibold text-slate-700 dark:text-slate-300">No products found</p>
+          <p>No products match the selected store filter or search keyword.</p>
+          @if (productStoreFilter() !== 'ALL' || productSearchQuery()) {
+            <button
+              (click)="setProductStoreFilter('ALL'); productSearchQuery.set('')"
+              class="mt-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60 rounded-lg text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition"
+            >
+              Reset Filters
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                <th class="py-3 px-4 font-semibold">Product Title & SKU</th>
+                <th class="py-3 px-4 font-semibold">Assigned Merchant Store</th>
+                <th class="py-3 px-4 font-semibold">Price</th>
+                <th class="py-3 px-4 font-semibold">Stock</th>
+                <th class="py-3 px-4 font-semibold">Gated Tier</th>
+                <th class="py-3 px-4 font-semibold text-right">Global Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+              @for (product of filteredProducts(); track product.id) {
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/60 transition">
+                  <td class="py-3.5 px-4">
+                    <p class="font-bold text-slate-900 dark:text-slate-100">{{ product.name }}</p>
+                    <p class="text-[10px] font-mono text-indigo-600 dark:text-indigo-400">{{ product.inventory.sku }}</p>
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <span class="text-slate-800 dark:text-slate-200 font-medium">{{ product.storeName }}</span>
+                    <p class="text-[10px] font-mono text-slate-500 dark:text-slate-400">{{ product.storeId }}</p>
+                  </td>
+
+                  <td class="py-3.5 px-4 font-mono font-bold text-slate-900 dark:text-slate-100">
+                    ${{ product.price | number:'1.2-2' }}
+                  </td>
+
+                  <td class="py-3.5 px-4 font-mono">
+                    <span [class.text-rose-600]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold" [class.dark:text-rose-400]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold" class="text-slate-800 dark:text-slate-200 font-medium">
+                      {{ product.inventory.stockQuantity }} units
+                    </span>
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <app-status-badge [status]="product.gatedTier"></app-status-badge>
+                  </td>
+
+                  <td class="py-3.5 px-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                      <button
+                        (click)="openEditProductModal(product)"
+                        class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        (click)="promptDelete('PRODUCT', product.id, product.name)"
+                        class="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-300 text-xs font-semibold transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- TAB 3: CLIENT ACCESS REGISTRY -->
+  @if (activeTab() === 'CLIENTS') {
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Gated VIP Patron Registry & Credentials</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">All registered verified patrons across all merchant storefronts with username & password oversight.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+            Showing <strong>{{ filteredInvitations().length }}</strong> of {{ invitationState.invitations().length }} Clients
+          </span>
+        </div>
+      </div>
+
+      <!-- Store Filter & Search Controls Bar -->
+      <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <!-- Store Selector Filter -->
+        <div class="flex items-center space-x-2 flex-1 max-w-sm">
+          <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap flex items-center space-x-1">
+            <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span>Filter Store:</span>
+          </label>
+          <select
+            [value]="clientStoreFilter()"
+            (change)="setClientStoreFilter($any($event.target).value)"
+            class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-xs cursor-pointer"
+          >
+            <option value="ALL">🌐 All Stores ({{ storeState.stores().length }})</option>
+            @for (store of storeState.stores(); track store.id) {
+              <option [value]="store.id">{{ store.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+          <input
+            type="text"
+            [value]="clientSearchQuery()"
+            (input)="clientSearchQuery.set($any($event.target).value)"
+            placeholder="Search clients by name, email, username..."
+            class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-xs"
+          />
+          @if (clientSearchQuery()) {
+            <button
+              (click)="clientSearchQuery.set('')"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold"
+            >
+              &times;
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Clients Table -->
+      @if (filteredInvitations().length === 0) {
+        <div class="p-12 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 space-y-2">
+          <p class="font-semibold text-slate-700 dark:text-slate-300">No client records found</p>
+          <p>No patrons match the selected store filter or search keyword.</p>
+          @if (clientStoreFilter() !== 'ALL' || clientSearchQuery()) {
+            <button
+              (click)="setClientStoreFilter('ALL'); clientSearchQuery.set('')"
+              class="mt-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60 rounded-lg text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition"
+            >
+              Reset Filters
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                <th class="py-3 px-4 font-semibold">Patron Name & Email</th>
+                <th class="py-3 px-4 font-semibold">Username</th>
+                <th class="py-3 px-4 font-semibold">Storefront Gating Access</th>
+                <th class="py-3 px-4 font-semibold">Dynamic Tier & Spend</th>
+                <th class="py-3 px-4 font-semibold">Password & Credential Status</th>
+                <th class="py-3 px-4 font-semibold">Account State</th>
+                <th class="py-3 px-4 font-semibold text-right">Super Admin Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+              @for (invite of filteredInvitations(); track invite.id) {
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/60 transition">
+                  <td class="py-3.5 px-4">
+                    <p class="font-bold text-slate-900 dark:text-slate-100">{{ invite.recipientName || 'Private Patron' }}</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{{ invite.recipientEmail }}</p>
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <div class="flex items-center space-x-1.5">
+                      <span class="font-mono text-indigo-700 dark:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800/60 text-[11px] font-semibold">
+                        {{ invite.username || invite.recipientEmail }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <p class="text-slate-800 dark:text-slate-200 font-medium">{{ invite.storeName }}</p>
+                    <p class="text-[10px] font-mono text-slate-500 dark:text-slate-400">{{ invite.storeId }}</p>
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <div class="space-y-1">
+                      <app-status-badge [status]="invite.assignedTier"></app-status-badge>
+                      <div class="text-[10px] font-mono text-slate-600 dark:text-slate-300">
+                        Spend: <strong class="text-slate-900 dark:text-slate-100">${{ invite.totalSpend | number:'1.0-0' }}</strong>
+                      </div>
+                      @if (invite.hasVipBlackSubscription) {
+                        <span class="inline-block text-[9px] font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 font-semibold">
+                          VIP Black ({{ invite.subscriptionPlan }})
+                        </span>
+                      }
+                    </div>
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <div class="space-y-1">
+                      <div class="flex items-center space-x-2">
+                        @if (revealedPasswords()[invite.id]) {
+                          <span class="font-mono text-[11px] text-amber-700 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800/60">
+                            {{ invite.tempPassword }}
+                          </span>
+                        } @else {
+                          <span class="font-mono text-slate-500 dark:text-slate-400 text-xs">••••••••</span>
+                        }
+                        <button
+                          (click)="toggleTableRowPassword(invite.id)"
+                          class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                          title="Toggle Password View"
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      @if (invite.isTempPassword) {
+                        <p class="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Temporary Password</p>
+                      } @else {
+                        <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Active Password</p>
+                      }
+                    </div>
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <app-status-badge [status]="invite.status"></app-status-badge>
+                  </td>
+
+                  <td class="py-3.5 px-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                      <button
+                        (click)="copyFullCredentials(invite)"
+                        title="Copy Full Credentials"
+                        class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                      </button>
+
+                      <button
+                        (click)="openPasswordModal(invite)"
+                        title="Change / Reset Password"
+                        class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 text-xs font-semibold transition flex items-center space-x-1"
+                      >
+                        <svg class="w-3 h-3 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                        </svg>
+                        <span>Change Password</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Modal: Create / Edit Store Entity -->
+  @if (isStoreModalOpen()) {
+    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div class="relative w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">
+            {{ editingStoreId() ? 'Edit Merchant Entity' : 'Register New Merchant Storefront' }}
+          </h2>
+          <button (click)="isStoreModalOpen.set(false)" class="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 text-2xl font-bold leading-none">&times;</button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Store Name *</label>
+            <input
+              type="text"
+              [value]="storeFormName()"
+              (input)="storeFormName.set($any($event.target).value)"
+              placeholder="e.g. Elysian Chronometry"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Owner Name *</label>
+              <input
+                type="text"
+                [value]="storeFormOwnerName()"
+                (input)="storeFormOwnerName.set($any($event.target).value)"
+                placeholder="Julian Sterling"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Owner Email *</label>
+              <input
+                type="email"
+                [value]="storeFormOwnerEmail()"
+                (input)="storeFormOwnerEmail.set($any($event.target).value)"
+                placeholder="julian@elysian.com"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Store Description</label>
+            <textarea
+              rows="2"
+              [value]="storeFormDescription()"
+              (input)="storeFormDescription.set($any($event.target).value)"
+              placeholder="High-tier horological complications..."
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Merchant Tier</label>
+              <select
+                [value]="storeFormTier()"
+                (change)="storeFormTier.set($any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+              >
+                <option value="STARTER">STARTER</option>
+                <option value="PREMIUM_BRAND">PREMIUM_BRAND</option>
+                <option value="LUXURY_EXCLUSIVE">LUXURY_EXCLUSIVE</option>
+                <option value="ENTERPRISE">ENTERPRISE</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Min. Entry Tier</label>
+              <select
+                [value]="storeFormMinTier()"
+                (change)="storeFormMinTier.set($any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+              >
+                <option value="BRONZE">BRONZE</option>
+                <option value="SILVER">SILVER</option>
+                <option value="GOLD">GOLD</option>
+                <option value="VIP_BLACK">VIP_BLACK</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="flex items-center space-x-2 cursor-pointer pt-2">
+            <input
+              type="checkbox"
+              [checked]="storeFormRequireInvite()"
+              (change)="storeFormRequireInvite.set($any($event.target).checked)"
+              class="w-4 h-4 rounded text-indigo-600 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-indigo-500"
+            />
+            <span class="text-slate-700 dark:text-slate-300 font-medium">Enforce mandatory invitation token requirement</span>
+          </label>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <button
+            (click)="isStoreModalOpen.set(false)"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="saveStore()"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition"
+          >
+            {{ editingStoreId() ? 'Update Store' : 'Create Store' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal: Edit Product Specs (Super Admin Override) -->
+  @if (isProductModalOpen()) {
+    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Super Admin Product Override</h2>
+          <button (click)="isProductModalOpen.set(false)" class="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 text-2xl font-bold leading-none">&times;</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Product Title</label>
+            <input
+              type="text"
+              [value]="productFormName()"
+              (input)="productFormName.set($any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Price ($)</label>
+              <input
+                type="number"
+                [value]="productFormPrice()"
+                (input)="productFormPrice.set(+$any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Stock</label>
+              <input
+                type="number"
+                [value]="productFormStock()"
+                (input)="productFormStock.set(+$any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 font-mono focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Gated Tier</label>
+            <select
+              [value]="productFormTier()"
+              (change)="productFormTier.set($any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            >
+              <option value="PUBLIC_MEMBER">PUBLIC_MEMBER</option>
+              <option value="SILVER">SILVER</option>
+              <option value="GOLD">GOLD</option>
+              <option value="VIP_BLACK">VIP_BLACK</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button
+            (click)="isProductModalOpen.set(false)"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="saveProduct()"
+            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition"
+          >
+            Save Override
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal: Super Admin Change / Reset Client Password -->
+  @if (isPasswordModalOpen() && selectedAccountForPassword(); as account) {
+    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+      <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Super Admin Password Reset</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Patron: <span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">{{ account.username }}</span> ({{ account.storeName }})</p>
+            </div>
+          </div>
+          <button
+            (click)="closePasswordModal()"
+            class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="space-y-4 text-xs">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="font-semibold text-slate-700 dark:text-slate-300">
+                New Password
+              </label>
+              <button
+                type="button"
+                (click)="generateModalTempPassword()"
+                class="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium flex items-center space-x-1"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Generate Temp Password</span>
+              </button>
+            </div>
+
+            <div class="relative">
+              <input
+                [type]="modalShowPassword() ? 'text' : 'password'"
+                [value]="modalNewPassword()"
+                (input)="modalNewPassword.set($any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-10 py-2.5 font-mono text-slate-900 dark:text-slate-100 font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              />
+              <button
+                type="button"
+                (click)="modalShowPassword.update(v => !v)"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                @if (modalShowPassword()) {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
+                  </svg>
+                } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- Options -->
+          <div class="space-y-2 pt-2">
+            <label class="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 cursor-pointer">
+              <input
+                type="checkbox"
+                [checked]="modalIsTemp()"
+                (change)="modalIsTemp.set($any($event.target).checked)"
+                class="w-4 h-4 rounded text-indigo-600 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:ring-indigo-500"
+              />
+              <span class="text-slate-700 dark:text-slate-300 font-medium">Mark as temporary credentials</span>
+            </label>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 px-1">
+              User can sign in immediately with these credentials and change password anytime later.
+            </p>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button
+            type="button"
+            (click)="closePasswordModal()"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="saveNewPassword()"
+            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-sm shadow-indigo-600/20"
+          >
+            Save & Update Password
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal: Delete Confirmation -->
+  @if (deleteConfirmEntity(); as entity) {
+    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="w-full max-w-sm bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-800/60 rounded-2xl p-6 space-y-4 shadow-2xl animate-in fade-in">
+        <h3 class="text-sm font-bold text-rose-600 dark:text-rose-400">Confirm Global Deletion</h3>
+        <p class="text-xs text-slate-600 dark:text-slate-300">
+          Are you certain you wish to permanently delete the {{ entity.type.toLowerCase() }}
+          <strong class="text-slate-900 dark:text-slate-100">"{{ entity.name }}"</strong>? This action cannot be reversed.
+        </p>
+        <div class="flex justify-end space-x-3 pt-2">
+          <button
+            (click)="cancelDelete()"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="executeDelete()"
+            class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm shadow-rose-600/20 transition"
+          >
+            Confirm Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

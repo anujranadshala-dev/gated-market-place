@@ -1,0 +1,746 @@
+<div class="space-y-6 transition-colors duration-200">
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-sm shadow-xl flex items-center space-x-3 animate-in fade-in slide-in-from-bottom-4">
+      <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <span class="font-medium">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Client Access & Dynamic Tier Registry</h1>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        Provision client credentials. Tiers progress automatically with store spend (Bronze &rarr; Silver &rarr; Gold), while VIP Black is subscription-based.
+      </p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="flex items-center space-x-3">
+      <div class="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs shadow-xs">
+        <span class="text-slate-500 dark:text-slate-400">Total Patrons: </span>
+        <strong class="text-slate-900 dark:text-slate-100 font-mono">{{ invitationState.currentStoreInvitations().length }}</strong>
+      </div>
+      <div class="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs shadow-xs">
+        <span class="text-slate-500 dark:text-slate-400">Active Patrons: </span>
+        <strong class="text-emerald-700 dark:text-emerald-400 font-mono font-bold">{{ invitationState.acceptedInvitationsCount() }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Column: Credential Provisioning Form -->
+    <div class="lg:col-span-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 space-y-5 shadow-xs">
+      <div class="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-sm font-bold text-slate-900 dark:text-slate-100">Provision Client Account</h2>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Initial Tier: Bronze ($0 Spend)</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Recipient Email -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Client Email Address *
+          </label>
+          <input
+            type="email"
+            [value]="recipientEmail()"
+            (input)="recipientEmail.set($any($event.target).value); onEmailOrNameChange()"
+            placeholder="patron@private-family.com"
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            [class.border-rose-400]="recipientEmail().length > 0 && !isEmailValid()"
+          />
+          @if (recipientEmail().length > 0 && !isEmailValid()) {
+            <p class="text-[10px] text-rose-600 dark:text-rose-400 mt-1">Please enter a valid email address.</p>
+          }
+        </div>
+
+        <!-- Recipient Full Name -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Client Full Name (Optional)
+          </label>
+          <input
+            type="text"
+            [value]="recipientName()"
+            (input)="recipientName.set($any($event.target).value); onEmailOrNameChange()"
+            placeholder="e.g. Lady Clara Cavendish"
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+          />
+        </div>
+
+        <!-- Username Field -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Assigned Username
+            </label>
+            <button
+              type="button"
+              (click)="username.set(invitationState.suggestUsername(recipientEmail(), recipientName()))"
+              class="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+            >
+              Auto-Suggest
+            </button>
+          </div>
+          <div class="relative">
+            <input
+              type="text"
+              [value]="username()"
+              (input)="username.set($any($event.target).value)"
+              placeholder="e.g. clara.cavendish"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-8 py-2 text-xs font-mono text-indigo-700 dark:text-indigo-300 font-semibold focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">@</span>
+          </div>
+        </div>
+
+        <!-- Temporary Password Field -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Temporary Password
+            </label>
+            <button
+              type="button"
+              (click)="generateNewFormPassword()"
+              class="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium flex items-center space-x-1"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>Regenerate</span>
+            </button>
+          </div>
+          <div class="relative">
+            <input
+              [type]="showPasswordInForm() ? 'text' : 'password'"
+              [value]="tempPassword()"
+              (input)="tempPassword.set($any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-10 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 font-semibold focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+            <button
+              type="button"
+              (click)="toggleFormPasswordVisibility()"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+              title="Toggle Visibility"
+            >
+              @if (showPasswordInForm()) {
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
+                </svg>
+              } @else {
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- Automatic Tier Progression Architecture Overview -->
+        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200">
+            <span class="flex items-center space-x-1.5">
+              <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+              <span>Automated Tier Progression</span>
+            </span>
+            <span class="text-amber-700 dark:text-amber-400 text-[10px] uppercase font-mono">Starts Bronze</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-1.5 text-[10px] text-center pt-1">
+            <div class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200/70 dark:border-amber-800/40">
+              <span class="font-bold text-amber-800 dark:text-amber-300 block">Bronze</span>
+              <span class="text-slate-500 dark:text-slate-400">$0 &ndash; $2.5k</span>
+            </div>
+            <div class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <span class="font-bold text-slate-700 dark:text-slate-300 block">Silver</span>
+              <span class="text-slate-500 dark:text-slate-400">$2.5k+ spend</span>
+            </div>
+            <div class="p-1.5 rounded-lg bg-yellow-50 dark:bg-yellow-950/40 border border-yellow-200/70 dark:border-yellow-800/40">
+              <span class="font-bold text-yellow-800 dark:text-yellow-300 block">Gold</span>
+              <span class="text-slate-500 dark:text-slate-400">$10k+ spend</span>
+            </div>
+          </div>
+
+          <div class="p-2 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/40 text-[10px] text-indigo-900 dark:text-indigo-200 flex items-center justify-between">
+            <span class="font-semibold flex items-center space-x-1">
+              <span>&#9819; VIP Black</span>
+            </span>
+            <span class="text-[9px] font-mono uppercase bg-indigo-100 dark:bg-indigo-900/60 px-1.5 py-0.5 rounded font-bold">Subscription Plan</span>
+          </div>
+        </div>
+
+        <!-- Custom Personal Note -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Personal Note in Credentials Email (Optional)
+          </label>
+          <textarea
+            rows="2"
+            [value]="customMessage()"
+            (input)="customMessage.set($any($event.target).value)"
+            placeholder="Special greeting regarding private collection access..."
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+          ></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="button"
+          (click)="dispatchCredentials()"
+          [disabled]="!isFormValid() || isSubmitting()"
+          class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition flex items-center justify-center space-x-2"
+        >
+          @if (isSubmitting()) {
+            <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span>Dispatching Credentials...</span>
+          } @else {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <span>Dispatch Username & Temp Password</span>
+          }
+        </button>
+      </div>
+
+      <!-- Last Dispatched Credentials Card -->
+      @if (lastDispatchedAccount(); as account) {
+        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 text-xs space-y-3 animate-in fade-in">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">Credentials Dispatched!</span>
+            <span class="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">Initial Tier: Bronze</span>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800/60 space-y-2 shadow-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500 dark:text-slate-400 text-[11px]">Username:</span>
+              <span class="font-mono font-bold text-slate-900 dark:text-slate-100">{{ account.username }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500 dark:text-slate-400 text-[11px]">Temp Password:</span>
+              <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ account.tempPassword }}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 italic">User can change password anytime.</p>
+            <button
+              (click)="copyFullCredentials(account)"
+              class="text-[10px] font-semibold text-emerald-800 dark:text-emerald-200 bg-emerald-100 dark:bg-emerald-900/60 hover:bg-emerald-200 dark:hover:bg-emerald-800/60 px-2.5 py-1 rounded transition"
+            >
+              Copy Credentials
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Right Column: Provisioned Clients Directory Table -->
+    <div class="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900 dark:text-slate-100">Provisioned Client Directory</h2>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Track dynamic spend tiers, VIP Black subscriptions, and manage credentials.</p>
+        </div>
+      </div>
+
+      @if (invitationState.currentStoreInvitations().length === 0) {
+        <div class="p-12 text-center text-slate-500 dark:text-slate-400 text-xs">
+          No client credentials issued yet. Use the form on the left to provision patron accounts.
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+                <th class="py-2.5 px-3 font-semibold">Client Name & Email</th>
+                <th class="py-2.5 px-3 font-semibold">Username</th>
+                <th class="py-2.5 px-3 font-semibold">Gated Tier</th>
+                <th class="py-2.5 px-3 font-semibold">Store Spend & Progression</th>
+                <th class="py-2.5 px-3 font-semibold">Password Status</th>
+                <th class="py-2.5 px-3 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+              @for (account of invitationState.currentStoreInvitations(); track account.id) {
+                @let progress = getProgressInfo(account);
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/60 transition">
+                  <!-- Name & Email -->
+                  <td class="py-3.5 px-3">
+                    <p class="font-semibold text-slate-800 dark:text-slate-200">{{ account.recipientName || 'Patron' }}</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{{ account.recipientEmail }}</p>
+                  </td>
+
+                  <!-- Username -->
+                  <td class="py-3.5 px-3">
+                    <div class="flex items-center space-x-1.5">
+                      <span class="font-mono text-indigo-700 dark:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800/60 text-[11px] font-semibold">
+                        {{ account.username }}
+                      </span>
+                      <button
+                        (click)="copyText(account.username, 'Username')"
+                        title="Copy Username"
+                        class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+
+                  <!-- Gated Tier -->
+                  <td class="py-3.5 px-3">
+                    <div class="space-y-1">
+                      <app-status-badge [status]="account.assignedTier"></app-status-badge>
+                      @if (account.hasVipBlackSubscription) {
+                        <span class="inline-block text-[9px] font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-1.5 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 font-semibold">
+                          Subscription ({{ account.subscriptionPlan }})
+                        </span>
+                      } @else {
+                        <span class="inline-block text-[9px] text-slate-500 dark:text-slate-400">
+                          Spend-based tier
+                        </span>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Store Spend & Progression -->
+                  <td class="py-3.5 px-3 min-w-[150px]">
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-mono font-bold text-slate-900 dark:text-slate-100">
+                          ${{ account.totalSpend | number:'1.0-0' }}
+                        </span>
+                        @if (account.hasVipBlackSubscription) {
+                          <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold">VIP Active</span>
+                        } @else if (progress.nextTier) {
+                          <span class="text-[10px] text-slate-500 dark:text-slate-400">
+                            ${{ progress.remainingToNextTier | number:'1.0-0' }} to {{ progress.nextTier }}
+                          </span>
+                        } @else {
+                          <span class="text-[10px] text-yellow-600 dark:text-yellow-400 font-semibold">Gold Max Spend</span>
+                        }
+                      </div>
+
+                      @if (!account.hasVipBlackSubscription) {
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            class="bg-indigo-600 dark:bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
+                            [style.width.%]="progress.progressPercent"
+                          ></div>
+                        </div>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Password Status -->
+                  <td class="py-3.5 px-3">
+                    <div class="space-y-1">
+                      <div class="flex items-center space-x-2">
+                        @if (revealedPasswords()[account.id]) {
+                          <span class="font-mono text-[11px] text-amber-700 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800/60">
+                            {{ account.tempPassword }}
+                          </span>
+                        } @else {
+                          <span class="font-mono text-slate-500 dark:text-slate-400 text-xs">••••••••</span>
+                        }
+                        <button
+                          (click)="toggleTableRowPassword(account.id)"
+                          class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                          title="Toggle Password View"
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      @if (account.isTempPassword) {
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Temporary Password</p>
+                      } @else {
+                        <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Custom User Password</p>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="py-3.5 px-3 text-right">
+                    <div class="flex items-center justify-end space-x-1.5">
+                      <!-- Simulate/Add Spend Button -->
+                      <button
+                        (click)="openSpendModal(account)"
+                        title="Simulate Purchase / Add Spend"
+                        class="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-[11px] font-semibold transition flex items-center space-x-1"
+                      >
+                        <span>+$ Spend</span>
+                      </button>
+
+                      <!-- VIP Black Subscription Toggle -->
+                      <button
+                        (click)="openSubscriptionModal(account)"
+                        title="Manage VIP Black Subscription"
+                        class="p-1.5 rounded-lg border transition"
+                        [class.bg-indigo-50]="account.hasVipBlackSubscription"
+                        [class.dark:bg-indigo-950/60]="account.hasVipBlackSubscription"
+                        [class.text-indigo-700]="account.hasVipBlackSubscription"
+                        [class.dark:text-indigo-300]="account.hasVipBlackSubscription"
+                        [class.border-indigo-300]="account.hasVipBlackSubscription"
+                        [class.dark:border-indigo-700]="account.hasVipBlackSubscription"
+                        [class.bg-slate-100]="!account.hasVipBlackSubscription"
+                        [class.dark:bg-slate-800]="!account.hasVipBlackSubscription"
+                        [class.text-slate-600]="!account.hasVipBlackSubscription"
+                        [class.dark:text-slate-400]="!account.hasVipBlackSubscription"
+                        [class.border-slate-200]="!account.hasVipBlackSubscription"
+                        [class.dark:border-slate-700]="!account.hasVipBlackSubscription"
+                      >
+                        <span class="text-xs">&#9819;</span>
+                      </button>
+
+                      <!-- Copy Credentials -->
+                      <button
+                        (click)="copyFullCredentials(account)"
+                        title="Copy Username & Password"
+                        class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                      </button>
+
+                      <!-- Change Password Button -->
+                      <button
+                        (click)="openPasswordModal(account)"
+                        title="Change Password Anytime"
+                        class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 text-[11px] font-semibold transition flex items-center space-x-1"
+                      >
+                        <svg class="w-3 h-3 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                        </svg>
+                        <span>Password</span>
+                      </button>
+
+                      <!-- Revoke Account -->
+                      @if (account.status !== 'Revoked') {
+                        <button
+                          (click)="revokeAccount(account.id)"
+                          title="Revoke Access"
+                          class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 transition"
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                          </svg>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Interactive Modal: Simulate / Add Customer Spend -->
+  @if (isSpendModalOpen() && selectedAccountForSpend(); as account) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+      <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl animate-in zoom-in-95">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/60 flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Record Store Spend / Purchase</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Patron: <span class="font-semibold text-slate-800 dark:text-slate-200">{{ account.username }}</span></p>
+            </div>
+          </div>
+          <button (click)="closeSpendModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">&times;</button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+            <div>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400">Current Spend</p>
+              <p class="text-base font-mono font-bold text-slate-900 dark:text-slate-100">${{ account.totalSpend | number:'1.0-0' }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] text-slate-500 dark:text-slate-400">Current Tier</p>
+              <app-status-badge [status]="account.assignedTier"></app-status-badge>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Purchase Amount to Add ($ USD)
+            </label>
+            <input
+              type="number"
+              [value]="spendAddAmount()"
+              (input)="spendAddAmount.set($any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            />
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button
+              type="button"
+              (click)="spendAddAmount.set(1000)"
+              class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-mono hover:bg-slate-200"
+            >
+              +$1,000
+            </button>
+            <button
+              type="button"
+              (click)="spendAddAmount.set(3000)"
+              class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-mono hover:bg-slate-200"
+            >
+              +$3,000 (Unlock Silver)
+            </button>
+            <button
+              type="button"
+              (click)="spendAddAmount.set(10000)"
+              class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-mono hover:bg-slate-200"
+            >
+              +$10,000 (Unlock Gold)
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button
+            type="button"
+            (click)="closeSpendModal()"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="executeAddSpend()"
+            class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm shadow-emerald-600/20"
+          >
+            Apply Purchase & Update Tier
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Interactive Modal: VIP Black Subscription Management -->
+  @if (isSubscriptionModalOpen() && selectedAccountForSub(); as account) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+      <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl animate-in zoom-in-95">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 flex items-center justify-center text-lg">
+              &#9819;
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">VIP Black Subscription</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Concierge Membership for <span class="font-semibold">{{ account.username }}</span></p>
+            </div>
+          </div>
+          <button (click)="closeSubscriptionModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">&times;</button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div class="p-3.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/50 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-indigo-950 dark:text-indigo-200">Subscription Status:</span>
+              <span class="font-mono font-bold text-xs" [class.text-emerald-600]="account.hasVipBlackSubscription" [class.text-slate-500]="!account.hasVipBlackSubscription">
+                {{ account.hasVipBlackSubscription ? 'ACTIVE (' + account.subscriptionPlan + ')' : 'INACTIVE' }}
+              </span>
+            </div>
+            <p class="text-[11px] text-indigo-900 dark:text-indigo-300">
+              VIP Black is a recurring subscription-tier granting top-level catalog access regardless of spend.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Select Subscription Plan
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                (click)="subPlanChoice.set('MONTHLY')"
+                class="p-3 rounded-xl border text-left transition cursor-pointer"
+                [class.border-indigo-600]="subPlanChoice() === 'MONTHLY'"
+                [class.bg-indigo-50/50]="subPlanChoice() === 'MONTHLY'"
+                [class.dark:bg-indigo-950/40]="subPlanChoice() === 'MONTHLY'"
+                [class.border-slate-200]="subPlanChoice() !== 'MONTHLY'"
+                [class.dark:border-slate-700]="subPlanChoice() !== 'MONTHLY'"
+              >
+                <span class="block font-bold text-slate-900 dark:text-slate-100 text-xs">Monthly Concierge</span>
+                <span class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">$299 / month</span>
+              </button>
+
+              <button
+                type="button"
+                (click)="subPlanChoice.set('ANNUAL')"
+                class="p-3 rounded-xl border text-left transition cursor-pointer"
+                [class.border-indigo-600]="subPlanChoice() === 'ANNUAL'"
+                [class.bg-indigo-50/50]="subPlanChoice() === 'ANNUAL'"
+                [class.dark:bg-indigo-950/40]="subPlanChoice() === 'ANNUAL'"
+                [class.border-slate-200]="subPlanChoice() !== 'ANNUAL'"
+                [class.dark:border-slate-700]="subPlanChoice() !== 'ANNUAL'"
+              >
+                <span class="block font-bold text-slate-900 dark:text-slate-100 text-xs">Annual Sovereign</span>
+                <span class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">$2,990 / year</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+          @if (account.hasVipBlackSubscription) {
+            <button
+              type="button"
+              (click)="toggleSubscription(account, false)"
+              class="px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-xs font-semibold border border-rose-200 dark:border-rose-800"
+            >
+              Cancel Subscription
+            </button>
+          } @else {
+            <div></div>
+          }
+
+          <div class="flex items-center space-x-2">
+            <button
+              type="button"
+              (click)="closeSubscriptionModal()"
+              class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              (click)="toggleSubscription(account, true)"
+              class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20"
+            >
+              {{ account.hasVipBlackSubscription ? 'Update Subscription' : 'Activate VIP Black' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Interactive Modal: Change Client Password Anytime -->
+  @if (isPasswordModalOpen() && selectedAccountForPassword(); as account) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+      <div class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl animate-in zoom-in-95">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Change Client Password</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Account: <span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">{{ account.username }}</span></p>
+            </div>
+          </div>
+          <button
+            (click)="closePasswordModal()"
+            class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold"
+          >
+            &times;
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="space-y-4 text-xs">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="font-semibold text-slate-700 dark:text-slate-300">
+                New Password
+              </label>
+              <button
+                type="button"
+                (click)="generateModalTempPassword()"
+                class="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline font-medium flex items-center space-x-1"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Generate New Password</span>
+              </button>
+            </div>
+
+            <div class="relative">
+              <input
+                [type]="modalShowPassword() ? 'text' : 'password'"
+                [value]="modalNewPassword()"
+                (input)="modalNewPassword.set($any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-10 py-2.5 font-mono text-slate-900 dark:text-slate-100 font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              />
+              <button
+                type="button"
+                (click)="modalShowPassword.update(v => !v)"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                @if (modalShowPassword()) {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
+                  </svg>
+                } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                }
+              </button>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-[11px]">
+            Password will be updated immediately. The user will be able to log in with this new password anytime.
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button
+            type="button"
+            (click)="closePasswordModal()"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="saveNewPassword()"
+            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-sm shadow-indigo-600/20"
+          >
+            Save Password
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

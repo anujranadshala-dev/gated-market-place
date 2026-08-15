@@ -1,0 +1,213 @@
+<div class="space-y-6 transition-colors duration-200">
+  <!-- Top Banner: Omnipotent Control Plane Notice -->
+  <div class="rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50/50 to-slate-50 dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-slate-900 border border-purple-200/80 dark:border-purple-800/60 p-6 shadow-xs">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-900/60 border border-purple-200 dark:border-purple-700 flex items-center justify-center text-purple-700 dark:text-purple-300 shadow-xs">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Super Admin Command Center</h1>
+            <span class="text-xs uppercase px-2.5 py-0.5 rounded-full font-bold bg-purple-100 dark:bg-purple-900/80 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-700">
+              Omnipotent Scope
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">
+            Global governance over all tenant merchants, cross-store product catalogs, gated patron directories, and end-to-end logistics.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center space-x-3">
+        <a
+          routerLink="/super-admin/oversight"
+          class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-sm shadow-purple-600/20 transition flex items-center space-x-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+          <span>Global Merchant Oversight</span>
+        </a>
+        <a
+          routerLink="/super-admin/logistics"
+          class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition flex items-center space-x-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+          </svg>
+          <span>Logistics Dispatch Board</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global KPI Metric Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Total GMV -->
+    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-xs">
+      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+        <span class="text-xs font-medium uppercase tracking-wider">Gross Platform Volume (GMV)</span>
+        <div class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/60">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-4">
+        <p class="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight font-mono">
+          ${{ storeState.totalMarketplaceGMV() | number:'1.0-0' }}
+        </p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Across {{ storeState.stores().length }} registered storefronts</p>
+      </div>
+    </div>
+
+    <!-- Active Stores -->
+    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-xs">
+      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+        <span class="text-xs font-medium uppercase tracking-wider">Active Merchants</span>
+        <div class="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-800/60">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-4">
+        <p class="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight font-mono">
+          {{ storeState.activeStoresCount() }} / {{ storeState.stores().length }}
+        </p>
+        <p class="text-xs text-emerald-700 dark:text-emerald-400 mt-1 font-semibold">100% Gated RBAC Active</p>
+      </div>
+    </div>
+
+    <!-- Total Catalog Items -->
+    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-xs">
+      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+        <span class="text-xs font-medium uppercase tracking-wider">Cross-Store Catalog</span>
+        <div class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-4">
+        <p class="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight font-mono">
+          {{ productState.products().length }} Items
+        </p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Catalog Value: ${{ productState.totalCatalogValue() | number:'1.0-0' }}</p>
+      </div>
+    </div>
+
+    <!-- Logistics Pipeline Velocity -->
+    <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-xs">
+      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+        <span class="text-xs font-medium uppercase tracking-wider">Logistics Pipeline</span>
+        <div class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-4 flex items-baseline justify-between">
+        <div>
+          <p class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight font-mono">
+            {{ orderState.packedReadyForDispatchCount() }} Packed
+          </p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ orderState.inTransitCount() }} Out for Delivery</p>
+        </div>
+        <a
+          routerLink="/super-admin/logistics"
+          class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold underline underline-offset-2"
+        >
+          Dispatch &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Stores Oversight Table -->
+  <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">All Merchant Tenants Directory</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Live multi-tenant oversight, gating policy enforcement, and direct tenant portal entry.</p>
+      </div>
+
+      <a
+        routerLink="/super-admin/oversight"
+        class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold"
+      >
+        Open Full CRUD Oversight &rarr;
+      </a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead>
+          <tr class="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+            <th class="py-3 px-4 font-semibold">Store Entity</th>
+            <th class="py-3 px-4 font-semibold">Merchant Principal</th>
+            <th class="py-3 px-4 font-semibold">Tier & Gating</th>
+            <th class="py-3 px-4 font-semibold">Status</th>
+            <th class="py-3 px-4 font-semibold">GMV / Orders</th>
+            <th class="py-3 px-4 font-semibold text-right">Impersonate / Oversee</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+          @for (store of storeState.stores(); track store.id) {
+            <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/60 transition">
+              <td class="py-4 px-4">
+                <div class="flex items-center space-x-3">
+                  <img [src]="store.logoUrl" class="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700 shadow-xs" />
+                  <div>
+                    <p class="font-bold text-slate-900 dark:text-slate-100">{{ store.name }}</p>
+                    <p class="text-[11px] font-mono text-slate-500 dark:text-slate-400">/store/{{ store.slug }}</p>
+                  </div>
+                </div>
+              </td>
+
+              <td class="py-4 px-4">
+                <p class="font-semibold text-slate-800 dark:text-slate-200">{{ store.ownerName }}</p>
+                <p class="text-[11px] font-mono text-slate-500 dark:text-slate-400">{{ store.ownerEmail }}</p>
+              </td>
+
+              <td class="py-4 px-4">
+                <div class="space-y-1">
+                  <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 font-mono font-semibold text-[10px] border border-slate-200 dark:border-slate-700">
+                    {{ store.tier }}
+                  </span>
+                  <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                    {{ store.gatingConfig.requireInvitation ? '🔒 Invite Required (' + store.gatingConfig.minimumLoyaltyTier + ')' : '🔓 Open' }}
+                  </p>
+                </div>
+              </td>
+
+              <td class="py-4 px-4">
+                <app-status-badge [status]="store.status"></app-status-badge>
+              </td>
+
+              <td class="py-4 px-4 font-mono">
+                <p class="font-bold text-slate-900 dark:text-slate-100">${{ store.metrics.totalRevenue | number:'1.0-0' }}</p>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400">{{ store.metrics.totalOrders }} orders</p>
+              </td>
+
+              <td class="py-4 px-4 text-right">
+                <button
+                  (click)="impersonateMerchant(store.id, store.name)"
+                  class="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 text-xs font-semibold shadow-xs transition"
+                >
+                  Enter Store Portal &rarr;
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

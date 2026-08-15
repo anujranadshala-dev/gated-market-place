@@ -1,0 +1,363 @@
+<div class="space-y-6 transition-colors duration-200">
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-sm shadow-xl flex items-center space-x-3 animate-in fade-in slide-in-from-bottom-4">
+      <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <span class="font-medium">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Page Header & Action Controls -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Merchant Product Catalog</h1>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        Configure catalog items, adjust physical inventory thresholds, and enforce tier-based gated access.
+      </p>
+    </div>
+
+    <button
+      (click)="openCreateModal()"
+      class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition flex items-center space-x-2 self-start sm:self-auto"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      <span>Add New Product</span>
+    </button>
+  </div>
+
+  <!-- Search & Gating Filter Bar -->
+  <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-xs">
+    <!-- Search Field -->
+    <div class="relative flex-1">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+      <input
+        type="text"
+        [value]="productState.searchFilter()"
+        (input)="productState.setSearchFilter($any($event.target).value)"
+        placeholder="Filter by product name, SKU or category..."
+        class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+      />
+    </div>
+
+    <!-- Category & Gated Tier Selectors -->
+    <div class="flex items-center space-x-3">
+      <!-- Category Filter -->
+      <select
+        [value]="productState.categoryFilter()"
+        (change)="productState.setCategoryFilter($any($event.target).value)"
+        class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900"
+      >
+        <option value="ALL">All Categories</option>
+        @for (cat of productState.availableCategories(); track cat) {
+          <option [value]="cat">{{ cat }}</option>
+        }
+      </select>
+
+      <!-- Gated Tier Filter -->
+      <select
+        [value]="productState.tierFilter()"
+        (change)="productState.setTierFilter($any($event.target).value)"
+        class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900"
+      >
+        <option value="ALL">All Gating Tiers</option>
+        <option value="PUBLIC_MEMBER">PUBLIC_MEMBER</option>
+        <option value="SILVER">SILVER</option>
+        <option value="GOLD">GOLD</option>
+        <option value="VIP_BLACK">VIP_BLACK Exclusive</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Product Catalog Cards Grid -->
+  @if (productState.filteredProducts().length === 0) {
+    <div class="p-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-3 shadow-xs">
+      <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+        </svg>
+      </div>
+      <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">No Products Matching Criteria</p>
+      <p class="text-xs text-slate-500 dark:text-slate-400">Try adjusting your keyword filter or adding a new gated catalog item.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (product of productState.filteredProducts(); track product.id) {
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition shadow-xs group">
+          <div>
+            <!-- Image & Tier Badge Overlay -->
+            <div class="relative h-48 w-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <img
+                [src]="product.images[0]"
+                [alt]="product.name"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+              />
+              <div class="absolute top-3 left-3 flex items-center space-x-2">
+                <app-status-badge [status]="product.gatedTier" [label]="product.gatedTier"></app-status-badge>
+              </div>
+              <div class="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-[11px] font-mono text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-xs font-semibold">
+                {{ product.inventory.sku }}
+              </div>
+            </div>
+
+            <!-- Content Details -->
+            <div class="p-5 space-y-3">
+              <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <span class="font-medium text-slate-600 dark:text-slate-300">{{ product.category }}</span>
+                <span class="font-mono text-slate-400 dark:text-slate-500">ID: {{ product.id }}</span>
+              </div>
+
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 leading-snug line-clamp-1">
+                {{ product.name }}
+              </h3>
+
+              <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                {{ product.description }}
+              </p>
+
+              <!-- Price & Stock Metrics -->
+              <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                  <span class="text-lg font-extrabold text-slate-900 dark:text-slate-100">${{ product.price | number:'1.2-2' }}</span>
+                  @if (product.compareAtPrice) {
+                    <span class="text-xs text-slate-400 dark:text-slate-500 line-through ml-2">${{ product.compareAtPrice | number:'1.2-2' }}</span>
+                  }
+                </div>
+
+                <!-- Stock Counter with Quick Adjust -->
+                <div class="flex items-center space-x-2">
+                  <span
+                    class="text-xs font-mono px-2 py-0.5 rounded font-medium"
+                    [class.bg-rose-50]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold"
+                    [class.dark:bg-rose-950/60]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold"
+                    [class.text-rose-700]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold"
+                    [class.dark:text-rose-300]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold"
+                    [class.border]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold"
+                    [class.border-rose-200]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold"
+                    [class.dark:border-rose-800/60]="product.inventory.stockQuantity <= product.inventory.lowStockThreshold"
+                    [class.bg-slate-100]="product.inventory.stockQuantity > product.inventory.lowStockThreshold"
+                    [class.dark:bg-slate-800]="product.inventory.stockQuantity > product.inventory.lowStockThreshold"
+                    [class.text-slate-700]="product.inventory.stockQuantity > product.inventory.lowStockThreshold"
+                    [class.dark:text-slate-300]="product.inventory.stockQuantity > product.inventory.lowStockThreshold"
+                  >
+                    Stock: {{ product.inventory.stockQuantity }}
+                  </span>
+                  <div class="flex items-center space-x-1">
+                    <button
+                      (click)="quickStockAdjust(product.id, product.inventory.stockQuantity, -1)"
+                      title="Decrease stock"
+                      class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-slate-700 transition"
+                    >
+                      -
+                    </button>
+                    <button
+                      (click)="quickStockAdjust(product.id, product.inventory.stockQuantity, 1)"
+                      title="Increase stock"
+                      class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-slate-700 transition"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons & Delete Flow -->
+          <div class="p-4 bg-slate-50/60 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            @if (deleteConfirmId() === product.id) {
+              <div class="flex items-center justify-between w-full space-x-2 animate-in fade-in">
+                <span class="text-xs text-rose-700 dark:text-rose-400 font-medium">Confirm delete?</span>
+                <div class="flex items-center space-x-2">
+                  <button
+                    (click)="executeDelete(product.id)"
+                    class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs"
+                  >
+                    Yes, Delete
+                  </button>
+                  <button
+                    (click)="cancelDelete()"
+                    class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs transition font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <button
+                (click)="confirmDelete(product.id)"
+                class="text-xs text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 font-medium transition"
+              >
+                Delete
+              </button>
+              <button
+                (click)="openEditModal(product)"
+                class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition shadow-xs"
+              >
+                Edit Specifications
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Add / Edit Product Signal Form Modal -->
+  @if (isModalOpen()) {
+    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div class="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">
+              {{ editingProductId() ? 'Edit Gated Product' : 'Add Gated Product' }}
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Specify inventory parameters and minimum gated VIP tiers.</p>
+          </div>
+          <button (click)="closeModal()" class="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 text-2xl font-bold leading-none">&times;</button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Product Name -->
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Product Title *</label>
+            <input
+              type="text"
+              [value]="formName()"
+              (input)="formName.set($any($event.target).value)"
+              placeholder="e.g. Royal Tourbillon Travel Case"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <!-- SKU -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">SKU (Stock Keeping Unit) *</label>
+            <input
+              type="text"
+              [value]="formSku()"
+              (input)="formSku.set($any($event.target).value)"
+              placeholder="e.g. VNC-LUG-90"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <!-- Category -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Category</label>
+            <select
+              [value]="formCategory()"
+              (change)="formCategory.set($any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            >
+              <option value="Leather Goods">Leather Goods</option>
+              <option value="Accessories">Accessories</option>
+              <option value="Workspace">Workspace</option>
+              <option value="Fragrance">Fragrance</option>
+              <option value="Audio">Audio</option>
+              <option value="Horology">Horology</option>
+            </select>
+          </div>
+
+          <!-- Price -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Price (USD) *</label>
+            <input
+              type="number"
+              [value]="formPrice()"
+              (input)="formPrice.set(+$any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <!-- Compare Price -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Compare-at Price (Optional)</label>
+            <input
+              type="number"
+              [value]="formCompareAtPrice() ?? ''"
+              (input)="formCompareAtPrice.set(+$any($event.target).value || undefined)"
+              placeholder="e.g. 1200"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <!-- Stock Quantity -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Stock Quantity</label>
+            <input
+              type="number"
+              [value]="formStock()"
+              (input)="formStock.set(+$any($event.target).value)"
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <!-- Gated Tier Requirement -->
+          <div>
+            <label class="block text-xs font-semibold text-indigo-700 dark:text-indigo-400 mb-1">Gated Access Tier Requirement</label>
+            <select
+              [value]="formGatedTier()"
+              (change)="formGatedTier.set($any($event.target).value)"
+              class="w-full bg-indigo-50/50 dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800/60 rounded-xl px-3 py-2 text-xs text-indigo-950 dark:text-indigo-200 font-semibold focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            >
+              <option value="PUBLIC_MEMBER">PUBLIC_MEMBER (All verified members)</option>
+              <option value="SILVER">SILVER (Loyal tier)</option>
+              <option value="GOLD">GOLD (Private client)</option>
+              <option value="VIP_BLACK">VIP_BLACK (Ultra Exclusive)</option>
+            </select>
+          </div>
+
+          <!-- Image URL -->
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Image URL</label>
+            <input
+              type="text"
+              [value]="formImageUrl()"
+              (input)="formImageUrl.set($any($event.target).value)"
+              placeholder="https://..."
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            />
+          </div>
+
+          <!-- Description -->
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Product Description</label>
+            <textarea
+              rows="3"
+              [value]="formDescription()"
+              (input)="formDescription.set($any($event.target).value)"
+              placeholder="Provide bespoke craftsmanship details..."
+              class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <button
+            (click)="closeModal()"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="saveProduct()"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition"
+          >
+            {{ editingProductId() ? 'Save Changes' : 'Publish Product' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

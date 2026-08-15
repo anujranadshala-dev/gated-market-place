@@ -1,0 +1,191 @@
+<header class="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 transition-colors duration-200">
+  <!-- Left: Portal Context & Active Scope -->
+  <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0b3c5d] via-[#2988c8] to-[#d97d10] flex items-center justify-center font-extrabold text-white text-xs shadow-sm shadow-[#2988c8]/20">
+        GP
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">GatedPulse Portal</span>
+          <span class="text-xs text-slate-400 dark:text-slate-500">/</span>
+          @if (authStore.isSuperAdmin()) {
+            <span class="text-xs font-semibold uppercase tracking-wider text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-800/60">
+              Super Admin Oversight
+            </span>
+          } @else {
+            <span class="text-xs font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800/60">
+              Store Owner Portal
+            </span>
+          }
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-xs">
+          @if (authStore.isStoreOwner() && storeState.activeStore()) {
+            Assigned Merchant: <strong class="text-slate-800 dark:text-slate-200">{{ storeState.activeStore()?.name }}</strong>
+          } @else {
+            Marketplace Control Plane (Omnipotent Access)
+          }
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Theme Switcher, Quick Persona Switcher & Live Profile -->
+  <div class="flex items-center space-x-3 sm:space-x-4">
+    <!-- Active Counters -->
+    @if (authStore.isStoreOwner()) {
+      <a
+        routerLink="/store-owner/orders"
+        class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40 transition"
+      >
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+        <span>Packing Queue: <strong class="text-amber-900 dark:text-amber-200">{{ orderState.pendingPackingCount() }}</strong></span>
+      </a>
+    } @else if (authStore.isSuperAdmin()) {
+      <a
+        routerLink="/super-admin/logistics"
+        class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-800 dark:text-sky-300 text-xs font-medium hover:bg-sky-100 dark:hover:bg-sky-900/40 transition"
+      >
+        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+        <span>Logistics In-Transit: <strong class="text-sky-900 dark:text-sky-200">{{ orderState.inTransitCount() }}</strong></span>
+      </a>
+    }
+
+    <!-- Dark / Light Mode Toggle Button -->
+    <button
+      type="button"
+      id="theme-toggle-btn"
+      (click)="toggleTheme()"
+      [title]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+      aria-label="Toggle dark and light mode"
+      class="relative p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-all flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+    >
+      @if (themeService.isDark()) {
+        <!-- Sun Icon for switching to light mode -->
+        <svg class="w-4 h-4 text-amber-400 animate-in spin-in-180 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <span class="text-xs font-semibold hidden md:inline text-slate-200">Light</span>
+      } @else {
+        <!-- Moon Icon for switching to dark mode -->
+        <svg class="w-4 h-4 text-slate-600 dark:text-slate-400 animate-in spin-in-180 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+        <span class="text-xs font-semibold hidden md:inline text-slate-700">Dark</span>
+      }
+    </button>
+
+    <!-- Role Persona Switcher Dropdown (Essential for RBAC Portfolio Evaluation) -->
+    <div class="relative">
+      <button
+        type="button"
+        (click)="togglePersonaMenu()"
+        class="flex items-center space-x-3 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-left transition focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+      >
+        <img
+          [src]="authStore.user()?.avatarUrl"
+          alt="Avatar"
+          class="w-7 h-7 rounded-full object-cover ring-1 ring-slate-300 dark:ring-slate-600"
+        />
+        <div class="hidden md:block">
+          <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-tight flex items-center space-x-1.5">
+            <span>{{ authStore.user()?.name }}</span>
+            <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+          <div class="text-[10px] font-mono text-indigo-600 dark:text-indigo-400 font-semibold">
+            {{ authStore.user()?.role }}
+          </div>
+        </div>
+      </button>
+
+      <!-- Dropdown Persona Menu -->
+      @if (isPersonaMenuOpen()) {
+        <div
+          class="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-100"
+        >
+          <div class="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">RBAC Persona Switcher</p>
+            <p class="text-xs text-slate-400 dark:text-slate-500">Test and preview roles in real time:</p>
+          </div>
+
+          <div class="space-y-1">
+            <!-- Persona 1: Eleanor Vance (Store Owner) -->
+            <button
+              (click)="selectPersona('STORE_OWNER', 'str_vance_01', 'Vance Luxury Atelier')"
+              [class.bg-indigo-50]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_vance_01'"
+              [class.dark:bg-indigo-950/60]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_vance_01'"
+              [class.text-indigo-900]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_vance_01'"
+              [class.dark:text-indigo-300]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_vance_01'"
+              class="w-full flex items-center space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition group"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+                class="w-8 h-8 rounded-full object-cover ring-1 ring-amber-400"
+              />
+              <div class="truncate">
+                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Eleanor Vance</p>
+                <p class="text-[11px] text-amber-700 dark:text-amber-400 font-mono">Store Owner (Vance Atelier)</p>
+              </div>
+            </button>
+
+            <!-- Persona 2: Marcus Thorne (Store Owner 2) -->
+            <button
+              (click)="selectPersona('STORE_OWNER', 'str_aethel_02', 'Aethelgard Rare Botanicals')"
+              [class.bg-indigo-50]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_aethel_02'"
+              [class.dark:bg-indigo-950/60]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_aethel_02'"
+              [class.text-indigo-900]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_aethel_02'"
+              [class.dark:text-indigo-300]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_aethel_02'"
+              class="w-full flex items-center space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition group"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"
+                class="w-8 h-8 rounded-full object-cover ring-1 ring-amber-400"
+              />
+              <div class="truncate">
+                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Marcus Thorne</p>
+                <p class="text-[11px] text-amber-700 dark:text-amber-400 font-mono">Store Owner (Aethelgard)</p>
+              </div>
+            </button>
+
+            <!-- Persona 3: Alexander Sterling (Super Admin) -->
+            <button
+              (click)="selectPersona('SUPER_ADMIN')"
+              [class.bg-purple-50]="authStore.isSuperAdmin()"
+              [class.dark:bg-purple-950/60]="authStore.isSuperAdmin()"
+              [class.text-purple-900]="authStore.isSuperAdmin()"
+              [class.dark:text-purple-300]="authStore.isSuperAdmin()"
+              class="w-full flex items-center space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition group"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+                class="w-8 h-8 rounded-full object-cover ring-1 ring-purple-400"
+              />
+              <div class="truncate">
+                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400">Alexander Sterling</p>
+                <p class="text-[11px] text-purple-700 dark:text-purple-400 font-mono">Super Admin (Omnipotent)</p>
+              </div>
+            </button>
+          </div>
+
+          <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between px-2">
+            <button
+              (click)="logout()"
+              class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium py-1 px-2 rounded hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
+            >
+              Sign Out
+            </button>
+            <button
+              (click)="closePersonaMenu()"
+              class="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-1 px-2"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</header>
+
