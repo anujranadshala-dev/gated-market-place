@@ -3,9 +3,9 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IAdminUser extends Document {
     email: string;
     name: string;
-    password?: string;
+    password: string;
     role: 'SUPER_ADMIN' | 'STORE_OWNER';
-    assignedStoreId?: string;
+    assignedStoreId: string;
     createdAt: Date;
     updatedAt: Date;
     lastLoginAt?: Date;

@@ -1,14 +1,32 @@
 import express, { Request, Response } from "express";
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import adminAuthRoutes from './routes/adminAuth.js';
+import connectDB from './db.js';
+
+dotenv.config();
+
+// Connect to MongoDB
+connectDB();
 
 const app = express();
+
+// Body parser
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
-app.listen(5000, () => {
-  console.log("Server is running on port 5000");
+// Mount authentication routes
+app.use('/api', adminAuthRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 export default app;
