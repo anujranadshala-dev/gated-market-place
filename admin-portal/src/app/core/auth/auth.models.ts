@@ -33,7 +33,28 @@ export interface LoginCredentials {
   storeId?: string;
 }
 
+export interface SignupPayload {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  storeId?: string;
+  storeName?: string;
+}
+
 export interface GatedPermission {
   action: 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'DISPATCH' | 'OVERSEE';
   resource: 'STORES' | 'PRODUCTS' | 'ORDERS' | 'INVITATIONS' | 'LOGISTICS' | 'USERS';
+}
+
+export interface BackendLoginResponse {
+  _id: string,
+  name: string,
+  email: string,
+  role: UserRole,
+  assignedStoreId: string,
+  assignedStoreName: string,
+  createdAt: string,
+  lastLoginAt: Date,
+  isVerified: boolean,
 }

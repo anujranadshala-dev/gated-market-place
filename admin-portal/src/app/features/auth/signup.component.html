@@ -1,0 +1,142 @@
+<div class="flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(41,136,200,0.12),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(41,136,200,0.15),rgba(0,0,0,0))] transition-colors duration-200">
+  <div class="w-full max-w-md space-y-6">
+    <!-- Brand Header -->
+    <div class="text-center space-y-2">
+      <div class="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0b3c5d] via-[#2988c8] to-[#d97d10] items-center justify-center text-xl font-extrabold text-white shadow-lg shadow-[#2988c8]/25">
+        GP
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Create Account</h1>
+      <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+        Join the GatedPulse B2B2C Marketplace
+      </p>
+    </div>
+
+    <!-- Signup Card -->
+    <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 space-y-4 shadow-xl shadow-slate-200/50 dark:shadow-none">
+      <div class="space-y-1">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Sign Up</h2>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400">Enter your details to create a new account</p>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-700 dark:text-rose-300">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Full Name</label>
+          <input
+            type="text"
+            [value]="name()"
+            (input)="name.set($any($event.target).value)"
+            placeholder="Enter your full name"
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+          />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Email</label>
+          <input
+            type="email"
+            [value]="email()"
+            (input)="email.set($any($event.target).value)"
+            placeholder="you@company.com"
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+          />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Password</label>
+          <input
+            type="password"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+            placeholder="Min. 6 characters"
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+          />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Confirm Password</label>
+          <input
+            type="password"
+            [value]="confirmPassword()"
+            (input)="confirmPassword.set($any($event.target).value)"
+            placeholder="Re-enter your password"
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+          />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Role</label>
+          <select
+            [value]="role()"
+            (change)="role.set($any($event.target).value)"
+            class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+          >
+            <option value="STORE_OWNER">Store Owner</option>
+            <option value="SUPER_ADMIN">Super Admin</option>
+          </select>
+        </div>
+
+        @if (role() === 'STORE_OWNER') {
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Store ID</label>
+              <input
+                type="text"
+                [value]="storeId()"
+                (input)="storeId.set($any($event.target).value)"
+                placeholder="str_xxx"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Store Name</label>
+              <input
+                type="text"
+                [value]="storeName()"
+                (input)="storeName.set($any($event.target).value)"
+                placeholder="My Store"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+              />
+            </div>
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="isLoading()"
+          class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold transition shadow-md shadow-indigo-600/20 disabled:cursor-not-allowed"
+        >
+          @if (isLoading()) {
+            <span class="inline-flex items-center space-x-2">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Creating Account...</span>
+            </span>
+          } @else {
+            <span>Create Account</span>
+          }
+        </button>
+      </form>
+
+      <div class="text-center pt-2 border-t border-slate-100 dark:border-slate-800">
+        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+          Already have an account?
+          <button
+            type="button"
+            (click)="navigateToLogin()"
+            class="text-indigo-600 dark:text-indigo-400 font-semibold hover:text-indigo-700 dark:hover:text-indigo-300 transition"
+          >
+            Sign In
+          </button>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

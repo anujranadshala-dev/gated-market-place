@@ -8,6 +8,11 @@ export const APP_ROUTES: Routes = [
     title: 'Authenticate - GatedPulse Marketplace',
   },
   {
+    path: 'signup',
+    loadComponent: () => import('./features/auth/signup.component').then((m) => m.SignupComponent),
+    title: 'Create Account - GatedPulse Marketplace',
+  },
+  {
     path: 'store-owner',
     canActivate: [authGuard],
     loadChildren: () =>

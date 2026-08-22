@@ -35,4 +35,8 @@ export class LoginComponent {
       role: this.selectedRole(),
     });
   }
+
+    public navigateToSignup(): void {
+    this.router.navigate(['/signup']);
+  }
 }

@@ -43,7 +43,7 @@ export async function createAdminUser(req: Request, res: Response) {
 
 export async function loginAdminUser(req: Request, res: Response) {
     const { email, password } = req.body as IAdminUser;
-    
+    console.log(email);
     // Basic validation for required fields.
     if (!email || !password) {
         return res.status(400).json({ message: 'Missing required fields: email, password.' });
@@ -64,7 +64,7 @@ export async function loginAdminUser(req: Request, res: Response) {
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
-
+ 
         // Update the last login timestamp.
         user.lastLoginAt = new Date();
         await user.save({ timestamps: false }); // Use { timestamps: false } to prevent `updatedAt` from being modified.
@@ -86,7 +86,6 @@ export async function loginAdminUser(req: Request, res: Response) {
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: '1d', // Token expires in 24 hours
         });
-
         // Set the token in an HTTP-Only cookie for security.
         // This prevents client-side JavaScript from accessing the token, mitigating XSS attacks.
         res.cookie('token', token, {

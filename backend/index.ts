@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import adminAuthRoutes from './routes/adminAuth.js';
 import connectDB from './db.js';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -11,6 +12,13 @@ connectDB();
 
 const app = express();
 
+const corsOptions = {
+  origin: 'http://localhost:3000', // Replace with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true, // Allow cookies or auth headers if needed
+};
+
+app.use(cors(corsOptions));
 // Body parser
 app.use(express.json());
 

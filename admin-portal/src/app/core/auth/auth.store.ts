@@ -1,6 +1,7 @@
 import { Injectable, computed, signal, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthSession, LoginCredentials, User, UserRole } from './auth.models';
+import { AuthSession, LoginCredentials, SignupPayload, User, UserRole, BackendLoginResponse } from './auth.models';
+import { HttpClient } from '@angular/common/http';
 
 /**
  * Modern Angular 21 Signal-Based Authentication Store
@@ -11,6 +12,8 @@ import { AuthSession, LoginCredentials, User, UserRole } from './auth.models';
 })
 export class AuthStore {
   private readonly router = inject(Router);
+  private readonly httpClient = inject(HttpClient)
+  private readonly baseUrl = 'http://localhost:5000'
 
   // Private Writable Signals
   private readonly _currentUser = signal<User | null>({
@@ -104,15 +107,55 @@ export class AuthStore {
     this._authError.set(null);
 
     return new Promise((resolve) => {
-      setTimeout(() => {
-        if (credentials.email.includes('admin') || credentials.role === 'SUPER_ADMIN') {
-          this.switchPersona('SUPER_ADMIN');
-        } else {
-          this.switchPersona('STORE_OWNER', credentials.storeId);
-        }
-        this._isLoading.set(false);
-        resolve(true);
-      }, 300);
+      this.httpClient.post<BackendLoginResponse>(`${this.baseUrl}/api/login`, credentials).subscribe({
+        next: (res) => {
+          this._currentUser.set({
+            id: res._id,
+            name: res.name,
+            email: res.email,
+            role: res.role,
+            assignedStoreId: res.assignedStoreId,
+            assignedStoreName: res.assignedStoreName,
+            createdAt: res.createdAt,
+            lastLoginAt: new Date().toISOString(),
+            isVerified: res.isVerified,
+          });
+          // this._token.set(res.token);
+          this.router.navigate([res.role === 'SUPER_ADMIN' ? '/super-admin/dashboard' : '/store-owner/dashboard']);
+        },
+        error: (err) => {
+          this._authError.set(err.message ?? 'Login failed');
+        },
+      });
+      // setTimeout(() => {
+      //   if (credentials.email.includes('admin') || credentials.role === 'SUPER_ADMIN') {
+      //     this.switchPersona('SUPER_ADMIN');
+      //   } else {
+      //     this.switchPersona('STORE_OWNER', credentials.storeId);
+      //   }
+      //   this._isLoading.set(false);
+      //   resolve(true);
+      // }, 300);
+    });
+  }
+
+  /**
+   * Register a new user account
+   */
+  public signup(payload: SignupPayload): Promise<boolean> {
+    this._isLoading.set(true);
+    this._authError.set(null);
+
+    return new Promise((resolve) => {
+      // setTimeout(() => {
+      //   if (payload.role === 'SUPER_ADMIN') {
+      //     this.switchPersona('SUPER_ADMIN');
+      //   } else {
+      //     this.switchPersona('STORE_OWNER', payload.storeId, payload.storeName);
+      //   }
+      //   this._isLoading.set(false);
+      //   resolve(true);
+      // }, 300);
     });
   }
 
