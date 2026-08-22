@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router } from '@angular/router';
 import { HeaderComponent } from './shared/components/header/header.component';
@@ -21,6 +21,16 @@ export class AppComponent {
   readonly authStore = inject(AuthStore);
   readonly themeService = inject(ThemeService);
   readonly router = inject(Router);
+  readonly isInitializing = signal(true);
+
+  constructor() {
+    this.authStore.tryAutoLogin().then((success) => {
+      if (success && this.isLoginPage()) {
+        this.router.navigate(['/store-owner/dashboard']);
+      }
+      this.isInitializing.set(false);
+    });
+  }
 
   public isLoginPage(): boolean {
     return this.router.url.includes('/login');

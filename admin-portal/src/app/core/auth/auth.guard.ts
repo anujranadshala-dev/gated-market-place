@@ -6,9 +6,11 @@ import { AuthStore } from './auth.store';
  * Functional Authentication Route Guard
  * Angular 21 zoneless-compatible guard inspecting reactive signals.
  */
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = async () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
+
+  await authStore.tryAutoLogin();
 
   if (authStore.isAuthenticated()) {
     return true;

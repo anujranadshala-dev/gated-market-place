@@ -81,31 +81,6 @@
           </select>
         </div>
 
-        @if (role() === 'STORE_OWNER') {
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Store ID</label>
-              <input
-                type="text"
-                [value]="storeId()"
-                (input)="storeId.set($any($event.target).value)"
-                placeholder="str_xxx"
-                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
-              />
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Store Name</label>
-              <input
-                type="text"
-                [value]="storeName()"
-                (input)="storeName.set($any($event.target).value)"
-                placeholder="My Store"
-                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
-              />
-            </div>
-          </div>
-        }
-
         <button
           type="submit"
           [disabled]="isLoading()"

@@ -1,45 +1,27 @@
 import { Injectable, computed, signal, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthSession, LoginCredentials, SignupPayload, User, UserRole, BackendLoginResponse } from './auth.models';
 import { HttpClient } from '@angular/common/http';
+import { LoginCredentials, SignupPayload, User, UserRole, BackendLoginResponse, BackendMeResponse, BackendRegisterResponse } from './auth.models';
 
-/**
- * Modern Angular 21 Signal-Based Authentication Store
- * Handles session tokens, reactive user identity, RBAC checks, and persona swapping for portfolio demo.
- */
+const API_BASE_URL = 'http://localhost:5000/api';
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthStore {
   private readonly router = inject(Router);
-  private readonly httpClient = inject(HttpClient)
-  private readonly baseUrl = 'http://localhost:5000'
+  private readonly http = inject(HttpClient);
 
-  // Private Writable Signals
-  private readonly _currentUser = signal<User | null>({
-    id: 'usr_owner_01',
-    name: 'Eleanor Vance',
-    email: 'eleanor@vance-atelier.com',
-    role: 'STORE_OWNER',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    assignedStoreId: 'str_vance_01',
-    assignedStoreName: 'Vance Luxury Atelier',
-    createdAt: '2025-01-15T08:00:00Z',
-    lastLoginAt: new Date().toISOString(),
-    isVerified: true,
-  });
-
-  private readonly _token = signal<string | null>('mock_jwt_session_token_b2b2c_gated_01');
+  private readonly _currentUser = signal<User | null>(null);
   private readonly _isLoading = signal<boolean>(false);
   private readonly _authError = signal<string | null>(null);
+  private _autoLoginPromise: Promise<boolean> | null = null;
 
-  // Public Read-Only Computed Signals
   readonly user = this._currentUser.asReadonly();
-  readonly token = this._token.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly authError = this._authError.asReadonly();
 
-  readonly isAuthenticated = computed<boolean>(() => !!this._currentUser() && !!this._token());
+  readonly isAuthenticated = computed<boolean>(() => !!this._currentUser());
   readonly userRole = computed<UserRole | null>(() => this._currentUser()?.role ?? null);
   readonly isSuperAdmin = computed<boolean>(() => this._currentUser()?.role === 'SUPER_ADMIN');
   readonly isStoreOwner = computed<boolean>(() => this._currentUser()?.role === 'STORE_OWNER');
@@ -47,124 +29,137 @@ export class AuthStore {
   readonly assignedStoreName = computed<string | null>(() => this._currentUser()?.assignedStoreName ?? null);
 
   constructor() {
-    // Reactive audit effect
     effect(() => {
       const user = this.user();
       if (user) {
-        // Log telemetry or sync permissions
         console.debug(`[AuthStore Signal] Active session verified: ${user.name} (${user.role})`);
       }
     });
   }
 
-  /**
-   * Seamless Persona Switcher for Evaluation / Portfolio Demo
-   */
-  public switchPersona(role: UserRole, targetStoreId?: string, targetStoreName?: string): void {
-    this._isLoading.set(true);
-    this._authError.set(null);
-
-    if (role === 'SUPER_ADMIN') {
-      this._currentUser.set({
-        id: 'usr_super_root',
-        name: 'Alexander Sterling',
-        email: 'alexander@gatedpulse-platform.io',
-        role: 'SUPER_ADMIN',
-        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        createdAt: '2024-11-01T00:00:00Z',
-        lastLoginAt: new Date().toISOString(),
-        isVerified: true,
-      });
-      this._token.set('mock_jwt_super_admin_omnipotent_token');
-      this._isLoading.set(false);
-      this.router.navigate(['/super-admin/dashboard']);
-    } else if (role === 'STORE_OWNER') {
-      const storeId = targetStoreId || 'str_vance_01';
-      const storeName = targetStoreName || 'Vance Luxury Atelier';
-      this._currentUser.set({
-        id: 'usr_owner_01',
-        name: 'Eleanor Vance',
-        email: 'eleanor@vance-atelier.com',
-        role: 'STORE_OWNER',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        assignedStoreId: storeId,
-        assignedStoreName: storeName,
-        createdAt: '2025-01-15T08:00:00Z',
-        lastLoginAt: new Date().toISOString(),
-        isVerified: true,
-      });
-      this._token.set('mock_jwt_store_owner_token');
-      this._isLoading.set(false);
-      this.router.navigate(['/store-owner/dashboard']);
-    }
-  }
-
-  /**
-   * Authenticate via credentials
-   */
   public login(credentials: LoginCredentials): Promise<boolean> {
     this._isLoading.set(true);
     this._authError.set(null);
 
     return new Promise((resolve) => {
-      this.httpClient.post<BackendLoginResponse>(`${this.baseUrl}/api/login`, credentials).subscribe({
-        next: (res) => {
-          this._currentUser.set({
-            id: res._id,
-            name: res.name,
-            email: res.email,
-            role: res.role,
-            assignedStoreId: res.assignedStoreId,
-            assignedStoreName: res.assignedStoreName,
-            createdAt: res.createdAt,
-            lastLoginAt: new Date().toISOString(),
-            isVerified: res.isVerified,
+      this.http.post<BackendLoginResponse>(`${API_BASE_URL}/login`, {
+        email: credentials.email,
+        password: credentials.password,
+      }, { withCredentials: true }).subscribe({
+        next: () => {
+          this.http.get<BackendMeResponse>(`${API_BASE_URL}/me`, { withCredentials: true }).subscribe({
+            next: (meRes) => {
+              const user = meRes.user;
+              this._currentUser.set({
+                id: user._id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                assignedStoreId: user.assignedStoreId,
+                createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
+                lastLoginAt: user.lastLoginAt instanceof Date ? user.lastLoginAt.toISOString() : new Date().toISOString(),
+                isVerified: true,
+                avatarUrl: user.avatarUrl
+              });
+              this._isLoading.set(false);
+              this.navigateByRole(user.role);
+              resolve(true);
+            },
+            error: (err) => {
+              this._authError.set(err.error?.message || 'Failed to fetch user profile');
+              this._isLoading.set(false);
+              resolve(false);
+            },
           });
-          // this._token.set(res.token);
-          this.router.navigate([res.role === 'SUPER_ADMIN' ? '/super-admin/dashboard' : '/store-owner/dashboard']);
         },
         error: (err) => {
-          this._authError.set(err.message ?? 'Login failed');
+          this._authError.set(err.error?.message || 'Login failed');
+          this._isLoading.set(false);
+          resolve(false);
         },
       });
-      // setTimeout(() => {
-      //   if (credentials.email.includes('admin') || credentials.role === 'SUPER_ADMIN') {
-      //     this.switchPersona('SUPER_ADMIN');
-      //   } else {
-      //     this.switchPersona('STORE_OWNER', credentials.storeId);
-      //   }
-      //   this._isLoading.set(false);
-      //   resolve(true);
-      // }, 300);
     });
   }
 
-  /**
-   * Register a new user account
-   */
   public signup(payload: SignupPayload): Promise<boolean> {
     this._isLoading.set(true);
     this._authError.set(null);
 
     return new Promise((resolve) => {
-      // setTimeout(() => {
-      //   if (payload.role === 'SUPER_ADMIN') {
-      //     this.switchPersona('SUPER_ADMIN');
-      //   } else {
-      //     this.switchPersona('STORE_OWNER', payload.storeId, payload.storeName);
-      //   }
-      //   this._isLoading.set(false);
-      //   resolve(true);
-      // }, 300);
+      this.http.post<BackendRegisterResponse>(`${API_BASE_URL}/register`, {
+        email: payload.email,
+        name: payload.name,
+        password: payload.password,
+        role: payload.role,
+      }, { withCredentials: true }).subscribe({
+        next: () => {
+          this.login({
+            email: payload.email,
+            password: payload.password,
+            role: payload.role,
+          }).then((success) => {
+            resolve(success);
+          });
+        },
+        error: (err) => {
+          this._authError.set(err.error?.message || 'Sign up failed');
+          this._isLoading.set(false);
+          resolve(false);
+        },
+      });
     });
   }
 
-  /**
-   * Terminate Active Session
-   */
+  private navigateByRole(role: UserRole): void {
+    if (role === 'SUPER_ADMIN') {
+      this.router.navigate(['/super-admin/dashboard']);
+    } else {
+      this.router.navigate(['/store-owner/dashboard']);
+    }
+  }
+
+  public tryAutoLogin(): Promise<boolean> {
+    if (this._autoLoginPromise) {
+      return this._autoLoginPromise;
+    }
+
+    this._autoLoginPromise = new Promise((resolve) => {
+      this.http.get<BackendMeResponse>(`${API_BASE_URL}/me`, { withCredentials: true }).subscribe({
+        next: (meRes) => {
+          const user = meRes.user;
+          this._currentUser.set({
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            assignedStoreId: user.assignedStoreId,
+            createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
+            lastLoginAt: user.lastLoginAt instanceof Date ? user.lastLoginAt.toISOString() : new Date().toISOString(),
+            isVerified: true,
+            avatarUrl: user.avatarUrl
+          });
+          resolve(true);
+        },
+        error: () => {
+          this._currentUser.set(null);
+          resolve(false);
+        },
+      });
+    });
+
+    return this._autoLoginPromise;
+  }
+
   public logout(): void {
-    this._currentUser.set(null);
-    this._token.set(null);
-    this.router.navigate(['/login']);
+    this.http.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true }).subscribe({
+      next: () => {
+        this._currentUser.set(null);
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        this._currentUser.set(null);
+        this.router.navigate(['/login']);
+      },
+    });
   }
 }

@@ -105,53 +105,9 @@
         <div
           class="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-100"
         >
-          <div class="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">RBAC Persona Switcher</p>
-            <p class="text-xs text-slate-400 dark:text-slate-500">Test and preview roles in real time:</p>
-          </div>
 
           <div class="space-y-1">
-            <!-- Persona 1: Eleanor Vance (Store Owner) -->
-            <button
-              (click)="selectPersona('STORE_OWNER', 'str_vance_01', 'Vance Luxury Atelier')"
-              [class.bg-indigo-50]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_vance_01'"
-              [class.dark:bg-indigo-950/60]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_vance_01'"
-              [class.text-indigo-900]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_vance_01'"
-              [class.dark:text-indigo-300]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_vance_01'"
-              class="w-full flex items-center space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition group"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
-                class="w-8 h-8 rounded-full object-cover ring-1 ring-amber-400"
-              />
-              <div class="truncate">
-                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Eleanor Vance</p>
-                <p class="text-[11px] text-amber-700 dark:text-amber-400 font-mono">Store Owner (Vance Atelier)</p>
-              </div>
-            </button>
-
-            <!-- Persona 2: Marcus Thorne (Store Owner 2) -->
-            <button
-              (click)="selectPersona('STORE_OWNER', 'str_aethel_02', 'Aethelgard Rare Botanicals')"
-              [class.bg-indigo-50]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_aethel_02'"
-              [class.dark:bg-indigo-950/60]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_aethel_02'"
-              [class.text-indigo-900]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_aethel_02'"
-              [class.dark:text-indigo-300]="authStore.isStoreOwner() && authStore.assignedStoreId() === 'str_aethel_02'"
-              class="w-full flex items-center space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition group"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"
-                class="w-8 h-8 rounded-full object-cover ring-1 ring-amber-400"
-              />
-              <div class="truncate">
-                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Marcus Thorne</p>
-                <p class="text-[11px] text-amber-700 dark:text-amber-400 font-mono">Store Owner (Aethelgard)</p>
-              </div>
-            </button>
-
-            <!-- Persona 3: Alexander Sterling (Super Admin) -->
-            <button
-              (click)="selectPersona('SUPER_ADMIN')"
+            <span
               [class.bg-purple-50]="authStore.isSuperAdmin()"
               [class.dark:bg-purple-950/60]="authStore.isSuperAdmin()"
               [class.text-purple-900]="authStore.isSuperAdmin()"
@@ -163,10 +119,10 @@
                 class="w-8 h-8 rounded-full object-cover ring-1 ring-purple-400"
               />
               <div class="truncate">
-                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400">Alexander Sterling</p>
+                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400">{{authStore.user()?.name}}</p>
                 <p class="text-[11px] text-purple-700 dark:text-purple-400 font-mono">Super Admin (Omnipotent)</p>
               </div>
-            </button>
+            </span>
           </div>
 
           <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between px-2">

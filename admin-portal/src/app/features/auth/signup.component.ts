@@ -22,8 +22,6 @@ export class SignupComponent {
   readonly password = signal<string>('');
   readonly confirmPassword = signal<string>('');
   readonly role = signal<UserRole>('STORE_OWNER');
-  readonly storeId = signal<string>('');
-  readonly storeName = signal<string>('');
   readonly errorMessage = signal<string | null>(null);
   readonly isLoading = signal<boolean>(false);
 
@@ -52,17 +50,9 @@ export class SignupComponent {
       email: this.email(),
       password: this.password(),
       role: this.role(),
-      storeId: this.storeId() || undefined,
-      storeName: this.storeName() || undefined,
     }).then((success) => {
       this.isLoading.set(false);
-      if (success) {
-        if (this.role() === 'SUPER_ADMIN') {
-          this.router.navigate(['/super-admin/dashboard']);
-        } else {
-          this.router.navigate(['/store-owner/dashboard']);
-        }
-      } else {
+      if (!success) {
         this.errorMessage.set('Sign up failed. Please try again.');
       }
     });

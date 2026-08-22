@@ -90,16 +90,14 @@ export async function loginAdminUser(req: Request, res: Response) {
         // This prevents client-side JavaScript from accessing the token, mitigating XSS attacks.
         res.cookie('token', token, {
             httpOnly: true,
-            // secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
-            secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
-            sameSite: 'strict', // Helps mitigate CSRF attacks
-            maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds, matches JWT expiration
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000,
         });
 
         // Return user information to the client. The token is now in a cookie.
         res.status(200).json({
             message: 'Login successful',
-            user: { id: user._id, email: user.email, name: user.name, role: user.role, assignedStoreId: user.assignedStoreId },
+            user: { id: user._id, email: user.email, name: user.name, role: user.role, assignedStoreId: user.assignedStoreId, avatarUrl: user.avatarUrl },
         });
     } catch (error) {
         console.error('Error during admin login:', error);
@@ -111,10 +109,8 @@ export async function logoutAdminUser(req: Request, res: Response) {
     // To log out, we clear the authentication cookie.
     res.cookie('token', '', {
         httpOnly: true,
-        expires: new Date(0), // Set expiry date to the past
-        // secure: process.env.NODE_ENV === 'production',
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        expires: new Date(0),
+        sameSite: 'lax',
     });
 
     res.status(200).json({ message: 'Logout successful.' });

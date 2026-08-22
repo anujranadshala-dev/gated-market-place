@@ -10,6 +10,7 @@ export interface IAdminUser extends Document {
     updatedAt: Date;
     lastLoginAt?: Date;
     passwordLastChangedAt?: Date;
+    avatarUrl: string
 }
 
 const adminUserSchema = new Schema<IAdminUser>({
@@ -24,6 +25,7 @@ const adminUserSchema = new Schema<IAdminUser>({
     assignedStoreId: String,
     lastLoginAt: Date,
     passwordLastChangedAt: Date,
+    avatarUrl: String
 }, {
     timestamps: true, // Manages createdAt and updatedAt
 });

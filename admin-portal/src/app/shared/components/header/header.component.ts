@@ -38,11 +38,6 @@ export class HeaderComponent {
     this.themeService.toggleTheme();
   }
 
-  public selectPersona(role: 'SUPER_ADMIN' | 'STORE_OWNER', storeId?: string, storeName?: string): void {
-    this.authStore.switchPersona(role, storeId, storeName);
-    this.closePersonaMenu();
-  }
-
   public logout(): void {
     this.authStore.logout();
     this.closePersonaMenu();

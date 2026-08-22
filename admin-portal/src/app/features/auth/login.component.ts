@@ -20,13 +20,9 @@ export class LoginComponent {
   readonly authStore = inject(AuthStore);
   readonly router = inject(Router);
 
-  readonly email = signal<string>('eleanor@vance-atelier.com');
-  readonly password = signal<string>('••••••••••••');
-  readonly selectedRole = signal<UserRole>('STORE_OWNER');
-
-  public quickSignIn(role: UserRole, storeId?: string, storeName?: string): void {
-    this.authStore.switchPersona(role, storeId, storeName);
-  }
+  readonly email = signal<string>('anujranadshala@gmail.com');
+  readonly password = signal<string>('Anuj123');
+  readonly selectedRole = signal<UserRole>('SUPER_ADMIN');
 
   public onSubmit(): void {
     this.authStore.login({

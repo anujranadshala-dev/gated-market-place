@@ -10,19 +10,16 @@ export interface AuthRequest extends Request {
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
     const token = req.cookies.token;
 
-    // Make sure token exists
     if (!token) {
         return res.status(401).json({ message: 'Not authorized to access this route' });
     }
 
     try {
-        // Verify token
         if (!process.env.JWT_SECRET) {
             throw new Error('Server configuration error: JWT secret is missing.');
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
 
-        // Get user from the token and attach to request
         req.user = await AdminUser.findById(decoded.userId).select('-password');
         if (!req.user) {
              return res.status(401).json({ message: 'Not authorized, user not found' });
