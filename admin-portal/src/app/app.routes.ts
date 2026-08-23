@@ -1,14 +1,16 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/auth/auth.guard';
+import { authGuard, guestGuard } from './core/auth/auth.guard';
 
 export const APP_ROUTES: Routes = [
   {
     path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () => import('./features/auth/login.component').then((m) => m.LoginComponent),
     title: 'Authenticate - GatedPulse Marketplace',
   },
   {
     path: 'signup',
+    canActivate: [guestGuard],
     loadComponent: () => import('./features/auth/signup.component').then((m) => m.SignupComponent),
     title: 'Create Account - GatedPulse Marketplace',
   },

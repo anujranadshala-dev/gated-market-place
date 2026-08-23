@@ -155,7 +155,7 @@
             <th class="py-3 px-4 font-semibold">Tier & Gating</th>
             <th class="py-3 px-4 font-semibold">Status</th>
             <th class="py-3 px-4 font-semibold">GMV / Orders</th>
-            <th class="py-3 px-4 font-semibold text-right">Impersonate / Oversee</th>
+            <th class="py-3 px-4 font-semibold text-right">Store Management</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -197,12 +197,13 @@
               </td>
 
               <td class="py-4 px-4 text-right">
-                <button
-                  (click)="impersonateMerchant(store.id, store.name)"
-                  class="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 text-xs font-semibold shadow-xs transition"
+                <a
+                  (click)="manageStore(store.id); $event.preventDefault()"
+                  routerLink="/store-owner/dashboard"
+                  class="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 text-xs font-semibold shadow-xs transition"
                 >
-                  Enter Store Portal &rarr;
-                </button>
+                  Open Store Dashboard &rarr;
+                </a>
               </td>
             </tr>
           }

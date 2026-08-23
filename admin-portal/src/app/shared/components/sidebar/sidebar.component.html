@@ -1,14 +1,143 @@
 <aside class="w-64 h-full flex flex-col justify-between bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 select-none transition-colors duration-200 overflow-y-auto">
   <div class="p-4 space-y-6">
-    <!-- Section: Store Owner Navigation -->
-    @if (authStore.isStoreOwner()) {
+    <!-- Section: Super Admin Navigation -->
+    @if (authStore.isSuperAdmin()) {
+      <div>
+        <div class="px-3 mb-2 flex items-center justify-between">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Omnipotent Oversight</span>
+          <span class="text-[10px] font-mono bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded border border-purple-200 dark:border-purple-800/60 font-semibold">GLOBAL</span>
+        </div>
+        <nav class="space-y-1">
+          <!-- Platform Overview -->
+          <div>
+            <a
+              (click)="navigateToSuperAdmin(['/super-admin/dashboard']); $event.preventDefault()"
+              routerLink="/super-admin/dashboard"
+              routerLinkActive="bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-semibold border-purple-200 dark:border-purple-800 shadow-xs"
+              class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
+            >
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2 2z"></path>
+              </svg>
+              <span>Platform Overview</span>
+            </a>
+
+            <!-- Sub-options under Platform Overview -->
+            @if (authStore.isStoreOwner() || storeState.selectedStoreId()) {
+              <nav class="ml-4 mt-1 space-y-1 border-l border-slate-200 dark:border-slate-700 pl-3">
+                <!-- Store Dashboard -->
+                <a
+                  routerLink="/store-owner/dashboard"
+                  routerLinkActive="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border-indigo-200 dark:border-indigo-800 shadow-xs"
+                  class="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
+                >
+                  <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                  </svg>
+                  <span>Store Dashboard</span>
+                </a>
+
+                <!-- Products -->
+                <a
+                  routerLink="/store-owner/products"
+                  routerLinkActive="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border-indigo-200 dark:border-indigo-800 shadow-xs"
+                  class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
+                >
+                  <div class="flex items-center space-x-3">
+                    <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    <span>Product Catalog</span>
+                  </div>
+                </a>
+
+                <!-- Client Credentials -->
+                <a
+                  routerLink="/store-owner/invitations"
+                  routerLinkActive="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border-indigo-200 dark:border-indigo-800 shadow-xs"
+                  class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
+                >
+                  <div class="flex items-center space-x-3">
+                    <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                    <span>Client Credentials</span>
+                  </div>
+                  @if (invitationState.pendingInvitationsCount() > 0) {
+                    <span class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-mono font-medium border border-slate-200 dark:border-slate-700">
+                      {{ invitationState.pendingInvitationsCount() }}
+                    </span>
+                  }
+                </a>
+
+                <!-- Orders -->
+                <a
+                  routerLink="/store-owner/orders"
+                  routerLinkActive="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border-indigo-200 dark:border-indigo-800 shadow-xs"
+                  class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
+                >
+                  <div class="flex items-center space-x-3">
+                    <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                    </svg>
+                    <span>Packing & Orders</span>
+                  </div>
+                  @if (orderState.pendingPackingCount() > 0) {
+                    <span class="text-xs bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800 animate-pulse">
+                      {{ orderState.pendingPackingCount() }}
+                    </span>
+                  }
+                </a>
+              </nav>
+            }
+          </div>
+
+          <!-- Global Stores & Catalog -->
+          <a
+            (click)="navigateToSuperAdmin(['/super-admin/oversight']); $event.preventDefault()"
+            routerLink="/super-admin/oversight"
+            routerLinkActive="bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-semibold border-purple-200 dark:border-purple-800 shadow-xs"
+            class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
+          >
+            <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span>Global Stores & Catalog</span>
+          </a>
+
+          <!-- Logistics & Delivery Board -->
+          <a
+            (click)="navigateToSuperAdmin(['/super-admin/logistics']); $event.preventDefault()"
+            routerLink="/super-admin/logistics"
+            routerLinkActive="bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-semibold border-purple-200 dark:border-purple-800 shadow-xs"
+            class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
+          >
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+              </svg>
+              <span>Logistics Board</span>
+            </div>
+            @if (orderState.packedReadyForDispatchCount() > 0) {
+              <span class="text-xs bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold px-2 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">
+                {{ orderState.packedReadyForDispatchCount() }}
+              </span>
+            }
+          </a>
+        </nav>
+      </div>
+    }
+
+    <!-- Section: Store Owner Navigation (when not super admin) -->
+    @if (authStore.isStoreOwner() && !authStore.isSuperAdmin()) {
       <div>
         <div class="px-3 mb-2 flex items-center justify-between">
           <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Store Management</span>
           <span class="text-[10px] font-mono bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800/60 font-semibold">MERCHANT</span>
         </div>
         <nav class="space-y-1">
-          <!-- Overview -->
+          <!-- Store Dashboard -->
           <a
             routerLink="/store-owner/dashboard"
             routerLinkActive="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border-indigo-200 dark:border-indigo-800 shadow-xs"
@@ -34,7 +163,7 @@
             </div>
           </a>
 
-          <!-- VIP Client Access & Credentials -->
+          <!-- Client Credentials -->
           <a
             routerLink="/store-owner/invitations"
             routerLinkActive="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border-indigo-200 dark:border-indigo-800 shadow-xs"
@@ -53,7 +182,7 @@
             }
           </a>
 
-          <!-- Orders & Packing Fulfillment -->
+          <!-- Orders -->
           <a
             routerLink="/store-owner/orders"
             routerLinkActive="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border-indigo-200 dark:border-indigo-800 shadow-xs"
@@ -68,61 +197,6 @@
             @if (orderState.pendingPackingCount() > 0) {
               <span class="text-xs bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800 animate-pulse">
                 {{ orderState.pendingPackingCount() }}
-              </span>
-            }
-          </a>
-        </nav>
-      </div>
-    }
-
-    <!-- Section: Super Admin Navigation -->
-    @if (authStore.isSuperAdmin()) {
-      <div>
-        <div class="px-3 mb-2 flex items-center justify-between">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Omnipotent Oversight</span>
-          <span class="text-[10px] font-mono bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded border border-purple-200 dark:border-purple-800/60 font-semibold">GLOBAL</span>
-        </div>
-        <nav class="space-y-1">
-          <!-- Platform Dashboard -->
-          <a
-            routerLink="/super-admin/dashboard"
-            routerLinkActive="bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-semibold border-purple-200 dark:border-purple-800 shadow-xs"
-            class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
-          >
-            <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-            <span>Platform Overview</span>
-          </a>
-
-          <!-- Global Oversight (Stores, Products, Clients) -->
-          <a
-            routerLink="/super-admin/oversight"
-            routerLinkActive="bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-semibold border-purple-200 dark:border-purple-800 shadow-xs"
-            class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
-          >
-            <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
-            <span>Global Stores & Catalog</span>
-          </a>
-
-          <!-- Logistics & Delivery Board -->
-          <a
-            routerLink="/super-admin/logistics"
-            routerLinkActive="bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-semibold border-purple-200 dark:border-purple-800 shadow-xs"
-            class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80 border border-transparent transition"
-          >
-            <div class="flex items-center space-x-3">
-              <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
-              </svg>
-              <span>Logistics Board</span>
-            </div>
-            @if (orderState.packedReadyForDispatchCount() > 0) {
-              <span class="text-xs bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold px-2 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">
-                {{ orderState.packedReadyForDispatchCount() }}
               </span>
             }
           </a>
@@ -151,4 +225,3 @@
     </span>
   </div>
 </aside>
-

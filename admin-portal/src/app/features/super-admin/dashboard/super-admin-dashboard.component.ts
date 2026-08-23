@@ -5,7 +5,6 @@ import { StoreState } from '../../../state/store.state';
 import { ProductState } from '../../../state/product.state';
 import { OrderState } from '../../../state/order.state';
 import { InvitationState } from '../../../state/invitation.state';
-import { AuthStore } from '../../../core/auth/auth.store';
 import { StatusBadgeComponent } from '../../../shared/components/badge/status-badge.component';
 
 /**
@@ -24,9 +23,8 @@ export class SuperAdminDashboardComponent {
   readonly productState = inject(ProductState);
   readonly orderState = inject(OrderState);
   readonly invitationState = inject(InvitationState);
-  readonly authStore = inject(AuthStore);
 
-  public impersonateMerchant(storeId: string, storeName: string): void {
-    this.authStore.switchPersona('STORE_OWNER', storeId, storeName);
+  public manageStore(storeId: string): void {
+    this.storeState.selectStore(storeId);
   }
 }

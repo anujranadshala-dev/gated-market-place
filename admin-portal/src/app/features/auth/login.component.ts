@@ -6,8 +6,8 @@ import { AuthStore } from '../../core/auth/auth.store';
 import { UserRole } from '../../core/auth/auth.models';
 
 /**
- * Authentication & Persona Portal Component
- * Provides seamless demo switching between Store Owner and Super Admin roles.
+ * Authentication Portal Component
+ * Provides login for Store Owners and Super Admins.
  */
 @Component({
   selector: 'app-login',

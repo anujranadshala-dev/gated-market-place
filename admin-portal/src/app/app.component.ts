@@ -8,7 +8,7 @@ import { ThemeService } from './core/theme/theme.service';
 
 /**
  * Root Application Shell Component
- * Integrates responsive sidebar navigation, persona bar, and router outlet.
+ * Integrates responsive sidebar navigation and router outlet.
  */
 @Component({
   selector: 'app-root',

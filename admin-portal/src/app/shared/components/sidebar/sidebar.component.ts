@@ -1,14 +1,11 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { OrderState } from '../../../state/order.state';
 import { InvitationState } from '../../../state/invitation.state';
+import { StoreState } from '../../../state/store.state';
 
-/**
- * Modern Angular 21 Standalone Navigation Sidebar
- * Adapts routes, counters, and navigation state dynamically to active RBAC role.
- */
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -21,6 +18,13 @@ import { InvitationState } from '../../../state/invitation.state';
 })
 export class SidebarComponent {
   readonly authStore = inject(AuthStore);
+  readonly storeState = inject(StoreState);
   readonly orderState = inject(OrderState);
   readonly invitationState = inject(InvitationState);
+  private readonly router = inject(Router);
+
+  public navigateToSuperAdmin(url: string[]): void {
+    this.storeState.clearSelectedStore();
+    this.router.navigate(url);
+  }
 }

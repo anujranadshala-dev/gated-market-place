@@ -7,6 +7,8 @@ import {
 } from '../controllers/AdminAuth.js';
 import { protect } from '../middleware/auth.js';
 
+import { createStore } from '../controllers/store.js'
+
 const router = Router();
 
 // Public routes
@@ -16,5 +18,7 @@ router.post('/login', loginAdminUser);
 // Protected routes that require authentication
 router.post('/logout', protect, logoutAdminUser);
 router.get('/me', protect, getMe);
+
+router.post('/create-store', protect, createStore)
 
 export default router;

@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import adminAuthRoutes from './routes/adminAuth.js';
+import adminAuthRoutes from './routes/route.js';
 import connectDB from './db.js';
 import cors from 'cors';
 

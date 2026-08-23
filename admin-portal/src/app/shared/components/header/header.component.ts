@@ -1,16 +1,12 @@
-import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { ThemeService } from '../../../core/theme/theme.service';
 import { StoreState } from '../../../state/store.state';
 import { OrderState } from '../../../state/order.state';
 import { StatusBadgeComponent } from '../badge/status-badge.component';
 
-/**
- * Modern Angular 21 Standalone Header Component
- * Displays live tenant context, quick RBAC persona switching, dark/light theme toggle, and fulfillment counters.
- */
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -23,24 +19,18 @@ export class HeaderComponent {
   readonly themeService = inject(ThemeService);
   readonly storeState = inject(StoreState);
   readonly orderState = inject(OrderState);
-
-  readonly isPersonaMenuOpen = signal<boolean>(false);
-
-  public togglePersonaMenu(): void {
-    this.isPersonaMenuOpen.update((v) => !v);
-  }
-
-  public closePersonaMenu(): void {
-    this.isPersonaMenuOpen.set(false);
-  }
+  private readonly router = inject(Router);
 
   public toggleTheme(): void {
     this.themeService.toggleTheme();
   }
 
+  public backToPlatform(): void {
+    this.storeState.clearSelectedStore();
+    this.router.navigate(['/super-admin/dashboard']);
+  }
+
   public logout(): void {
     this.authStore.logout();
-    this.closePersonaMenu();
   }
 }
-

@@ -135,6 +135,7 @@ export class StoreState {
   readonly stores = this._stores.asReadonly();
   readonly searchQuery = this._searchQuery.asReadonly();
   readonly tierFilter = this._tierFilter.asReadonly();
+  readonly selectedStoreId = this._selectedStoreId.asReadonly();
 
   // Computed Signals
   readonly currentStoreOwnerStore = computed<Store | null>(() => {
@@ -195,6 +196,16 @@ export class StoreState {
 
   public selectStore(storeId: string | null): void {
     this._selectedStoreId.set(storeId);
+  }
+
+  public clearSelectedStore(): void {
+    this._selectedStoreId.set(null);
+  }
+
+  public getSelectedStoreName(): string | null {
+    const id = this._selectedStoreId();
+    if (!id) return null;
+    return this._stores().find((s) => s.id === id)?.name ?? null;
   }
 
   public createStore(dto: CreateStoreDto): Store {
