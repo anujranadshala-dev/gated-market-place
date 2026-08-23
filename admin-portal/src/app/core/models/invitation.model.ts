@@ -13,7 +13,7 @@ export type InviteStatus = 'Active' | 'Password Changed' | 'Pending First Login'
 export type CustomerTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'VIP_BLACK';
 
 export interface CustomerInvitation {
-  id: string;
+  id?: string;
   storeId: string;
   storeName: string;
   recipientEmail: string;

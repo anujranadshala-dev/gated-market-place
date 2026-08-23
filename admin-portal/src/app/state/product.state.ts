@@ -1,7 +1,11 @@
-import { Injectable, computed, signal, inject } from '@angular/core';
+import { Injectable, computed, signal, inject, effect } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Product, CreateProductDto, ProductStatus, GatedAccessTier } from '../core/models/product.model';
 import { AuthStore } from '../core/auth/auth.store';
 import { StoreState } from './store.state';
+
+const API_BASE_URL = 'http://localhost:5000/api';
 
 /**
  * Modern Angular 21 Signal Store for Product Inventory & Catalog Management
@@ -12,170 +16,25 @@ import { StoreState } from './store.state';
 export class ProductState {
   private readonly authStore = inject(AuthStore);
   private readonly storeState = inject(StoreState);
+  private readonly http = inject(HttpClient);
 
-  // Initial Product Seeds across multi-tenant stores
-  private readonly _products = signal<Product[]>([
-    {
-      id: 'prod_01',
-      storeId: 'str_vance_01',
-      storeName: 'Vance Luxury Atelier',
-      name: 'Vanguard Hand-Stitched Leather Briefcase',
-      slug: 'vanguard-leather-briefcase',
-      description: 'Vegetable-tanned bridle leather with solid brass hardware, serialized brass tag, and suede interior lining.',
-      category: 'Leather Goods',
-      price: 2450,
-      compareAtPrice: 2800,
-      inventory: {
-        stockQuantity: 14,
-        lowStockThreshold: 3,
-        sku: 'VNC-BRF-001',
-        weightKg: 2.4,
-      },
-      status: 'ACTIVE',
-      gatedTier: 'GOLD',
-      images: [
-        'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80',
-      ],
-      tags: ['Bespoke', 'Heritage', 'Gated Exclusive'],
-      isFeatured: true,
-      createdAt: '2025-01-12T10:00:00Z',
-      updatedAt: '2025-02-01T11:00:00Z',
-    },
-    {
-      id: 'prod_02',
-      storeId: 'str_vance_01',
-      storeName: 'Vance Luxury Atelier',
-      name: 'Chronos Horology Travel Roll (Quad)',
-      slug: 'chronos-horology-travel-roll',
-      description: 'Alcantara-cushioned watch roll with modular dividers for up to 4 timepieces.',
-      category: 'Accessories',
-      price: 890,
-      compareAtPrice: 950,
-      inventory: {
-        stockQuantity: 28,
-        lowStockThreshold: 5,
-        sku: 'VNC-WTR-004',
-        weightKg: 0.8,
-      },
-      status: 'ACTIVE',
-      gatedTier: 'SILVER',
-      images: [
-        'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80',
-      ],
-      tags: ['Watches', 'Travel'],
-      isFeatured: true,
-      createdAt: '2025-01-14T09:00:00Z',
-      updatedAt: '2025-01-20T14:30:00Z',
-    },
-    {
-      id: 'prod_03',
-      storeId: 'str_vance_01',
-      storeName: 'Vance Luxury Atelier',
-      name: 'Black Label Monogrammed Desk Pad',
-      slug: 'black-label-desk-pad',
-      description: 'Top-grain Tuscan calfskin with weighted corners and micro-textured mouse-friendly surface.',
-      category: 'Workspace',
-      price: 420,
-      inventory: {
-        stockQuantity: 45,
-        lowStockThreshold: 10,
-        sku: 'VNC-DSK-012',
-        weightKg: 1.1,
-      },
-      status: 'ACTIVE',
-      gatedTier: 'PUBLIC_MEMBER',
-      images: [
-        'https://images.unsplash.com/photo-1585776245993-841961e6878b?w=600&auto=format&fit=crop&q=80',
-      ],
-      tags: ['Office', 'Desk'],
-      isFeatured: false,
-      createdAt: '2025-01-16T15:00:00Z',
-      updatedAt: '2025-01-16T15:00:00Z',
-    },
-    {
-      id: 'prod_04',
-      storeId: 'str_vance_01',
-      storeName: 'Vance Luxury Atelier',
-      name: 'Sovereign Damascus Steel Cigar Cutter',
-      slug: 'sovereign-damascus-cigar-cutter',
-      description: 'Pattern-welded Damascus steel with titanium screws and hand-polished mirror bevels.',
-      category: 'Accessories',
-      price: 1350,
-      inventory: {
-        stockQuantity: 2, // Low stock!
-        lowStockThreshold: 4,
-        sku: 'VNC-ACC-99',
-        weightKg: 0.3,
-      },
-      status: 'ACTIVE',
-      gatedTier: 'VIP_BLACK',
-      images: [
-        'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=600&auto=format&fit=crop&q=80',
-      ],
-      tags: ['Collector', 'Limited Edition'],
-      isFeatured: true,
-      createdAt: '2025-01-20T16:00:00Z',
-      updatedAt: '2025-02-05T12:00:00Z',
-    },
-    {
-      id: 'prod_05',
-      storeId: 'str_aethel_02',
-      storeName: 'Aethelgard Rare Botanicals',
-      name: 'Nocturne Alpine Oud Parfum Extrait 50ml',
-      slug: 'nocturne-alpine-oud-extrait',
-      description: 'Wild-harvested cedarwood, dark amber resin, and Himalayan oud macerated for 18 months.',
-      category: 'Fragrance',
-      price: 680,
-      inventory: {
-        stockQuantity: 30,
-        lowStockThreshold: 5,
-        sku: 'AET-OUD-050',
-        weightKg: 0.4,
-      },
-      status: 'ACTIVE',
-      gatedTier: 'SILVER',
-      images: [
-        'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&auto=format&fit=crop&q=80',
-      ],
-      tags: ['Artisanal', 'Extrait'],
-      isFeatured: true,
-      createdAt: '2025-01-19T11:00:00Z',
-      updatedAt: '2025-02-02T10:00:00Z',
-    },
-    {
-      id: 'prod_06',
-      storeId: 'str_zenith_03',
-      storeName: 'Zenith Haute Audio',
-      name: 'Aether Monoblock Class-A Tube Amplifier',
-      slug: 'aether-monoblock-tube-amp',
-      description: 'Custom point-to-point hand wired 300B triodes with silver-wound output transformers.',
-      category: 'Audio',
-      price: 8400,
-      inventory: {
-        stockQuantity: 4,
-        lowStockThreshold: 2,
-        sku: 'ZNT-AMP-300B',
-        weightKg: 28.0,
-      },
-      status: 'ACTIVE',
-      gatedTier: 'VIP_BLACK',
-      images: [
-        'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=600&auto=format&fit=crop&q=80',
-      ],
-      tags: ['Audiophile', 'Bespoke'],
-      isFeatured: true,
-      createdAt: '2025-01-05T14:00:00Z',
-      updatedAt: '2025-02-10T11:00:00Z',
-    },
-  ]);
+  private readonly _products = signal<Product[]>([]);
 
   private readonly _searchFilter = signal<string>('');
   private readonly _categoryFilter = signal<string>('ALL');
   private readonly _tierFilter = signal<GatedAccessTier | 'ALL'>('ALL');
   private readonly _selectedStoreScope = signal<string | 'ALL'>('ALL');
 
-  // Readonly signals
+  constructor() {
+    effect(() => {
+      const user = this.authStore.user();
+      if (user) {
+        this.getProducts();
+      } else {
+        this._products.set([]);
+      }
+    });
+  }
   readonly products = this._products.asReadonly();
   readonly searchFilter = this._searchFilter.asReadonly();
   readonly categoryFilter = this._categoryFilter.asReadonly();
@@ -250,14 +109,47 @@ export class ProductState {
     this._selectedStoreScope.set(storeId);
   }
 
-  public addProduct(dto: CreateProductDto): Product {
-    const activeStore = this.storeState.stores().find((s) => s.id === dto.storeId);
-    const newProduct: Product = {
-      id: `prod_${Date.now().toString(36)}`,
+  public async getProducts(): Promise<void> {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ products: any[] }>(`${API_BASE_URL}/products`, { withCredentials: true })
+      );
+
+      if (response?.products) {
+        const mappedProducts: Product[] = response.products.map((p: any) => ({
+          id: p._id || p.id,
+          storeId: p.storeId,
+          storeName: p.storeName,
+          name: p.name,
+          slug: p.slug,
+          description: p.description,
+          category: p.category,
+          price: p.price,
+          compareAtPrice: p.compareAtPrice,
+          inventory: p.inventory,
+          status: p.status,
+          gatedTier: p.gatedTier,
+          images: p.images,
+          tags: p.tags,
+          isFeatured: p.isFeatured,
+          createdAt: p.createdAt,
+          updatedAt: p.updatedAt,
+        }));
+        this._products.set(mappedProducts);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      this._products.set([]);
+    }
+  }
+
+  public async addProduct(dto: CreateProductDto): Promise<void> {
+    const slug = dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    const payload = {
       storeId: dto.storeId,
-      storeName: activeStore?.name || 'Assigned Store',
       name: dto.name,
-      slug: dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      slug,
       description: dto.description,
       category: dto.category,
       price: dto.price,
@@ -276,12 +168,22 @@ export class ProductState {
       ],
       tags: dto.tags || ['New Arrival'],
       isFeatured: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
 
-    this._products.update((prods) => [newProduct, ...prods]);
-    return newProduct;
+    try {
+      await firstValueFrom(
+        this.http.post<{ message: string; productId: string }>(
+          `${API_BASE_URL}/create-product`,
+          payload,
+          { withCredentials: true }
+        )
+      );
+
+      await this.getProducts();
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw error;
+    }
   }
 
   public updateProduct(productId: string, updates: Partial<Product>): void {

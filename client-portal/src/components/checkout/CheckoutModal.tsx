@@ -107,7 +107,6 @@ export const CheckoutModal: React.FC = () => {
 
     setTimeout(() => {
       const newOrder: Order = {
-        id: `ord_${Date.now().toString(36)}`,
         orderNumber: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
         userId: currentUser?.id || 'usr_guest',
         userEmail: currentUser?.email || 'shopper@example.com',

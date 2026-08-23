@@ -99,7 +99,7 @@ export class GlobalOversightComponent {
   readonly storeFormOwnerEmail = signal<string>('');
   readonly storeFormDescription = signal<string>('');
   readonly storeFormTier = signal<StoreTier>('PREMIUM_BRAND');
-  readonly storeFormRequireInvite = signal<boolean>(true);
+
   readonly storeFormMinTier = signal<'BRONZE' | 'SILVER' | 'GOLD' | 'VIP_BLACK'>('SILVER');
 
   // Product Global Edit Modal State
@@ -198,7 +198,6 @@ export class GlobalOversightComponent {
     this.storeFormOwnerEmail.set('');
     this.storeFormDescription.set('');
     this.storeFormTier.set('PREMIUM_BRAND');
-    this.storeFormRequireInvite.set(true);
     this.storeFormMinTier.set('SILVER');
     this.isStoreModalOpen.set(true);
   }
@@ -211,12 +210,11 @@ export class GlobalOversightComponent {
     this.storeFormOwnerEmail.set(store.ownerEmail);
     this.storeFormDescription.set(store.description);
     this.storeFormTier.set(store.tier);
-    this.storeFormRequireInvite.set(store.gatingConfig.requireInvitation);
     this.storeFormMinTier.set(store.gatingConfig.minimumLoyaltyTier);
     this.isStoreModalOpen.set(true);
   }
 
-  public saveStore(): void {
+  public async saveStore(): Promise<void> {
     if (!this.storeFormName().trim() || !this.storeFormOwnerEmail().trim()) {
       this.showToast('Please provide store name and owner email.');
       return;
@@ -232,7 +230,7 @@ export class GlobalOversightComponent {
         description: this.storeFormDescription(),
         tier: this.storeFormTier(),
         gatingConfig: {
-          requireInvitation: this.storeFormRequireInvite(),
+          requireInvitation: true,
           allowedEmailDomains: [],
           minimumLoyaltyTier: this.storeFormMinTier(),
           autoApproveWhitelist: false,
@@ -248,12 +246,16 @@ export class GlobalOversightComponent {
         description: this.storeFormDescription(),
         tier: this.storeFormTier(),
         gatingConfig: {
-          requireInvitation: this.storeFormRequireInvite(),
+          requireInvitation: true,
           minimumLoyaltyTier: this.storeFormMinTier(),
         },
       };
-      this.storeState.createStore(dto);
-      this.showToast('New merchant storefront onboarded.');
+      try {
+        await this.storeState.createStore(dto);
+        this.showToast('New merchant storefront onboarded.');
+      } catch (error) {
+        this.showToast('Failed to create store. Please try again.');
+      }
     }
 
     this.isStoreModalOpen.set(false);

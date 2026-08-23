@@ -83,7 +83,7 @@ export interface UserAddress {
 }
 
 export interface User {
-  id: string;
+  id?: string;
   username: string; // Store-issued username
   email: string;
   fullName: string;
@@ -137,7 +137,7 @@ export interface CartItem {
 }
 
 export interface Order {
-  id: string;
+  id?: string;
   orderNumber: string;
   userId: string;
   userEmail: string;

@@ -9,6 +9,7 @@ export interface IStore extends Document {
     ownerEmail: string;
     description: string;
     status: 'ACTIVE' | 'PENDING_APPROVAL' | 'SUSPENDED';
+    tier: 'STARTER' | 'PREMIUM_BRAND' | 'LUXURY_EXCLUSIVE' | 'ENTERPRISE';
     logoUrl: string;
     currency: string;
     gatingConfig: {
@@ -33,12 +34,17 @@ const storeSchema = new Schema<IStore>({
     slug: { type: String, required: true, unique: true },
     ownerId: { type: String, required: true },
     ownerName: String,
-    ownerEmail: { type: String, required: true },
+    ownerEmail: { type: String, required: true, unique: true },
     description: String,
     status: {
         type: String,
         enum: ['ACTIVE', 'PENDING_APPROVAL', 'SUSPENDED'],
         default: 'PENDING_APPROVAL',
+    },
+    tier: {
+        type: String,
+        enum: ['STARTER', 'PREMIUM_BRAND', 'LUXURY_EXCLUSIVE', 'ENTERPRISE'],
+        default: 'STARTER',
     },
     logoUrl: String,
     currency: String, // e.g., 'USD', 'EUR'

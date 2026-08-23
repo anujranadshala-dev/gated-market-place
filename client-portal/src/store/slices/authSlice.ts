@@ -46,7 +46,6 @@ export const authSlice = createSlice({
       // Initialize new session user for this magic link
       const emailUsername = action.payload.email.split('@')[0];
       const newUser: User = {
-        id: `usr_${Date.now().toString(36)}`,
         username: emailUsername,
         email: action.payload.email,
         fullName: emailUsername.replace('.', ' ').replace('_', ' ').toUpperCase(),
@@ -109,7 +108,6 @@ export const authSlice = createSlice({
 
       // If user typed a custom store-assigned credential
       const newUser: User = {
-        id: `usr_${Date.now().toString(36)}`,
         username: trimmedInput,
         email: trimmedInput.includes('@') ? trimmedInput : `${trimmedInput}@shopper.com`,
         fullName: trimmedInput.replace('.', ' ').replace('_', ' ').toUpperCase(),
@@ -161,7 +159,6 @@ export const authSlice = createSlice({
         const addresses = state.currentUser.savedAddresses ? [...state.currentUser.savedAddresses] : [];
         const newAddress = {
           ...action.payload,
-          id: action.payload.id || `addr_${Date.now().toString(36)}`
         };
         if (newAddress.isDefault || addresses.length === 0) {
           addresses.forEach((a) => (a.isDefault = false));

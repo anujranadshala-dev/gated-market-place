@@ -211,7 +211,6 @@ export class InvitationState {
     const initialTier = calculateCustomerTier(initialSpend, initialVipBlack);
 
     const newAccount: CustomerInvitation = {
-      id: `usr_client_${Date.now().toString(36)}`,
       storeId: dto.storeId,
       storeName: currentStore?.name || 'Assigned Store',
       recipientEmail: dto.recipientEmail.toLowerCase().trim(),

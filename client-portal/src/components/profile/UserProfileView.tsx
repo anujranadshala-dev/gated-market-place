@@ -258,7 +258,6 @@ export const UserProfileView: React.FC = () => {
   const handleSaveModalAddress = (e: React.FormEvent) => {
     e.preventDefault();
     const addressData: UserAddress = {
-      id: editingAddressId || `addr_${Date.now().toString(36)}`,
       label: modalAddrLabel,
       recipientName: modalAddrRecipient || currentUser.fullName,
       street: modalAddrStreet,
