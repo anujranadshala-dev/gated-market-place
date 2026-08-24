@@ -186,28 +186,45 @@ export class ProductState {
     }
   }
 
-  public updateProduct(productId: string, updates: Partial<Product>): void {
-    this._products.update((prods) =>
-      prods.map((p) => (p.id === productId ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p))
-    );
+  public async updateProduct(productId: string, updates: Partial<Product>): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.put<{ message: string; product: any }>(
+          `${API_BASE_URL}/products/${productId}`,
+          updates,
+          { withCredentials: true }
+        )
+      );
+
+      await this.getProducts();
+    } catch (error) {
+      console.error('Error updating product:', error);
+      throw error;
+    }
   }
 
-  public updateStock(productId: string, newStock: number): void {
-    this._products.update((prods) =>
-      prods.map((p) => {
-        if (p.id === productId) {
-          return {
-            ...p,
-            inventory: { ...p.inventory, stockQuantity: Math.max(0, newStock) },
-            updatedAt: new Date().toISOString(),
-          };
-        }
-        return p;
-      })
-    );
+  public async updateStock(productId: string, newStock: number): Promise<void> {
+    await this.updateProduct(productId, {
+      inventory: {
+        ...this._products().find((p) => p.id === productId)?.inventory || {},
+        stockQuantity: Math.max(0, newStock),
+      },
+    });
   }
 
-  public deleteProduct(productId: string): void {
-    this._products.update((prods) => prods.filter((p) => p.id !== productId));
+  public async deleteProduct(productId: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.delete<{ message: string }>(
+          `${API_BASE_URL}/products/${productId}`,
+          { withCredentials: true }
+        )
+      );
+
+      this._products.update((prods) => prods.filter((p) => p.id !== productId));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw error;
+    }
   }
 }

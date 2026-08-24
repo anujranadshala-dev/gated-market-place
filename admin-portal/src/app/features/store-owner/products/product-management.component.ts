@@ -80,7 +80,7 @@ export class ProductManagementComponent {
     this.editingProductId.set(null);
   }
 
-  public saveProduct(): void {
+  public async saveProduct(): Promise<void> {
     const storeId = this.authStore.assignedStoreId() || this.storeState.activeStore()?.id || 'str_vance_01';
 
     if (!this.formName().trim() || !this.formSku().trim() || this.formPrice() <= 0) {
@@ -90,24 +90,26 @@ export class ProductManagementComponent {
 
     const editId = this.editingProductId();
     if (editId) {
-      // Update existing
-      this.productState.updateProduct(editId, {
-        name: this.formName(),
-        category: this.formCategory(),
-        description: this.formDescription(),
-        price: Number(this.formPrice()),
-        compareAtPrice: this.formCompareAtPrice() ? Number(this.formCompareAtPrice()) : undefined,
-        inventory: {
-          stockQuantity: Number(this.formStock()),
-          lowStockThreshold: Number(this.formLowStock()),
-          sku: this.formSku().toUpperCase(),
-        },
-        gatedTier: this.formGatedTier(),
-        images: [this.formImageUrl() || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80'],
-      });
-      this.showToast('Product specifications updated successfully.');
+      try {
+        await this.productState.updateProduct(editId, {
+          name: this.formName(),
+          category: this.formCategory(),
+          description: this.formDescription(),
+          price: Number(this.formPrice()),
+          compareAtPrice: this.formCompareAtPrice() ? Number(this.formCompareAtPrice()) : undefined,
+          inventory: {
+            stockQuantity: Number(this.formStock()),
+            lowStockThreshold: Number(this.formLowStock()),
+            sku: this.formSku().toUpperCase(),
+          },
+          gatedTier: this.formGatedTier(),
+          images: [this.formImageUrl() || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80'],
+        });
+        this.showToast('Product specifications updated successfully.');
+      } catch (error) {
+        this.showToast('Failed to update product. Please try again.');
+      }
     } else {
-      // Create new
       const dto: CreateProductDto = {
         storeId,
         name: this.formName(),
@@ -121,8 +123,12 @@ export class ProductManagementComponent {
         gatedTier: this.formGatedTier(),
         imageUrl: this.formImageUrl(),
       };
-      this.productState.addProduct(dto);
-      this.showToast('New gated catalog product published.');
+      try {
+        await this.productState.addProduct(dto);
+        this.showToast('New gated catalog product published.');
+      } catch (error) {
+        this.showToast('Failed to create product. Please try again.');
+      }
     }
 
     this.closeModal();
@@ -136,14 +142,18 @@ export class ProductManagementComponent {
     this.deleteConfirmId.set(null);
   }
 
-  public executeDelete(id: string): void {
-    this.productState.deleteProduct(id);
+  public async executeDelete(id: string): Promise<void> {
+    try {
+      await this.productState.deleteProduct(id);
+      this.showToast('Product successfully removed from catalog.');
+    } catch (error) {
+      this.showToast('Failed to delete product. Please try again.');
+    }
     this.deleteConfirmId.set(null);
-    this.showToast('Product successfully removed from catalog.');
   }
 
-  public quickStockAdjust(productId: string, currentStock: number, delta: number): void {
-    this.productState.updateStock(productId, currentStock + delta);
+  public async quickStockAdjust(productId: string, currentStock: number, delta: number): Promise<void> {
+    await this.productState.updateStock(productId, currentStock + delta);
   }
 
   public showToast(msg: string): void {

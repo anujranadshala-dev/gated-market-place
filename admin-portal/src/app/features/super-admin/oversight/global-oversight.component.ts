@@ -222,21 +222,25 @@ export class GlobalOversightComponent {
 
     const editId = this.editingStoreId();
     if (editId) {
-      this.storeState.updateStore(editId, {
-        name: this.storeFormName(),
-        slug: this.storeFormSlug() || this.storeFormName().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        ownerName: this.storeFormOwnerName(),
-        ownerEmail: this.storeFormOwnerEmail(),
-        description: this.storeFormDescription(),
-        tier: this.storeFormTier(),
-        gatingConfig: {
-          requireInvitation: true,
-          allowedEmailDomains: [],
-          minimumLoyaltyTier: this.storeFormMinTier(),
-          autoApproveWhitelist: false,
-        },
-      });
-      this.showToast('Store settings updated.');
+      try {
+        await this.storeState.updateStore(editId, {
+          name: this.storeFormName(),
+          slug: this.storeFormSlug() || this.storeFormName().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          ownerName: this.storeFormOwnerName(),
+          ownerEmail: this.storeFormOwnerEmail(),
+          description: this.storeFormDescription(),
+          tier: this.storeFormTier(),
+          gatingConfig: {
+            requireInvitation: true,
+            allowedEmailDomains: [],
+            minimumLoyaltyTier: this.storeFormMinTier(),
+            autoApproveWhitelist: false,
+          },
+        });
+        this.showToast('Store settings updated.');
+      } catch (error) {
+        this.showToast('Failed to update store. Please try again.');
+      }
     } else {
       const dto: CreateStoreDto = {
         name: this.storeFormName(),
@@ -261,9 +265,9 @@ export class GlobalOversightComponent {
     this.isStoreModalOpen.set(false);
   }
 
-  public toggleStoreStatus(storeId: string, currentStatus: StoreStatus): void {
+  public async toggleStoreStatus(storeId: string, currentStatus: StoreStatus): Promise<void> {
     const nextStatus: StoreStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-    this.storeState.updateStoreStatus(storeId, nextStatus);
+    await this.storeState.updateStoreStatus(storeId, nextStatus);
     this.showToast(`Store status updated to ${nextStatus}.`);
   }
 
@@ -280,24 +284,27 @@ export class GlobalOversightComponent {
     this.isProductModalOpen.set(true);
   }
 
-  public saveProduct(): void {
+  public async saveProduct(): Promise<void> {
     const editId = this.editingProductId();
     if (!editId) return;
 
-    this.productState.updateProduct(editId, {
-      name: this.productFormName(),
-      category: this.productFormCategory(),
-      price: Number(this.productFormPrice()),
-      inventory: {
-        stockQuantity: Number(this.productFormStock()),
-        lowStockThreshold: 3,
-        sku: this.productFormSku().toUpperCase(),
-      },
-      gatedTier: this.productFormTier(),
-    });
-
-    this.isProductModalOpen.set(false);
-    this.showToast('Product modified by Super Admin.');
+    try {
+      await this.productState.updateProduct(editId, {
+        name: this.productFormName(),
+        category: this.productFormCategory(),
+        price: Number(this.productFormPrice()),
+        inventory: {
+          stockQuantity: Number(this.productFormStock()),
+          lowStockThreshold: 3,
+          sku: this.productFormSku().toUpperCase(),
+        },
+        gatedTier: this.productFormTier(),
+      });
+      this.isProductModalOpen.set(false);
+      this.showToast('Product modified by Super Admin.');
+    } catch (error) {
+      this.showToast('Failed to update product. Please try again.');
+    }
   }
 
   // --- Delete confirmation ---
@@ -309,16 +316,20 @@ export class GlobalOversightComponent {
     this.deleteConfirmEntity.set(null);
   }
 
-  public executeDelete(): void {
+  public async executeDelete(): Promise<void> {
     const entity = this.deleteConfirmEntity();
     if (!entity) return;
 
-    if (entity.type === 'STORE') {
-      this.storeState.deleteStore(entity.id);
-      this.showToast(`Store ${entity.name} deleted from ecosystem.`);
-    } else if (entity.type === 'PRODUCT') {
-      this.productState.deleteProduct(entity.id);
-      this.showToast(`Product ${entity.name} removed from catalog.`);
+    try {
+      if (entity.type === 'STORE') {
+        await this.storeState.deleteStore(entity.id);
+        this.showToast(`Store ${entity.name} deleted from ecosystem.`);
+      } else if (entity.type === 'PRODUCT') {
+        await this.productState.deleteProduct(entity.id);
+        this.showToast(`Product ${entity.name} removed from catalog.`);
+      }
+    } catch (error) {
+      this.showToast(`Failed to delete ${entity.type.toLowerCase()}. Please try again.`);
     }
 
     this.deleteConfirmEntity.set(null);

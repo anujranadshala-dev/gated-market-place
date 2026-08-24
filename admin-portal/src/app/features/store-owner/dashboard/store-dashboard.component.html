@@ -269,7 +269,7 @@
               <div class="flex items-center space-x-3 self-end sm:self-auto">
                 <span class="text-sm font-bold text-slate-900 dark:text-slate-100">${{ order.totalAmount | number:'1.2-2' }}</span>
                 <button
-                  (click)="orderState.markAsPacked(order.id); showToast('Order ' + order.orderNumber + ' marked as Packed!')"
+                  (click)="onPackOrder(order)"
                   class="px-3.5 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 text-xs font-bold transition flex items-center space-x-1.5 shadow-xs"
                 >
                   <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -35,11 +35,10 @@ export class StoreOrdersComponent {
     this.selectedOrder.set(null);
   }
 
-  public packOrder(orderId: string): void {
-    this.orderState.markAsPacked(orderId, this.packingNotes());
+  public async packOrder(orderId: string): Promise<void> {
+    await this.orderState.markAsPacked(orderId, this.packingNotes());
     this.showToast(`Order marked as 'Packed'. Handoff notification sent to Super Admin Logistics.`);
     
-    // Refresh selected order state if modal is open
     const updated = this.orderState.orders().find((o) => o.id === orderId);
     if (updated) {
       this.selectedOrder.set(updated);

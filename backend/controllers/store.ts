@@ -57,3 +57,64 @@ export async function getStore(req: AuthRequest, res: Response) {
         res.status(500).json({ message: 'Server error while fetching stores.' });
     }
 }
+
+export async function updateStore(req: AuthRequest, res: Response) {
+    const { storeId } = req.params;
+    const updates = req.body;
+
+    if (!storeId) {
+        return res.status(400).json({ message: 'Store ID is required' });
+    }
+
+    try {
+        const existingStore = await store.findById(storeId);
+        if (!existingStore) {
+            return res.status(404).json({ message: 'Store not found' });
+        }
+
+        if (req.user?.role !== 'SUPER_ADMIN') {
+            if (existingStore.ownerEmail !== req.user!.email) {
+                return res.status(403).json({ message: 'You are not authorized to update this store' });
+            }
+        }
+
+        const updatedStore = await store.findByIdAndUpdate(
+            storeId,
+            { $set: updates },
+            { new: true }
+        );
+
+        res.status(200).json({ message: 'Store updated successfully.', store: updatedStore });
+    } catch (error) {
+        console.error('Error updating store:', error);
+        res.status(500).json({ message: 'Server error while updating store.' });
+    }
+}
+
+export async function deleteStore(req: AuthRequest, res: Response) {
+    const { storeId } = req.params;
+
+    if (!storeId) {
+        return res.status(400).json({ message: 'Store ID is required' });
+    }
+
+    try {
+        const existingStore = await store.findById(storeId);
+        if (!existingStore) {
+            return res.status(404).json({ message: 'Store not found' });
+        }
+
+        if (req.user?.role !== 'SUPER_ADMIN') {
+            if (existingStore.ownerEmail !== req.user!.email) {
+                return res.status(403).json({ message: 'You are not authorized to delete this store' });
+            }
+        }
+
+        await store.findByIdAndDelete(storeId);
+
+        res.status(200).json({ message: 'Store deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting store:', error);
+        res.status(500).json({ message: 'Server error while deleting store.' });
+    }
+}

@@ -8,6 +8,7 @@ import { ProductState } from '../../../state/product.state';
 import { OrderState } from '../../../state/order.state';
 import { InvitationState } from '../../../state/invitation.state';
 import { StatusBadgeComponent } from '../../../shared/components/badge/status-badge.component';
+import { Order } from '../../../core/models/order.model';
 
 /**
  * Store Owner Dashboard Component
@@ -34,24 +35,32 @@ export class StoreDashboardComponent {
     this.isEditingGating.update((v) => !v);
   }
 
-  public saveGatingSettings(requireInvite: boolean, minTier: 'BRONZE' | 'SILVER' | 'GOLD' | 'VIP_BLACK'): void {
+  public async saveGatingSettings(requireInvite: boolean, minTier: 'BRONZE' | 'SILVER' | 'GOLD' | 'VIP_BLACK'): Promise<void> {
     const store = this.storeState.activeStore();
     if (!store) return;
 
-    this.storeState.updateStore(store.id, {
-      gatingConfig: {
-        ...store.gatingConfig,
-        requireInvitation: requireInvite,
-        minimumLoyaltyTier: minTier,
-      },
-    });
-
-    this.isEditingGating.set(false);
-    this.showToast('Gating access criteria updated successfully.');
+    try {
+      await this.storeState.updateStore(store.id, {
+        gatingConfig: {
+          ...store.gatingConfig,
+          requireInvitation: requireInvite,
+          minimumLoyaltyTier: minTier,
+        },
+      });
+      this.isEditingGating.set(false);
+      this.showToast('Gating access criteria updated successfully.');
+    } catch (error) {
+      this.showToast('Failed to update gating settings. Please try again.');
+    }
   }
 
   public showToast(msg: string): void {
     this.toastMessage.set(msg);
     setTimeout(() => this.toastMessage.set(null), 3000);
+  }
+
+  public async onPackOrder(order: Order): Promise<void> {
+    await this.orderState.markAsPacked(order.id);
+    this.showToast(`Order ${order.orderNumber} marked as 'Packed'. Handoff sent to Super Admin Logistics.`);
   }
 }

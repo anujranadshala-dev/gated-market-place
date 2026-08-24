@@ -189,20 +189,43 @@ export class StoreState {
     }
   }
 
-  public updateStore(storeId: string, updates: Partial<Store>): void {
-    this._stores.update((stores) =>
-      stores.map((s) => (s.id === storeId ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s))
-    );
+  public async updateStore(storeId: string, updates: Partial<Store>): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.put<{ message: string; store: any }>(
+          `${API_BASE_URL}/stores/${storeId}`,
+          updates,
+          { withCredentials: true }
+        )
+      );
+
+      await this.getStores();
+    } catch (error) {
+      console.error('Error updating store:', error);
+      throw error;
+    }
   }
 
-  public updateStoreStatus(storeId: string, status: StoreStatus): void {
-    this.updateStore(storeId, { status });
+  public async updateStoreStatus(storeId: string, status: StoreStatus): Promise<void> {
+    await this.updateStore(storeId, { status });
   }
 
-  public deleteStore(storeId: string): void {
-    this._stores.update((stores) => stores.filter((s) => s.id !== storeId));
-    if (this._selectedStoreId() === storeId) {
-      this._selectedStoreId.set(null);
+  public async deleteStore(storeId: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.delete<{ message: string }>(
+          `${API_BASE_URL}/stores/${storeId}`,
+          { withCredentials: true }
+        )
+      );
+
+      this._stores.update((stores) => stores.filter((s) => s.id !== storeId));
+      if (this._selectedStoreId() === storeId) {
+        this._selectedStoreId.set(null);
+      }
+    } catch (error) {
+      console.error('Error deleting store:', error);
+      throw error;
     }
   }
 }

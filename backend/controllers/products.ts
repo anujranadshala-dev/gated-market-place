@@ -72,3 +72,66 @@ export async function getProduct(req: AuthRequest, res: Response) {
         res.status(500).json({ message: 'Server error while fetching products.' });
     }
 }
+
+export async function updateProduct(req: AuthRequest, res: Response) {
+    const { productId } = req.params;
+    const updates = req.body;
+
+    if (!productId) {
+        return res.status(400).json({ message: 'Product ID is required' });
+    }
+
+    try {
+        const existingProduct = await product.findById(productId);
+        if (!existingProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        if (req.user?.role !== 'SUPER_ADMIN') {
+            const userStore = await store.findOne({ ownerEmail: req.user!.email });
+            if (!userStore || existingProduct.storeId !== userStore._id.toString()) {
+                return res.status(403).json({ message: 'You are not authorized to update this product' });
+            }
+        }
+
+        const updatedProduct = await product.findByIdAndUpdate(
+            productId,
+            { $set: updates },
+            { new: true }
+        );
+
+        res.status(200).json({ message: 'Product updated successfully.', product: updatedProduct });
+    } catch (error) {
+        console.error('Error updating product:', error);
+        res.status(500).json({ message: 'Server error while updating product.' });
+    }
+}
+
+export async function deleteProduct(req: AuthRequest, res: Response) {
+    const { productId } = req.params;
+
+    if (!productId) {
+        return res.status(400).json({ message: 'Product ID is required' });
+    }
+
+    try {
+        const existingProduct = await product.findById(productId);
+        if (!existingProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        if (req.user?.role !== 'SUPER_ADMIN') {
+            const userStore = await store.findOne({ ownerEmail: req.user!.email });
+            if (!userStore || existingProduct.storeId !== userStore._id.toString()) {
+                return res.status(403).json({ message: 'You are not authorized to delete this product' });
+            }
+        }
+
+        await product.findByIdAndDelete(productId);
+
+        res.status(200).json({ message: 'Product deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        res.status(500).json({ message: 'Server error while deleting product.' });
+    }
+}

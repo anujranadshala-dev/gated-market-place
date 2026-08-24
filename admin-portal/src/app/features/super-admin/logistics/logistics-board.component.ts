@@ -40,11 +40,11 @@ export class LogisticsBoardComponent {
     this.dispatchingOrder.set(null);
   }
 
-  public confirmDispatch(): void {
+  public async confirmDispatch(): Promise<void> {
     const order = this.dispatchingOrder();
     if (!order) return;
 
-    this.orderState.markOutForDelivery(order.id, {
+    await this.orderState.markOutForDelivery(order.id, {
       carrierName: this.carrierName(),
       trackingNumber: this.trackingNumber(),
       driverName: this.driverName(),
@@ -55,8 +55,8 @@ export class LogisticsBoardComponent {
     this.closeDispatchModal();
   }
 
-  public markAsDelivered(orderId: string, orderNumber: string): void {
-    this.orderState.markDelivered(orderId);
+  public async markAsDelivered(orderId: string, orderNumber: string): Promise<void> {
+    await this.orderState.markDelivered(orderId);
     this.showToast(`Order ${orderNumber} fulfilled and marked as 'Delivered'.`);
   }
 
