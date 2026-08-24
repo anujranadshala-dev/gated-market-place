@@ -1,0 +1,24 @@
+{
+  "name": "gated-market-place",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gated Market Place — monorepo with Node/Express backend, Angular admin portal, and React client portal.",
+  "workspaces": [
+    "backend",
+    "admin-portal",
+    "client-portal"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --parallel --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "start": "npm run start --workspace backend",
+    "dev:backend": "npm run dev --workspace backend",
+    "dev:admin": "npm run dev --workspace admin-portal",
+    "dev:client": "npm run dev --workspace client-portal",
+    "install:all": "npm install"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

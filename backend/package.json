@@ -1,5 +1,5 @@
 {
-  "name": "gated-market-place-backend",
+  "name": "backend",
   "version": "1.0.0",
   "description": "Backend for the Gated Market Place",
   "main": "dist/index.js",
