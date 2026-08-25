@@ -9,7 +9,7 @@
     "client-portal"
   ],
   "scripts": {
-    "dev": "npm run dev --workspaces --parallel --if-present",
+    "dev": "concurrently -n backend,admin,client -c blue,green,yellow \"npm:dev:backend\" \"npm:dev:admin\" \"npm:dev:client\"",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "start": "npm run start --workspace backend",
@@ -17,6 +17,9 @@
     "dev:admin": "npm run dev --workspace admin-portal",
     "dev:client": "npm run dev --workspace client-portal",
     "install:all": "npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   },
   "engines": {
     "node": ">=20"
