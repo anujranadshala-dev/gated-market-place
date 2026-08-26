@@ -27,11 +27,10 @@ import { logout } from '../../store/slices/authSlice';
 import { getUserGatedTier, GATED_TIERS } from '../../utils/tierUtils';
 
 interface HeaderProps {
-  onOpenArchitecture: () => void;
   onOpenMagicLinkSimulator: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenArchitecture, onOpenMagicLinkSimulator }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
   const dispatch = useAppDispatch();
   const isDark = useAppSelector((state) => state.theme.isDark);
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -151,15 +150,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenArchitecture, onOpenMagicL
 
           {/* Right Action Bar */}
           <div className="flex items-center space-x-2">
-            
-            {/* Architecture Blueprint Button */}
-            <button
-              onClick={onOpenArchitecture}
-              className="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-[#e67e22] dark:hover:border-[#e67e22] transition-all cursor-pointer shadow-xs active:scale-95"
-            >
-              <FileCode className="w-3.5 h-3.5 text-[#e67e22]" />
-              <span>Schemas</span>
-            </button>
 
             {/* Dark/Light Mode Toggle Button */}
             <button

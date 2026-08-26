@@ -11,7 +11,6 @@ import { UserProfileView } from './components/profile/UserProfileView';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { CheckoutModal } from './components/checkout/CheckoutModal';
 import { OrderTrackingModal } from './components/orders/OrderTrackingModal';
-import { ArchitectureModal } from './components/architecture/ArchitectureModal';
 import { setCurrentView } from './store/slices/tenantSlice';
 
 export default function App() {
@@ -20,7 +19,6 @@ export default function App() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   const isDark = useAppSelector((state) => state.theme.isDark);
 
-  const [isArchitectureOpen, setIsArchitectureOpen] = useState(false);
 
   // Sync dark theme on root html
   useEffect(() => {
@@ -48,7 +46,6 @@ export default function App() {
 
       {/* Main Header with Theme & Cart Controls */}
       <Header
-        onOpenArchitecture={() => setIsArchitectureOpen(true)}
         onOpenMagicLinkSimulator={() => dispatch(setCurrentView('magic_link_auth'))}
       />
 
@@ -67,15 +64,9 @@ export default function App() {
       <CartDrawer />
       <CheckoutModal />
       <OrderTrackingModal />
-      
-      {/* Full-Stack Architecture Blueprint Inspector */}
-      <ArchitectureModal
-        isOpen={isArchitectureOpen}
-        onClose={() => setIsArchitectureOpen(false)}
-      />
 
       {/* Corporate Footer */}
-      <Footer onOpenArchitecture={() => setIsArchitectureOpen(true)} />
+      <Footer />
     </div>
   );
 }
