@@ -27,11 +27,7 @@ import { setActiveStore } from '../../store/slices/tenantSlice';
 import { logout } from '../../store/slices/authSlice';
 import { getUserGatedTier, GATED_TIERS } from '../../utils/tierUtils';
 
-interface HeaderProps {
-  onOpenMagicLinkSimulator: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
+export const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -280,7 +276,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                       <button
                         onClick={() => {
                           setIsUserMenuOpen(false);
-                          onOpenMagicLinkSimulator();
+                          navigate('/login');
                         }}
                         className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center space-x-2 cursor-pointer"
                       >

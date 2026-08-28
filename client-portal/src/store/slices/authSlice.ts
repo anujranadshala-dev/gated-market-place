@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../../types';
-import { PRESET_USERS, DEMO_MAGIC_TOKENS } from '../../data/mockData';
+import { api } from '../../services/api';
 
 interface AuthState {
   currentUser: User | null;
@@ -8,23 +8,90 @@ interface AuthState {
   magicToken: string | null;
   verificationLoading: boolean;
   verificationError: string | null;
+  loginLoading: boolean;
+  loginError: string | null;
+  profileLoading: boolean;
+  profileError: string | null;
+  passwordLoading: boolean;
+  passwordError: string | null;
   accessRequests: { storeId: string; status: 'pending' | 'approved'; requestedAt: string }[];
   sessionExpiresAt: number | null;
 }
 
-// Default initial state starts with Sarah Jenkins (Enterprise VIP) so reviewer immediately sees populated gated UI,
-// but can easily test magic link flow or switch users!
-const initialUser = PRESET_USERS[0];
-
 const initialState: AuthState = {
-  currentUser: initialUser,
-  isAuthenticated: true,
+  currentUser: null,
+  isAuthenticated: false,
   magicToken: null,
   verificationLoading: false,
   verificationError: null,
+  loginLoading: false,
+  loginError: null,
+  profileLoading: false,
+  profileError: null,
+  passwordLoading: false,
+  passwordError: null,
   accessRequests: [],
-  sessionExpiresAt: Date.now() + 24 * 60 * 60 * 1000
+  sessionExpiresAt: null,
 };
+
+export const loginWithCredentials = createAsyncThunk(
+  'auth/loginWithCredentials',
+  async (credentials: { usernameOrEmail: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.login(credentials.usernameOrEmail, credentials.password);
+      return response.user;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Login failed');
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      await api.logout();
+    } catch (error) {
+      // Ignore logout errors
+    }
+  }
+);
+
+export const fetchCurrentUser = createAsyncThunk(
+  'auth/fetchCurrentUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.getMe();
+      return response.user;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch user');
+    }
+  }
+);
+
+export const updateUserProfileApi = createAsyncThunk(
+  'auth/updateUserProfileApi',
+  async (data: { fullName?: string; email?: string; mobileNumber?: string; avatarUrl?: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.updateProfile(data);
+      return response.user;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update profile');
+    }
+  }
+);
+
+export const changeUserPasswordApi = createAsyncThunk(
+  'auth/changeUserPasswordApi',
+  async (data: { currentPassword?: string; newPassword: string }, { rejectWithValue }) => {
+    try {
+      await api.changePassword(data.currentPassword || '', data.newPassword);
+      return { message: 'Password changed successfully' };
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to change password');
+    }
+  }
+);
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -33,126 +100,14 @@ export const authSlice = createSlice({
     setMagicToken: (state, action: PayloadAction<string>) => {
       state.magicToken = action.payload;
     },
-    verifyMagicTokenStart: (state) => {
-      state.verificationLoading = true;
-      state.verificationError = null;
+    clearLoginError: (state) => {
+      state.loginError = null;
     },
-    verifyMagicTokenSuccess: (
-      state,
-      action: PayloadAction<{ email: string; organization: string; stores: string[]; role: User['role'] }>
-    ) => {
-      state.verificationLoading = false;
-      state.verificationError = null;
-      // Initialize new session user for this magic link
-      const emailUsername = action.payload.email.split('@')[0];
-      const newUser: User = {
-        username: emailUsername,
-        email: action.payload.email,
-        fullName: emailUsername.replace('.', ' ').replace('_', ' ').toUpperCase(),
-        organization: action.payload.organization,
-        role: action.payload.role,
-        accessibleStores: action.payload.stores,
-        hasCompletedPasswordSetup: false,
-        isTemporaryPassword: true,
-        temporaryPassword: 'Temp#' + Math.random().toString(36).substring(2, 7),
-        currentPassword: 'Password123!',
-        avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-        creditLimit: 85000,
-        creditUsed: 0,
-        taxExemptNumber: 'EXEMPT-' + Math.floor(10000 + Math.random() * 90000)
-      };
-      state.currentUser = newUser;
-      state.isAuthenticated = true;
-      state.sessionExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    clearProfileError: (state) => {
+      state.profileError = null;
     },
-    verifyMagicTokenFailure: (state, action: PayloadAction<string>) => {
-      state.verificationLoading = false;
-      state.verificationError = action.payload;
-    },
-    loginWithCredentials: (
-      state,
-      action: PayloadAction<{ usernameOrEmail: string; password: string }>
-    ) => {
-      const { usernameOrEmail, password } = action.payload;
-      state.verificationLoading = false;
-
-      const trimmedInput = usernameOrEmail.trim().toLowerCase();
-      const match = PRESET_USERS.find(
-        (u) =>
-          u.username.toLowerCase() === trimmedInput ||
-          u.email.toLowerCase() === trimmedInput
-      );
-
-      if (match) {
-        // Accept either active password or initial temp password
-        if (
-          password === match.currentPassword ||
-          password === match.temporaryPassword ||
-          password === 'Password123!' ||
-          password.length >= 6
-        ) {
-          const isTemp = password === match.temporaryPassword && match.isTemporaryPassword;
-          state.currentUser = {
-            ...match,
-            isTemporaryPassword: isTemp
-          };
-          state.isAuthenticated = true;
-          state.verificationError = null;
-          state.sessionExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
-          return;
-        } else {
-          state.verificationError = 'Incorrect password. Please verify the temporary password sent by your store.';
-          return;
-        }
-      }
-
-      // If user typed a custom store-assigned credential
-      const newUser: User = {
-        username: trimmedInput,
-        email: trimmedInput.includes('@') ? trimmedInput : `${trimmedInput}@shopper.com`,
-        fullName: trimmedInput.replace('.', ' ').replace('_', ' ').toUpperCase(),
-        organization: 'Online Shopper',
-        role: 'REGULAR_SHOPPER',
-        accessibleStores: ['store_nexus_robotics', 'store_lumina_photonics'],
-        hasCompletedPasswordSetup: false,
-        isTemporaryPassword: true,
-        temporaryPassword: password,
-        currentPassword: password,
-        avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80'
-      };
-      state.currentUser = newUser;
-      state.isAuthenticated = true;
-      state.verificationError = null;
-      state.sessionExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
-    },
-    changeUserPassword: (
-      state,
-      action: PayloadAction<{ currentPassword?: string; newPassword: string }>
-    ) => {
-      if (state.currentUser) {
-        state.currentUser.currentPassword = action.payload.newPassword;
-        state.currentUser.isTemporaryPassword = false;
-        state.currentUser.hasCompletedPasswordSetup = true;
-        state.currentUser.passwordChangedAt = new Date().toISOString();
-      }
-    },
-    completePasswordSetup: (state, action: PayloadAction<{ newPassword?: string }>) => {
-      if (state.currentUser) {
-        if (action.payload?.newPassword) {
-          state.currentUser.currentPassword = action.payload.newPassword;
-        }
-        state.currentUser.isTemporaryPassword = false;
-        state.currentUser.hasCompletedPasswordSetup = true;
-        state.currentUser.passwordChangedAt = new Date().toISOString();
-      }
-    },
-    updateUserProfile: (state, action: PayloadAction<Partial<User>>) => {
-      if (state.currentUser) {
-        state.currentUser = {
-          ...state.currentUser,
-          ...action.payload
-        };
-      }
+    clearPasswordError: (state) => {
+      state.passwordError = null;
     },
     addUserAddress: (state, action: PayloadAction<import('../../types').UserAddress>) => {
       if (state.currentUser) {
@@ -209,14 +164,6 @@ export const authSlice = createSlice({
         });
       }
     },
-    switchUserPreset: (state, action: PayloadAction<string>) => {
-      const found = PRESET_USERS.find((u) => u.id === action.payload);
-      if (found) {
-        state.currentUser = { ...found };
-        state.isAuthenticated = true;
-        state.verificationError = null;
-      }
-    },
     requestStoreAccess: (state, action: PayloadAction<string>) => {
       const storeId = action.payload;
       if (!state.accessRequests.some((r) => r.storeId === storeId)) {
@@ -246,12 +193,6 @@ export const authSlice = createSlice({
         state.currentUser.totalSpent = Math.round((current + action.payload.amount) * 100) / 100;
       }
     },
-    simulateAddSpend: (state, action: PayloadAction<number>) => {
-      if (state.currentUser) {
-        const current = state.currentUser.totalSpent || 0;
-        state.currentUser.totalSpent = Math.round((current + action.payload) * 100) / 100;
-      }
-    },
     subscribeToVipBlack: (
       state,
       action: PayloadAction<{ plan: 'monthly' | 'annual' }>
@@ -276,29 +217,95 @@ export const authSlice = createSlice({
       state.isAuthenticated = false;
       state.magicToken = null;
       state.verificationError = null;
+      state.loginError = null;
+      state.profileError = null;
+      state.passwordError = null;
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginWithCredentials.pending, (state) => {
+        state.loginLoading = true;
+        state.loginError = null;
+        state.verificationError = null;
+      })
+      .addCase(loginWithCredentials.fulfilled, (state, action) => {
+        state.loginLoading = false;
+        state.currentUser = action.payload;
+        state.isAuthenticated = true;
+        state.loginError = null;
+        state.verificationError = null;
+        state.sessionExpiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      })
+      .addCase(loginWithCredentials.rejected, (state, action) => {
+        state.loginLoading = false;
+        state.loginError = action.payload as string;
+        state.isAuthenticated = false;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.currentUser = null;
+        state.isAuthenticated = false;
+        state.magicToken = null;
+        state.verificationError = null;
+        state.loginError = null;
+        state.sessionExpiresAt = null;
+      })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        state.currentUser = action.payload;
+        state.isAuthenticated = true;
+        state.sessionExpiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      })
+      .addCase(fetchCurrentUser.rejected, (state) => {
+        state.currentUser = null;
+        state.isAuthenticated = false;
+        state.sessionExpiresAt = null;
+      })
+      .addCase(updateUserProfileApi.pending, (state) => {
+        state.profileLoading = true;
+        state.profileError = null;
+      })
+      .addCase(updateUserProfileApi.fulfilled, (state, action) => {
+        state.profileLoading = false;
+        state.currentUser = action.payload;
+        state.profileError = null;
+      })
+      .addCase(updateUserProfileApi.rejected, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = action.payload as string;
+      })
+      .addCase(changeUserPasswordApi.pending, (state) => {
+        state.passwordLoading = true;
+        state.passwordError = null;
+      })
+      .addCase(changeUserPasswordApi.fulfilled, (state) => {
+        state.passwordLoading = false;
+        state.passwordError = null;
+        if (state.currentUser) {
+          state.currentUser.isTemporaryPassword = false;
+          state.currentUser.hasCompletedPasswordSetup = true;
+          state.currentUser.passwordChangedAt = new Date().toISOString();
+        }
+      })
+      .addCase(changeUserPasswordApi.rejected, (state, action) => {
+        state.passwordLoading = false;
+        state.passwordError = action.payload as string;
+      });
   }
 });
 
 export const {
   setMagicToken,
-  verifyMagicTokenStart,
-  verifyMagicTokenSuccess,
-  verifyMagicTokenFailure,
-  loginWithCredentials,
-  changeUserPassword,
-  completePasswordSetup,
-  updateUserProfile,
+  clearLoginError,
+  clearProfileError,
+  clearPasswordError,
   addUserAddress,
   updateUserAddress,
   deleteUserAddress,
   setDefaultAddress,
-  switchUserPreset,
   requestStoreAccess,
   grantStoreAccessDirectly,
   redeemInviteCode,
   recordOrderSpend,
-  simulateAddSpend,
   subscribeToVipBlack,
   cancelVipBlackSubscription,
   logout

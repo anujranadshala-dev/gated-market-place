@@ -15,7 +15,7 @@ export interface IAddress {
 }
 
 // Main User document interface
-export interface IShopUser extends Document {
+export interface IClientUser extends Document {
   username: string;
   email: string;
   fullName: string;
@@ -49,20 +49,19 @@ const addressSchema = new Schema<IAddress>({
   zipCode: { type: String, required: true },
   country: { type: String, required: true },
   phone: String,
-}, { _id: true }); // _id is useful for managing addresses in an array
+}, { _id: true });
 
-const shopUserSchema = new Schema<IShopUser>({
-  // id is handled by mongoose as _id
+const clientUserSchema = new Schema<IClientUser>({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   fullName: { type: String, required: true },
   role: {
     type: String,
-    enum: ['SHOP_USER'], // Enforce the value at the database level
+    enum: ['SHOP_USER'],
     default: 'SHOP_USER',
   },
   accessibleStoresId: [String],
-  password: { type: String, required: true, select: false }, // select: false hides it by default
+  password: { type: String, required: true, select: false },
   passwordLastChangedAt: Date,
   avatarUrl: String,
   mobileNumber: String,
@@ -87,7 +86,7 @@ const shopUserSchema = new Schema<IShopUser>({
   address: addressSchema,
   savedAddresses: [addressSchema],
 }, {
-  timestamps: true, // Manages createdAt and updatedAt
+  timestamps: true,
 });
 
-export default mongoose.model<IShopUser>('ShopUser', shopUserSchema);
+export default mongoose.model<IClientUser>('ClientUser', clientUserSchema);

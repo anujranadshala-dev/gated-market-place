@@ -10,19 +10,17 @@ import {
   Clock, 
   Percent, 
   KeyRound, 
-  CheckCircle2, 
+  CheckCircle2,
   Tag,
   ShieldAlert,
   Crown,
   Lock,
-  Zap,
   Award,
-  TrendingUp,
-  Plus
+  TrendingUp
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { setActiveStore } from '../../store/slices/tenantSlice';
-import { redeemInviteCode, simulateAddSpend } from '../../store/slices/authSlice';
+import { recordOrderSpend } from '../../store/slices/authSlice';
 import { 
   getUserGatedTier, 
   getTierProgress, 
@@ -36,17 +34,12 @@ export const TenantStoreGrid: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { currentUser } = useAppSelector((state) => state.auth);
-  const { stores } = useAppSelector((state) => state.tenant);
+  const { stores, loading, error } = useAppSelector((state) => state.tenant);
   const { orders } = useAppSelector((state) => state.order);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [inviteCodeInput, setInviteCodeInput] = useState('');
-  const [inviteError, setInviteError] = useState('');
-  const [inviteSuccess, setInviteSuccess] = useState(false);
-
   const [isVipModalOpen, setIsVipModalOpen] = useState(false);
 
   const userGatedTier = getUserGatedTier(currentUser, orders);
@@ -62,67 +55,38 @@ export const TenantStoreGrid: React.FC = () => {
   const handleOpenStore = (store: Store) => {
     const isInvited = currentUser?.accessibleStores?.includes(store.id) || currentUser?.isVipBlackSubscribed;
     if (!isInvited) {
-      setIsInviteModalOpen(true);
       return;
     }
     dispatch(setActiveStore(store.id));
     navigate('/store');
   };
 
-  const handleSimulateSpend = (amount: number) => {
-    dispatch(simulateAddSpend(amount));
-    try {
-      confetti({
-        particleCount: 40,
-        spread: 60,
-        origin: { y: 0.7 }
-      });
-    } catch (e) {}
-  };
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+        <div className="p-8 bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="w-10 h-10 border-4 border-[#2988c8] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">Loading stores...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleRedeemInvite = (e: React.FormEvent) => {
-    e.preventDefault();
-    const code = inviteCodeInput.trim().toUpperCase();
-    
-    // Check available invitation tokens
-    if (
-      code === 'NEXUS-VIP-2026' || 
-      code === 'AERO-DEF-900' || 
-      code === 'BIO-CLINICAL-100' ||
-      code === 'VERDANT-GO-777' ||
-      code === 'LUMINA-PRO-555' ||
-      code === 'BLACK-RESERVE-999'
-    ) {
-      const targetStoreId = code.includes('AERO') 
-        ? 'store_aerovanguard' 
-        : code.includes('BIO') 
-        ? 'store_biovance_pharma' 
-        : code.includes('VERDANT')
-        ? 'store_verdant_agritech'
-        : code.includes('LUMINA')
-        ? 'store_lumina_photonics'
-        : code.includes('BLACK')
-        ? 'store_black_reserve'
-        : 'store_nexus_robotics';
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+        <div className="p-8 bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <ShieldAlert className="w-10 h-10 text-rose-500 mx-auto mb-3" />
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Failed to Load Stores</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
-      dispatch(redeemInviteCode({ inviteCode: code, storeId: targetStoreId }));
-      setInviteSuccess(true);
-      setInviteError('');
-      setTimeout(() => {
-        setIsInviteModalOpen(false);
-        setInviteSuccess(false);
-        setInviteCodeInput('');
-      }, 1000);
-    } else {
-      setInviteError('Invalid token code. Active demo keys: NEXUS-VIP-2026, AERO-DEF-900, BIO-CLINICAL-100, VERDANT-GO-777, LUMINA-PRO-555, BLACK-RESERVE-999');
-    }
-  };
-
-  // Filter stores according to search, category, and selected tab
+  // Filter stores according to search, category
   const filteredStores = stores.filter((st) => {
     const isInvited = currentUser?.accessibleStores?.includes(st.id) || currentUser?.isVipBlackSubscribed;
-    
-    // if (filterTab === 'invited' && !isInvited) return false;
     if (selectedCategory !== 'ALL' && st.category !== selectedCategory) return false;
 
     const term = searchTerm.toLowerCase().trim();
@@ -188,7 +152,7 @@ export const TenantStoreGrid: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Spend Meter & Simulation */}
+          {/* Right Column: Spend Meter */}
           <div className="bg-slate-900/90 backdrop-blur-md rounded-2xl p-5 border border-slate-700/80 lg:w-96 space-y-4 shadow-xl">
             
             {/* Lifetime Spend & Progress */}
@@ -222,7 +186,7 @@ export const TenantStoreGrid: React.FC = () => {
               ) : tierProgress.isVipBlack ? (
                 <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 flex items-center justify-between">
                   <span className="flex items-center space-x-1.5 font-bold">
-                    <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    <Crown className="w-4 h-4 text-amber-400" />
                     <span>VIP Black Pass Active</span>
                   </span>
                   <span className="text-[11px] text-amber-200">15% Max Off Across All Stores</span>
@@ -237,69 +201,35 @@ export const TenantStoreGrid: React.FC = () => {
               )}
             </div>
 
-            {/* Quick Demo Spend Actions */}
-            <div className="pt-3 border-t border-slate-800 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-400">Quick Test Spend (Simulate Orders):</span>
-              </div>
-              <div className="grid grid-cols-3 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleSimulateSpend(250)}
-                  className="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition-colors flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
-                >
-                  <Plus className="w-3 h-3 text-amber-400" />
-                  <span>+$250</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSimulateSpend(1000)}
-                  className="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition-colors flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
-                >
-                  <Plus className="w-3 h-3 text-amber-400" />
-                  <span>+$1,000</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSimulateSpend(2500)}
-                  className="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition-colors flex items-center justify-center space-x-1 cursor-pointer active:scale-95"
-                >
-                  <Plus className="w-3 h-3 text-amber-400" />
-                  <span>+$2,500</span>
-                </button>
-              </div>
-
-              {/* VIP Black Subscription CTA */}
-              {!currentUser?.isVipBlackSubscribed ? (
-                <button
-                  type="button"
-                  onClick={() => setIsVipModalOpen(true)}
-                  className="w-full mt-2 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-extrabold transition-all shadow-md flex items-center justify-center space-x-1.5 cursor-pointer active:scale-98"
-                >
-                  <Crown className="w-4 h-4 fill-slate-950" />
-                  <span>Upgrade to VIP Black (15% Off All Stores)</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsVipModalOpen(true)}
-                  className="w-full mt-2 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
-                >
-                  <Crown className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Manage VIP Black Membership</span>
-                </button>
-              )}
-            </div>
-
+            {/* VIP Black Subscription CTA */}
+            {!currentUser?.isVipBlackSubscribed ? (
+              <button
+                type="button"
+                onClick={() => setIsVipModalOpen(true)}
+                className="w-full mt-2 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-extrabold transition-all shadow-md flex items-center justify-center space-x-1.5 cursor-pointer active:scale-98"
+              >
+                <Crown className="w-4 h-4 fill-slate-950" />
+                <span>Upgrade to VIP Black (15% Off All Stores)</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsVipModalOpen(true)}
+                className="w-full mt-2 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <Crown className="w-3.5 h-3.5 text-amber-400" />
+                <span>Manage VIP Black Membership</span>
+              </button>
+            )}
           </div>
 
         </div>
       </div>
 
-      {/* 2. Filter Tabs & Search & Redeem Token */}
+      {/* 2. Filter Tabs & Search */}
       <div className="space-y-4">
         
-        {/* User Identity & Store Invitation Access Bar */}
+        {/* User Identity & Store Access Bar */}
         <div className="p-4 rounded-2xl bg-white dark:bg-[#212832] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-[#2988c8]/10 text-[#2988c8] flex items-center justify-center font-bold text-base shrink-0">
@@ -322,46 +252,18 @@ export const TenantStoreGrid: React.FC = () => {
               </p>
             </div>
           </div>
-
-          <div className="flex items-center space-x-2 shrink-0">
-            <button
-              type="button"
-              onClick={() => setIsInviteModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-98"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Redeem Store Invite Code</span>
-            </button>
-          </div>
         </div>
 
         {/* Tab Controls & Category Pills */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          {/* Main Tabs */}
-          {/* <div className="flex items-center space-x-1.5 bg-white dark:bg-[#212832] p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs"> */}
             <span
-              // onClick={() => setFilterTab('invited')}
-              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex items-center space-x-1.5 ${
-                // filterTab === 'invited'
-                   'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-xs'
-                  // : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
+               className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex items-center space-x-1.5 ${
+                  'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-xs'
+               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               <span>My Invited Stores ({invitedStoresCount})</span>
             </span>
-{/* 
-            <button
-              onClick={() => setFilterTab('all')}
-              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                filterTab === 'all'
-                  ? 'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <span>All Stores ({stores.length})</span>
-            </button> */}
-          {/* </div> */}
 
           {/* Search */}
           <div className="relative w-full sm:w-72">
@@ -405,16 +307,6 @@ export const TenantStoreGrid: React.FC = () => {
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
             Try resetting your search query or switching to "All Stores" to explore other catalogs.
           </p>
-          {/* <span
-            onClick={() => {
-              setSearchTerm('');
-              setSelectedCategory('ALL');
-              setFilterTab('all');
-            }}
-            className="mt-4 px-4 py-2 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white text-xs font-semibold cursor-pointer"
-          >
-            Reset Filters
-          </span> */}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -504,7 +396,7 @@ export const TenantStoreGrid: React.FC = () => {
                           <span>Not in your invited stores list</span>
                         </div>
                         <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-tight">
-                          Enter your store invitation token or sign in with an authorized shopper account to access this store.
+                          Contact your store administrator to get access.
                         </p>
                       </div>
                     ) : (
@@ -542,12 +434,11 @@ export const TenantStoreGrid: React.FC = () => {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setIsInviteModalOpen(true);
                       }}
                       className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
                     >
                       <KeyRound className="w-3.5 h-3.5 text-[#2988c8]" />
-                      <span>Redeem Invite Code to Unlock</span>
+                      <span>Access Restricted</span>
                     </button>
                   )}
                 </div>
@@ -558,128 +449,7 @@ export const TenantStoreGrid: React.FC = () => {
         </div>
       )}
 
-      {/* 4. Redeem Token Modal */}
-      {isInviteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-xl bg-[#2988c8] text-white flex items-center justify-center">
-                  <KeyRound className="w-4 h-4" />
-                </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                  Redeem Store Invite Token
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsInviteModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-xs text-slate-600 dark:text-slate-300 mb-4">
-              Enter the single-use token or invitation code provided by your organization or vendor.
-            </p>
-
-            <form onSubmit={handleRedeemInvite} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                  Invitation Token:
-                </label>
-                <input
-                  type="text"
-                  value={inviteCodeInput}
-                  onChange={(e) => setInviteCodeInput(e.target.value)}
-                  placeholder="e.g. AERO-DEF-900"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
-                  autoFocus
-                />
-              </div>
-
-              {inviteError && (
-                <p className="text-xs text-rose-500 font-medium">
-                  {inviteError}
-                </p>
-              )}
-
-              {inviteSuccess && (
-                <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center space-x-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Store access granted successfully!</span>
-                </div>
-              )}
-
-              <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900/60 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5">
-                <p className="font-bold text-slate-700 dark:text-slate-300">Active Demo Store Invite Keys (Click to Fill):</p>
-                <div className="flex flex-wrap gap-1.5 pt-1 font-mono">
-                  <button
-                    type="button"
-                    onClick={() => setInviteCodeInput('AERO-DEF-900')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
-                  >
-                    AERO-DEF-900 (AeroVanguard)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInviteCodeInput('BIO-CLINICAL-100')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
-                  >
-                    BIO-CLINICAL-100 (BioVance)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInviteCodeInput('NEXUS-VIP-2026')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
-                  >
-                    NEXUS-VIP-2026 (Nexus Robotics)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInviteCodeInput('VERDANT-GO-777')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
-                  >
-                    VERDANT-GO-777 (Verdant Agritech)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInviteCodeInput('LUMINA-PRO-555')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
-                  >
-                    LUMINA-PRO-555 (Lumina Photonics)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInviteCodeInput('BLACK-RESERVE-999')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-amber-400 text-amber-500 cursor-pointer"
-                  >
-                    BLACK-RESERVE-999 (Apex Black)
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end space-x-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsInviteModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white text-xs font-bold transition-colors cursor-pointer"
-                >
-                  Verify & Redeem
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 5. VIP Black Subscription Modal */}
+      {/* 4. VIP Black Subscription Modal */}
       <VipBlackModal
         isOpen={isVipModalOpen}
         onClose={() => setIsVipModalOpen(false)}

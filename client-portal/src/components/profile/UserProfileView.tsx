@@ -42,14 +42,13 @@ import {
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { 
-  updateUserProfile, 
   addUserAddress, 
   updateUserAddress, 
   deleteUserAddress, 
   setDefaultAddress,
-  changeUserPassword,
-  simulateAddSpend,
-  cancelVipBlackSubscription 
+  cancelVipBlackSubscription,
+  updateUserProfileApi,
+  changeUserPasswordApi
 } from '../../store/slices/authSlice';
 import { getUserGatedTier, getTierProgress, GATED_TIERS } from '../../utils/tierUtils';
 import { VipBlackModal } from '../auth/VipBlackModal';
@@ -57,14 +56,6 @@ import { setActiveStore } from '../../store/slices/tenantSlice';
 import { setActiveOrder, toggleOrderModal } from '../../store/slices/orderSlice';
 import { UserAddress } from '../../types';
 import confetti from 'canvas-confetti';
-
-const AVATAR_PRESETS = [
-  { url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80', label: 'Sarah' },
-  { url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80', label: 'Marcus' },
-  { url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80', label: 'Alex' },
-  { url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&auto=format&fit=crop&q=80', label: 'Elena' },
-  { url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80', label: 'David' }
-];
 
 export const UserProfileView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -87,7 +78,7 @@ export const UserProfileView: React.FC = () => {
   const [fullName, setFullName] = useState(currentUser?.fullName || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [mobileNumber, setMobileNumber] = useState(currentUser?.mobileNumber || currentUser?.phone || '');
-  const [selectedAvatar, setSelectedAvatar] = useState(currentUser?.avatarUrl || AVATAR_PRESETS[0].url);
+  const [selectedAvatar, setSelectedAvatar] = useState(currentUser?.avatarUrl || '');
 
   // Password Change State
   const [currentOrTempPassword, setCurrentOrTempPassword] = useState('');
@@ -117,7 +108,7 @@ export const UserProfileView: React.FC = () => {
       setFullName(currentUser.fullName || '');
       setEmail(currentUser.email || '');
       setMobileNumber(currentUser.mobileNumber || currentUser.phone || '');
-      setSelectedAvatar(currentUser.avatarUrl || AVATAR_PRESETS[0].url);
+      setSelectedAvatar(currentUser.avatarUrl || '');
       setCurrentOrTempPassword(currentUser.temporaryPassword || currentUser.currentPassword || '');
     }
   }, [currentUser]);
@@ -144,10 +135,9 @@ export const UserProfileView: React.FC = () => {
     );
   }
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Preserve primary address or initialize default if needed
     let updatedAddress = currentUser.address;
     if (updatedAddress) {
       updatedAddress = {
@@ -157,34 +147,34 @@ export const UserProfileView: React.FC = () => {
       };
     }
 
-    dispatch(
-      updateUserProfile({
+    try {
+      await dispatch(updateUserProfileApi({
         fullName,
         email,
         mobileNumber,
-        phone: mobileNumber,
-        avatarUrl: selectedAvatar,
-        address: updatedAddress
-      })
-    );
+        avatarUrl: selectedAvatar
+      })).unwrap();
 
-    setIsEditingProfile(false);
-    setSaveSuccessMessage('Your profile information was updated successfully!');
+      setIsEditingProfile(false);
+      setSaveSuccessMessage('Your profile information was updated successfully!');
 
-    try {
-      confetti({
-        particleCount: 40,
-        spread: 60,
-        origin: { y: 0.7 }
-      });
-    } catch (err) {}
+      try {
+        confetti({
+          particleCount: 40,
+          spread: 60,
+          origin: { y: 0.7 }
+        });
+      } catch (err) {}
 
-    setTimeout(() => {
-      setSaveSuccessMessage(null);
-    }, 3500);
+      setTimeout(() => {
+        setSaveSuccessMessage(null);
+      }, 3500);
+    } catch (error: any) {
+      setSaveSuccessMessage(error.message || 'Failed to update profile');
+    }
   };
 
-  const handleChangePasswordSubmit = (e: React.FormEvent) => {
+  const handleChangePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError(null);
 
@@ -200,13 +190,11 @@ export const UserProfileView: React.FC = () => {
 
     setIsChangingPassword(true);
 
-    setTimeout(() => {
-      dispatch(
-        changeUserPassword({
-          currentPassword: currentOrTempPassword,
-          newPassword
-        })
-      );
+    try {
+      await dispatch(changeUserPasswordApi({
+        currentPassword: currentOrTempPassword,
+        newPassword
+      })).unwrap();
 
       setIsChangingPassword(false);
       setNewPassword('');
@@ -224,7 +212,10 @@ export const UserProfileView: React.FC = () => {
       setTimeout(() => {
         setSaveSuccessMessage(null);
       }, 4000);
-    }, 600);
+    } catch (error: any) {
+      setIsChangingPassword(false);
+      setPasswordError(error.message || 'Failed to change password');
+    }
   };
 
   const handleOpenAddAddressModal = () => {
@@ -352,7 +343,7 @@ export const UserProfileView: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
             <div className="relative group">
               <img
-                src={currentUser.avatarUrl || AVATAR_PRESETS[0].url}
+                src={currentUser.avatarUrl || ''}
                 alt={currentUser.fullName}
                 className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-4 ring-[#2988c8]/30 shadow-lg"
               />
@@ -641,36 +632,9 @@ export const UserProfileView: React.FC = () => {
                   </div>
                 )}
 
-                {/* Simulation Buttons for User Testing */}
                 <div className="pt-3 border-t border-slate-800">
                   <div className="text-[11px] font-semibold text-slate-400 mb-2">
-                    Test Auto-Tier Upgrades (Simulate Spend):
-                  </div>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => dispatch(simulateAddSpend(250))}
-                      className="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition-colors flex items-center justify-center space-x-1 cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3 text-amber-400" />
-                      <span>+$250</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => dispatch(simulateAddSpend(1000))}
-                      className="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition-colors flex items-center justify-center space-x-1 cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3 text-amber-400" />
-                      <span>+$1,000</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => dispatch(simulateAddSpend(2500))}
-                      className="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 transition-colors flex items-center justify-center space-x-1 cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3 text-amber-400" />
-                      <span>+$2,500</span>
-                    </button>
+                    Your tier is automatically calculated from your order history.
                   </div>
                 </div>
 
@@ -855,29 +819,15 @@ export const UserProfileView: React.FC = () => {
               {isEditingProfile && (
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                    Choose Profile Photo:
+                    Profile Photo URL:
                   </label>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {AVATAR_PRESETS.map((preset, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setSelectedAvatar(preset.url)}
-                        className={`relative rounded-xl overflow-hidden p-0.5 transition-all cursor-pointer ${
-                          selectedAvatar === preset.url
-                            ? 'ring-3 ring-[#2988c8] scale-105 shadow-md'
-                            : 'opacity-70 hover:opacity-100'
-                        }`}
-                      >
-                        <img src={preset.url} alt={preset.label} className="w-12 h-12 rounded-lg object-cover" />
-                        {selectedAvatar === preset.url && (
-                          <div className="absolute inset-0 bg-[#2988c8]/20 flex items-center justify-center">
-                            <Check className="w-4 h-4 text-white drop-shadow" />
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                  <input
+                    type="url"
+                    value={selectedAvatar}
+                    onChange={(e) => setSelectedAvatar(e.target.value)}
+                    placeholder="https://example.com/avatar.jpg"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
+                  />
                 </div>
               )}
 

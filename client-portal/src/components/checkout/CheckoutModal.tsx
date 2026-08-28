@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { toggleCheckoutModal, clearCart } from '../../store/slices/cartSlice';
-import { checkoutSuccess, startCheckoutProcessing } from '../../store/slices/orderSlice';
+import { checkoutSuccess, startCheckoutProcessing, createOrder } from '../../store/slices/orderSlice';
 import { recordOrderSpend } from '../../store/slices/authSlice';
 import { getUserGatedTier, getTierProgress, GATED_TIERS } from '../../utils/tierUtils';
 import { Order } from '../../types';
@@ -100,14 +100,56 @@ export const CheckoutModal: React.FC = () => {
 
   const distinctStoreIds = Array.from(new Set(items.map((i) => i.storeId)));
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     dispatch(startCheckoutProcessing());
 
-    setTimeout(() => {
+    try {
+      const primaryStoreId = distinctStoreIds[0];
+      
+      const orderData = {
+        storeId: primaryStoreId,
+        customer: {
+          recipientName: recipientName || currentUser?.fullName || 'Valued Customer',
+          email: currentUser?.email || 'shopper@example.com',
+          phone: recipientPhone || currentUser?.mobileNumber || '',
+        },
+        shippingAddress: {
+          recipientName: recipientName || currentUser?.fullName || 'Valued Customer',
+          addressLine: apartment ? `${addressLine}, ${apartment}` : addressLine,
+          city,
+          state,
+          zipCode,
+          country: 'United States',
+        },
+        items: items.map((item) => ({
+          product: {
+            id: item.product.id,
+            sku: item.product.sku,
+            name: item.product.name,
+            basePrice: item.product.basePrice,
+            imageUrl: item.product.imageUrl,
+          },
+          quantity: item.quantity,
+          appliedUnitPrice: item.appliedUnitPrice,
+          itemSubtotal: item.itemSubtotal,
+        })),
+        subtotal,
+        shippingFee,
+        taxAmount: totalTax,
+        discountAmount: totalDiscounts,
+        totalAmount: grandTotal,
+        currency: 'USD',
+        paymentMethod: 'CORPORATE_CARD',
+        notes: deliveryNotes,
+      };
+
+      const result = await dispatch(createOrder(orderData)).unwrap();
+      
       const newOrder: Order = {
-        orderNumber: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
+        id: result.orderId,
+        orderNumber: result.orderNumber,
         userId: currentUser?.id || 'usr_guest',
         userEmail: currentUser?.email || 'shopper@example.com',
         organization: currentUser?.organization || 'Home Delivery',
@@ -133,7 +175,6 @@ export const CheckoutModal: React.FC = () => {
         storeIds: distinctStoreIds
       };
 
-      // Automatically record spend to trigger automated tier upgrades
       dispatch(recordOrderSpend({ amount: grandTotal }));
       dispatch(checkoutSuccess(newOrder));
       dispatch(clearCart());
@@ -147,7 +188,11 @@ export const CheckoutModal: React.FC = () => {
           origin: { y: 0.5 }
         });
       } catch (err) {}
-    }, 1000);
+    } catch (error: any) {
+      dispatch(startCheckoutProcessing());
+      setIsSubmitting(false);
+      alert(error.message || 'Failed to place order. Please try again.');
+    }
   };
 
   return (

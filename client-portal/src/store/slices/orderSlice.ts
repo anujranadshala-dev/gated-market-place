@@ -1,79 +1,48 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Order } from '../../types';
+import { api } from '../../services/api';
 
 interface OrderState {
   orders: Order[];
   activeOrder: Order | null;
   isOrderModalOpen: boolean;
   isProcessingCheckout: boolean;
+  loading: boolean;
+  error: string | null;
 }
 
-const initialMockOrders: Order[] = [
-  {
-    id: 'ord_sample_9021',
-    orderNumber: 'NX-ORD-882194',
-    userId: 'usr_enterprise_sarah',
-    userEmail: 'sarah.jenkins@aerodyne-corp.com',
-    organization: 'Aerodyne Aerospace & Robotics Labs',
-    items: [
-      {
-        product: {
-          id: 'prod_nexus_01',
-          storeId: 'store_nexus_robotics',
-          storeName: 'Nexus Industrial Automation',
-          sku: 'NX-ACT-8800',
-          name: 'Nexus Ultra-Torque 6-DOF Brushless Servo Actuator',
-          description: 'Industrial robotic actuator with harmonic drive gearbox',
-          category: 'Actuators & Motors',
-          basePrice: 1250.00,
-          moq: 2,
-          stock: 48,
-          inStock: true,
-          leadTimeDays: 3,
-          taxRate: 0.0825,
-          priceTiers: [],
-          specifications: {},
-          imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80',
-          complianceTags: ['CE Compliant']
-        },
-        quantity: 5,
-        appliedUnitPrice: 1150.00,
-        appliedDiscountPercent: 8,
-        itemSubtotal: 5750.00,
-        itemTax: 474.38,
-        storeId: 'store_nexus_robotics',
-        storeName: 'Nexus Industrial Automation'
-      }
-    ],
-    subtotal: 5750.00,
-    discountTotal: 460.00,
-    taxTotal: 474.38,
-    shippingFee: 150.00,
-    grandTotal: 5914.38,
-    status: 'Pending',
-    paymentMethod: 'PO_INVOICE',
-    poNumber: 'PO-AERODYNE-2026-0994',
-    shippingAddress: {
-      recipientName: 'Sarah Jenkins (Receiving Dock 4)',
-      company: 'Aerodyne Aerospace & Robotics Labs',
-      addressLine: '8400 Technology Parkway, Suite 100',
-      city: 'Austin',
-      state: 'TX',
-      zipCode: '78759',
-      country: 'United States'
-    },
-    notes: 'Please attach NIST calibration certificates with shipping container.',
-    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-    storeIds: ['store_nexus_robotics']
-  }
-];
-
 const initialState: OrderState = {
-  orders: initialMockOrders,
+  orders: [],
   activeOrder: null,
   isOrderModalOpen: false,
-  isProcessingCheckout: false
+  isProcessingCheckout: false,
+  loading: false,
+  error: null,
 };
+
+export const fetchOrders = createAsyncThunk(
+  'order/fetchOrders',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.getOrders();
+      return response.orders;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch orders');
+    }
+  }
+);
+
+export const createOrder = createAsyncThunk(
+  'order/createOrder',
+  async (orderData: any, { rejectWithValue }) => {
+    try {
+      const response = await api.createOrder(orderData);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to create order');
+    }
+  }
+);
 
 export const orderSlice = createSlice({
   name: 'order',
@@ -106,6 +75,28 @@ export const orderSlice = createSlice({
         }
       }
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders = action.payload;
+      })
+      .addCase(fetchOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.isProcessingCheckout = false;
+      })
+      .addCase(createOrder.rejected, (state, action) => {
+        state.isProcessingCheckout = false;
+        state.error = action.payload as string;
+      });
   }
 });
 
