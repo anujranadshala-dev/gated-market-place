@@ -41,7 +41,7 @@ export default function App() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#121921] text-slate-800 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#171c23] text-slate-800 dark:text-slate-100 transition-colors duration-200">
       
       {/* Top Interactive Demo Persona Switcher */}
       <RoleSwitcherBar />

@@ -4,18 +4,18 @@ import { Shield, Lock, Cpu, Server, CheckCircle, ExternalLink } from 'lucide-rea
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="w-full bg-[#1a2530] text-slate-300 border-t border-slate-700/60 mt-auto">
+    <footer className="w-full bg-[#212832] text-slate-300 border-t border-slate-700/60 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           
           {/* Col 1: System Identity */}
           <div className="md:col-span-1 space-y-3">
             <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 rounded-lg bg-[#e67e22] flex items-center justify-center text-white shadow-xs">
+              <div className="w-7 h-7 rounded-lg bg-[#2988c8] flex items-center justify-center text-white shadow-xs">
                 <Shield className="w-4 h-4" />
               </div>
               <span className="font-bold text-white text-base tracking-tight">
-                Nexus<span className="text-[#e67e22]">Gate</span>
+                Nexus<span className="text-[#2988c8]">Gate</span>
               </span>
             </div>
             <p className="text-xs text-slate-300/80 leading-relaxed">

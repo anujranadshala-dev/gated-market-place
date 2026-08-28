@@ -46,12 +46,12 @@ export const OrderTrackingModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 max-w-3xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 my-8">
+      <div className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 max-w-3xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 my-8">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-[#e67e22] text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-[#2988c8] text-white flex items-center justify-center shadow-xs">
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
@@ -88,7 +88,7 @@ export const OrderTrackingModal: React.FC = () => {
               {activeOrder.status !== 'Shipped' && (
                 <button
                   onClick={handleNextStatus}
-                  className="px-2.5 py-1 rounded bg-[#e67e22] text-white text-[11px] font-medium hover:bg-[#d35400] transition-colors flex items-center space-x-1 cursor-pointer"
+                  className="px-2.5 py-1 rounded bg-[#2988c8] text-white text-[11px] font-medium hover:bg-[#d97d10] transition-colors flex items-center space-x-1 cursor-pointer"
                 >
                   <span>Simulate Next Stage</span>
                   <ArrowRight className="w-3 h-3" />
@@ -106,7 +106,7 @@ export const OrderTrackingModal: React.FC = () => {
                     key={step.key}
                     className={`p-3 rounded-lg border text-left ${
                       isCurrent
-                        ? 'border-[#e67e22] bg-amber-50/70 dark:bg-amber-950/40 ring-1 ring-[#e67e22]'
+                        ? 'border-[#2988c8] bg-amber-50/70 dark:bg-amber-950/40 ring-1 ring-[#2988c8]'
                         : isPassed
                         ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20'
                         : 'border-slate-200 dark:border-slate-800 opacity-50'
@@ -139,7 +139,7 @@ export const OrderTrackingModal: React.FC = () => {
                 {activeOrder.paymentMethod.replace('_', ' ')}
               </span>
               {activeOrder.poNumber && (
-                <p className="font-mono text-[11px] text-[#e67e22] mt-0.5">
+                <p className="font-mono text-[11px] text-[#2988c8] mt-0.5">
                   Ref: {activeOrder.poNumber}
                 </p>
               )}
@@ -157,7 +157,7 @@ export const OrderTrackingModal: React.FC = () => {
 
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
               <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Grand Authorized Total</span>
-              <span className="font-extrabold text-base text-[#1a2530] dark:text-white">
+              <span className="font-extrabold text-base text-[#212832] dark:text-white">
                 ${activeOrder.grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </span>
               <p className="text-[10px] text-slate-500">Tax & Freight included</p>
@@ -185,7 +185,7 @@ export const OrderTrackingModal: React.FC = () => {
                     <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
                       <td className="p-3">
                         <p className="font-bold text-slate-900 dark:text-white">{item.product.name}</p>
-                        <p className="text-[10px] font-mono text-[#e67e22]">{item.product.sku}</p>
+                        <p className="text-[10px] font-mono text-[#2988c8]">{item.product.sku}</p>
                       </td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">{item.storeName}</td>
                       <td className="p-3 text-center font-bold">{item.quantity}</td>
@@ -213,7 +213,7 @@ export const OrderTrackingModal: React.FC = () => {
                 dispatch(toggleOrderModal(false));
                 navigate('/');
               }}
-              className="px-4 py-2 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-semibold shadow-md transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white text-xs font-semibold shadow-md transition-colors cursor-pointer"
             >
               Back to Gated Stores
             </button>

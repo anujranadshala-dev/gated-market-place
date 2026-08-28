@@ -66,15 +66,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
               }}
               className="flex items-center space-x-3 group text-left cursor-pointer focus:outline-none"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#e67e22] flex items-center justify-center text-white shadow-sm ring-1 ring-white/10 group-hover:scale-105 transition-transform duration-200">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#212832] via-[#212832] to-[#2988c8] flex items-center justify-center text-white shadow-sm ring-1 ring-white/10 group-hover:scale-105 transition-transform duration-200">
                 <ShieldCheck className="w-5 h-5 text-amber-400" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                    Nexus<span className="text-[#e67e22]">Gate</span>
+                    Nexus<span className="text-[#2988c8]">Gate</span>
                   </span>
-                  <span className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-md bg-[#e67e22]/10 text-[#e67e22] dark:text-amber-400 border border-[#e67e22]/25">
+                  <span className="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-md bg-[#2988c8]/10 text-[#2988c8] dark:text-amber-400 border border-[#2988c8]/25">
                     PORTAL
                   </span>
                 </div>
@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                 }}
                 className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 active:scale-95 ${
                   location.pathname === '/'
-                    ? 'text-white bg-[#0f172a] dark:bg-[#e67e22] shadow-xs'
+                    ? 'text-white bg-[#212832] dark:bg-[#2988c8] shadow-xs'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                   onClick={() => navigate('/store')}
                   className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 active:scale-95 ${
                     location.pathname === '/store'
-                      ? 'text-white bg-[#0f172a] dark:bg-[#e67e22] shadow-xs'
+                      ? 'text-white bg-[#212832] dark:bg-[#2988c8] shadow-xs'
                       : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
@@ -124,14 +124,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                 onClick={() => navigate('/orders')}
                 className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 active:scale-95 ${
                   location.pathname === '/orders'
-                    ? 'text-white bg-[#0f172a] dark:bg-[#e67e22] shadow-xs'
+                    ? 'text-white bg-[#212832] dark:bg-[#2988c8] shadow-xs'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <Clock className="w-4 h-4" />
                 <span>Orders</span>
                 {orders.some((o) => o.status === 'Pending') && (
-                  <span className="px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-[#e67e22] text-white animate-subtle-pulse">
+                  <span className="px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-[#2988c8] text-white animate-subtle-pulse">
                     {orders.filter((o) => o.status === 'Pending').length}
                   </span>
                 )}
@@ -141,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                 onClick={() => navigate('/profile')}
                 className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 active:scale-95 ${
                   location.pathname === '/profile'
-                    ? 'text-white bg-[#0f172a] dark:bg-[#e67e22] shadow-xs'
+                    ? 'text-white bg-[#212832] dark:bg-[#2988c8] shadow-xs'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -171,7 +171,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
             {/* Shopping Cart Button */}
             <button
               onClick={() => dispatch(toggleCartDrawer())}
-              className="relative flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white shadow-sm transition-all duration-150 cursor-pointer active:scale-95 font-bold text-xs"
+              className="relative flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white shadow-sm transition-all duration-150 cursor-pointer active:scale-95 font-bold text-xs"
             >
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden sm:inline">Cart</span>
@@ -203,7 +203,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                   <img
                     src={currentUser.avatarUrl}
                     alt={currentUser.fullName}
-                    className="w-7 h-7 rounded-full object-cover ring-2 ring-[#e67e22]/50"
+                    className="w-7 h-7 rounded-full object-cover ring-2 ring-[#2988c8]/50"
                   />
                   <div className="hidden xl:block text-left text-xs">
                     <p className="font-bold text-slate-800 dark:text-white leading-tight truncate max-w-[110px]">
@@ -233,7 +233,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                       </p>
                       <div className="mt-2 flex items-center justify-between text-[11px] bg-slate-50 dark:bg-slate-900/60 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
                         <span className="text-slate-500 dark:text-slate-400">Total Spend:</span>
-                        <span className="font-mono font-bold text-[#e67e22]">
+                        <span className="font-mono font-bold text-[#2988c8]">
                           ${((currentUser.totalSpent || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
@@ -273,7 +273,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                         }}
                         className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center space-x-2 cursor-pointer"
                       >
-                        <Clock className="w-3.5 h-3.5 text-[#e67e22]" />
+                        <Clock className="w-3.5 h-3.5 text-[#2988c8]" />
                         <span>Purchase Order History</span>
                       </button>
 
@@ -306,7 +306,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                className="px-3.5 py-1.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-bold transition-colors shadow-xs"
+                className="px-3.5 py-1.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white text-xs font-bold transition-colors shadow-xs"
               >
                 Sign In
               </button>
@@ -338,10 +338,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-bold text-slate-800 dark:text-white"
           >
             <div className="flex items-center space-x-2">
-              <StoreIcon className="w-4 h-4 text-[#e67e22]" />
+              <StoreIcon className="w-4 h-4 text-[#2988c8]" />
               <span>Invited Stores</span>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-[#e67e22]/15 text-[#e67e22] text-[10px] font-bold">
+            <span className="px-2 py-0.5 rounded-full bg-[#2988c8]/15 text-[#2988c8] text-[10px] font-bold">
               {accessibleStoresCount} Stores
             </span>
           </button>
@@ -370,7 +370,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-bold text-slate-800 dark:text-white"
           >
             <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-[#e67e22]" />
+              <Clock className="w-4 h-4 text-[#2988c8]" />
               <span>Orders & Tracking</span>
             </div>
             {orders.length > 0 && (
@@ -388,7 +388,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-bold text-slate-800 dark:text-white"
           >
             <div className="flex items-center space-x-2">
-              <UserIcon className="w-4 h-4 text-[#e67e22]" />
+              <UserIcon className="w-4 h-4 text-[#2988c8]" />
               <span>Profile & Spend Tier</span>
             </div>
             <span className="text-[10px] text-amber-500 font-bold">

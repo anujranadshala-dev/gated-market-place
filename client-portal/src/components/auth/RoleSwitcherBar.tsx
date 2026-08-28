@@ -16,8 +16,8 @@ export const RoleSwitcherBar: React.FC = () => {
     <div className="bg-[#0b131c] text-white border-b border-slate-800/80 text-xs select-none transition-all duration-200">
       <div className="max-w-7xl mx-auto px-4 py-1.5 flex flex-col md:flex-row items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#e67e22]/15 text-amber-300 font-bold text-[10px] uppercase tracking-wider border border-[#e67e22]/30 shadow-xs">
-            <KeyRound className="w-3 h-3 mr-1 text-[#e67e22]" /> Shopper Accounts
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#2988c8]/15 text-amber-300 font-bold text-[10px] uppercase tracking-wider border border-[#2988c8]/30 shadow-xs">
+            <KeyRound className="w-3 h-3 mr-1 text-[#2988c8]" /> Shopper Accounts
           </span>
           <span className="text-slate-400 hidden xl:inline text-[11px]">
             Switch shopper profile to preview individual store invitations & spend discount:

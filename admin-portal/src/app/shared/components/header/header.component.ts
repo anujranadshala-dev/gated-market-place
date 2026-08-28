@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthStore } from '../../../core/auth/auth.store';
@@ -21,6 +21,8 @@ export class HeaderComponent {
   readonly orderState = inject(OrderState);
   private readonly router = inject(Router);
 
+  public isProfileOpen = signal(false);
+
   public toggleTheme(): void {
     this.themeService.toggleTheme();
   }
@@ -31,6 +33,7 @@ export class HeaderComponent {
   }
 
   public logout(): void {
+    this.isProfileOpen.set(false);
     this.authStore.logout();
   }
 }

@@ -51,12 +51,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-3xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 my-8">
+      <div className="bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-3xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 my-8">
         
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
           <div className="flex items-center space-x-2">
-            <span className="font-mono text-xs text-[#e67e22] font-bold px-2 py-0.5 bg-amber-50 dark:bg-amber-950/60 rounded-md border border-amber-200 dark:border-amber-900">
+            <span className="font-mono text-xs text-[#2988c8] font-bold px-2 py-0.5 bg-amber-50 dark:bg-amber-950/60 rounded-md border border-amber-200 dark:border-amber-900">
               SKU: {product.sku}
             </span>
             <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -83,7 +83,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                 className="w-full h-full object-cover"
               />
               {product.featuredOffer && (
-                <div className="absolute top-2 left-2 px-2.5 py-1 rounded-lg bg-[#e67e22] text-white text-[11px] font-bold shadow-md flex items-center space-x-1">
+                <div className="absolute top-2 left-2 px-2.5 py-1 rounded-lg bg-[#2988c8] text-white text-[11px] font-bold shadow-md flex items-center space-x-1">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Special Offer</span>
                 </div>
@@ -111,7 +111,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
             {/* Technical Specifications */}
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
               <p className="text-xs font-bold text-slate-900 dark:text-white mb-2 flex items-center">
-                <Layers className="w-3.5 h-3.5 text-[#e67e22] mr-1.5" />
+                <Layers className="w-3.5 h-3.5 text-[#2988c8] mr-1.5" />
                 Technical Specifications
               </p>
               <div className="space-y-1.5 text-xs">
@@ -146,7 +146,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                   </div>
 
                   {pricing.appliedDiscountPercent > 0 && (
-                    <span className="px-2 py-1 rounded-full text-xs font-bold bg-[#e67e22] text-white shadow-xs">
+                    <span className="px-2 py-1 rounded-full text-xs font-bold bg-[#2988c8] text-white shadow-xs">
                       {pricing.appliedDiscountPercent}% Volume Tier Saved
                     </span>
                   )}
@@ -179,7 +179,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Tiered Bulk Pricing:
                     </p>
-                    <span className="text-[11px] text-[#e67e22] font-semibold">Applied in Redux Cart</span>
+                    <span className="text-[11px] text-[#2988c8] font-semibold">Applied in Redux Cart</span>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-2">
@@ -192,7 +192,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                           key={idx}
                           className={`p-2.5 rounded-xl border text-center transition-all ${
                             isActiveTier
-                              ? 'border-[#e67e22] bg-amber-50/80 dark:bg-amber-950/60 ring-1 ring-[#e67e22]'
+                              ? 'border-[#2988c8] bg-amber-50/80 dark:bg-amber-950/60 ring-1 ring-[#2988c8]'
                               : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40'
                           }`}
                         >
@@ -270,7 +270,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                 type="button"
                 onClick={handleAddToCart}
                 disabled={addedAnimation}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
+                className="flex-1 py-3 px-4 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
               >
                 {addedAnimation ? (
                   <>

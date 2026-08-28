@@ -132,7 +132,7 @@ export const CartDrawer: React.FC = () => {
           {/* Cart Header */}
           <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-[#e67e22] text-white flex items-center justify-center shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-[#2988c8] text-white flex items-center justify-center shadow-xs">
                 <ShoppingCart className="w-4 h-4" />
               </div>
               <div>
@@ -183,7 +183,7 @@ export const CartDrawer: React.FC = () => {
                 {/* Volume Tier Alert banner */}
                 {volumeDiscountSaved > 0 && (
                   <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 flex items-center space-x-2 text-xs text-amber-800 dark:text-amber-300">
-                    <Sparkles className="w-4 h-4 text-[#e67e22] shrink-0" />
+                    <Sparkles className="w-4 h-4 text-[#2988c8] shrink-0" />
                     <span>
                       <strong>Volume Tier Applied:</strong> You're saving ${volumeDiscountSaved.toLocaleString('en-US', { minimumFractionDigits: 2 })} on bulk quantities!
                     </span>
@@ -196,12 +196,12 @@ export const CartDrawer: React.FC = () => {
                   return (
                     <div
                       key={storeId}
-                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a2530] overflow-hidden shadow-xs"
+                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#212832] overflow-hidden shadow-xs"
                     >
                       {/* Tenant Header Pill */}
                       <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <Building2 className="w-3.5 h-3.5 text-[#e67e22]" />
+                          <Building2 className="w-3.5 h-3.5 text-[#2988c8]" />
                           <span className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[200px]">
                             {storeInfo?.name || storeItems[0].storeName}
                           </span>
@@ -222,7 +222,7 @@ export const CartDrawer: React.FC = () => {
                                 className="w-14 h-14 rounded-lg object-cover bg-slate-900 shrink-0 border border-slate-200 dark:border-slate-700"
                               />
                               <div className="flex-1 min-w-0">
-                                <span className="font-mono text-[10px] text-[#e67e22] font-bold">
+                                <span className="font-mono text-[10px] text-[#2988c8] font-bold">
                                   {item.product.sku}
                                 </span>
                                 <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-tight line-clamp-2">
@@ -308,7 +308,7 @@ export const CartDrawer: React.FC = () => {
                       value={promoInput}
                       onChange={(e) => setPromoInput(e.target.value)}
                       placeholder="e.g. NEXUSQ3 or B2BVIP10"
-                      className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#e67e22]"
+                      className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2988c8]"
                     />
                     <button
                       type="submit"
@@ -360,7 +360,7 @@ export const CartDrawer: React.FC = () => {
 
                 {/* Assigned Gated Tier Automated Discount */}
                 {tierDiscountAmount > 0 && (
-                  <div className="flex justify-between text-[#e67e22] dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-1 rounded-lg border border-amber-200 dark:border-amber-900/60">
+                  <div className="flex justify-between text-[#2988c8] dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-1 rounded-lg border border-amber-200 dark:border-amber-900/60">
                     <span className="flex items-center space-x-1">
                       <Crown className="w-3.5 h-3.5" />
                       <span>{userGatedTier} Tier ({tierDiscountPercent}% Off):</span>
@@ -411,7 +411,7 @@ export const CartDrawer: React.FC = () => {
                 <span className="text-sm font-bold text-slate-900 dark:text-white">
                   Grand Total (USD):
                 </span>
-                <span className="text-xl font-extrabold text-[#1a2530] dark:text-white">
+                <span className="text-xl font-extrabold text-[#212832] dark:text-white">
                   ${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -419,7 +419,7 @@ export const CartDrawer: React.FC = () => {
               <button
                 type="button"
                 onClick={handleProceedCheckout}
-                className="w-full py-3 px-4 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
+                className="w-full py-3 px-4 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
               >
                 <span>Proceed to Checkout ({userGatedTier} Tier)</span>
                 <ArrowRight className="w-4 h-4" />

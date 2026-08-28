@@ -125,7 +125,7 @@ export const UserProfileView: React.FC = () => {
   if (!currentUser) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-amber-500/20 text-[#e67e22] flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-2xl bg-amber-500/20 text-[#2988c8] flex items-center justify-center mx-auto mb-4">
           <AlertCircle className="w-8 h-8" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
@@ -136,7 +136,7 @@ export const UserProfileView: React.FC = () => {
         </p>
         <button
           onClick={() => navigate('/')}
-          className="px-5 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-semibold text-xs transition-colors cursor-pointer"
+          className="px-5 py-2.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-semibold text-xs transition-colors cursor-pointer"
         >
           Go to Store Catalog
         </button>
@@ -333,7 +333,7 @@ export const UserProfileView: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('security')}
-            className="px-3.5 py-1.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+            className="px-3.5 py-1.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
           >
             Change Password Now
           </button>
@@ -341,10 +341,10 @@ export const UserProfileView: React.FC = () => {
       )}
 
       {/* Shopper Profile Header Card */}
-      <div className="bg-white dark:bg-[#1a2530] rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xl mb-8 relative overflow-hidden">
+      <div className="bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xl mb-8 relative overflow-hidden">
         
         {/* Background Warm Accent */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#e67e22]/15 via-amber-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#2988c8]/15 via-amber-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
           
@@ -354,9 +354,9 @@ export const UserProfileView: React.FC = () => {
               <img
                 src={currentUser.avatarUrl || AVATAR_PRESETS[0].url}
                 alt={currentUser.fullName}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-4 ring-[#e67e22]/30 shadow-lg"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-4 ring-[#2988c8]/30 shadow-lg"
               />
-              <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white dark:border-[#1a2530] flex items-center justify-center text-white text-[10px] shadow-sm">
+              <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white dark:border-[#212832] flex items-center justify-center text-white text-[10px] shadow-sm">
                 <Check className="w-3.5 h-3.5" />
               </span>
             </div>
@@ -369,7 +369,7 @@ export const UserProfileView: React.FC = () => {
                 
                 {/* Store Username Badge */}
                 <span className="px-2.5 py-0.5 text-[11px] font-mono font-bold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center space-x-1">
-                  <UserIcon className="w-3 h-3 text-[#e67e22]" />
+                  <UserIcon className="w-3 h-3 text-[#2988c8]" />
                   <span>@{currentUser.username || currentUser.email.split('@')[0]}</span>
                 </span>
 
@@ -395,7 +395,7 @@ export const UserProfileView: React.FC = () => {
 
                 {(currentUser.mobileNumber || currentUser.phone) && (
                   <span className="flex items-center space-x-1.5">
-                    <Phone className="w-3.5 h-3.5 text-[#e67e22]" />
+                    <Phone className="w-3.5 h-3.5 text-[#2988c8]" />
                     <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
                       {currentUser.mobileNumber || currentUser.phone}
                     </span>
@@ -421,7 +421,7 @@ export const UserProfileView: React.FC = () => {
                 setIsEditingProfile(!isEditingProfile);
                 setActiveTab('profile');
               }}
-              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
+              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-xs shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
             >
               {isEditingProfile ? (
                 <>
@@ -459,7 +459,7 @@ export const UserProfileView: React.FC = () => {
               Lifetime Store Spend
             </span>
             <div className="flex items-baseline space-x-1.5 mt-0.5">
-              <span className="text-xl font-mono font-extrabold text-[#1a2530] dark:text-white">
+              <span className="text-xl font-mono font-extrabold text-[#212832] dark:text-white">
                 ${tierProgress.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -470,7 +470,7 @@ export const UserProfileView: React.FC = () => {
               Orders Placed
             </span>
             <div className="flex items-baseline space-x-1.5 mt-0.5">
-              <span className="text-xl font-extrabold text-[#1a2530] dark:text-white">
+              <span className="text-xl font-extrabold text-[#212832] dark:text-white">
                 {userOrders.length}
               </span>
               <span className="text-[11px] text-slate-500 dark:text-[#9aa8b2]">Purchases</span>
@@ -481,7 +481,7 @@ export const UserProfileView: React.FC = () => {
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-[#9aa8b2] block">
               Username Handle
             </span>
-            <div className="mt-1 flex items-center space-x-1 text-xs font-mono font-bold text-[#e67e22]">
+            <div className="mt-1 flex items-center space-x-1 text-xs font-mono font-bold text-[#2988c8]">
               <span>@{currentUser.username || 'shopper'}</span>
             </div>
           </div>
@@ -497,7 +497,7 @@ export const UserProfileView: React.FC = () => {
           onClick={() => setActiveTab('profile')}
           className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
             activeTab === 'profile'
-              ? 'bg-[#1a2530] text-white dark:bg-[#e67e22] dark:text-white shadow-sm'
+              ? 'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
@@ -509,7 +509,7 @@ export const UserProfileView: React.FC = () => {
           onClick={() => setActiveTab('tier')}
           className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
             activeTab === 'tier'
-              ? 'bg-[#1a2530] text-white dark:bg-[#e67e22] dark:text-white shadow-sm'
+              ? 'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
@@ -524,7 +524,7 @@ export const UserProfileView: React.FC = () => {
           onClick={() => setActiveTab('security')}
           className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
             activeTab === 'security'
-              ? 'bg-[#1a2530] text-white dark:bg-[#e67e22] dark:text-white shadow-sm'
+              ? 'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
@@ -539,7 +539,7 @@ export const UserProfileView: React.FC = () => {
           onClick={() => setActiveTab('addresses')}
           className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
             activeTab === 'addresses'
-              ? 'bg-[#1a2530] text-white dark:bg-[#e67e22] dark:text-white shadow-sm'
+              ? 'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
@@ -551,7 +551,7 @@ export const UserProfileView: React.FC = () => {
           onClick={() => setActiveTab('orders')}
           className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center space-x-2 shrink-0 cursor-pointer ${
             activeTab === 'orders'
-              ? 'bg-[#1a2530] text-white dark:bg-[#e67e22] dark:text-white shadow-sm'
+              ? 'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
@@ -566,7 +566,7 @@ export const UserProfileView: React.FC = () => {
         <div className="space-y-8 animate-in fade-in duration-200">
           
           {/* Main Tier Overview Hero */}
-          <div className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] text-white p-6 sm:p-8 shadow-xl">
+          <div className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-[#212832] via-[#212832] to-[#212832] text-white p-6 sm:p-8 shadow-xl">
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               
               <div className="space-y-3 max-w-xl">
@@ -680,9 +680,9 @@ export const UserProfileView: React.FC = () => {
           </div>
 
           {/* Tier Matrix Table */}
-          <div className="bg-white dark:bg-[#1a2530] rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm">
+          <div className="bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm">
             <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 flex items-center space-x-2">
-              <Award className="w-5 h-5 text-[#e67e22]" />
+              <Award className="w-5 h-5 text-[#2988c8]" />
               <span>Spend-Based Shopper Tiers & Discount Matrix</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-[#9aa8b2] mb-6">
@@ -751,7 +751,7 @@ export const UserProfileView: React.FC = () => {
           </div>
 
           {/* VIP Black Subscription Management Section */}
-          <div className="bg-white dark:bg-[#1a2530] rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm">
+          <div className="bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-start space-x-3">
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
@@ -826,7 +826,7 @@ export const UserProfileView: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* Main Info Card / Form */}
-          <div className="lg:col-span-8 bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm">
+          <div className="lg:col-span-8 bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -841,7 +841,7 @@ export const UserProfileView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsEditingProfile(true)}
-                  className="px-3.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-bold text-[#e67e22] hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors flex items-center space-x-1.5 cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-bold text-[#2988c8] hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors flex items-center space-x-1.5 cursor-pointer"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Edit Details</span>
@@ -865,13 +865,13 @@ export const UserProfileView: React.FC = () => {
                         onClick={() => setSelectedAvatar(preset.url)}
                         className={`relative rounded-xl overflow-hidden p-0.5 transition-all cursor-pointer ${
                           selectedAvatar === preset.url
-                            ? 'ring-3 ring-[#e67e22] scale-105 shadow-md'
+                            ? 'ring-3 ring-[#2988c8] scale-105 shadow-md'
                             : 'opacity-70 hover:opacity-100'
                         }`}
                       >
                         <img src={preset.url} alt={preset.label} className="w-12 h-12 rounded-lg object-cover" />
                         {selectedAvatar === preset.url && (
-                          <div className="absolute inset-0 bg-[#e67e22]/20 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-[#2988c8]/20 flex items-center justify-center">
                             <Check className="w-4 h-4 text-white drop-shadow" />
                           </div>
                         )}
@@ -897,7 +897,7 @@ export const UserProfileView: React.FC = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Sarah Jenkins"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none disabled:opacity-85 disabled:cursor-not-allowed"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none disabled:opacity-85 disabled:cursor-not-allowed"
                     />
                     <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   </div>
@@ -916,9 +916,9 @@ export const UserProfileView: React.FC = () => {
                       value={mobileNumber}
                       onChange={(e) => setMobileNumber(e.target.value)}
                       placeholder="e.g. +1 (512) 890-2144"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none disabled:opacity-85 disabled:cursor-not-allowed"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none disabled:opacity-85 disabled:cursor-not-allowed"
                     />
-                    <Phone className="w-4 h-4 text-[#e67e22] absolute left-3 top-3" />
+                    <Phone className="w-4 h-4 text-[#2988c8] absolute left-3 top-3" />
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-[#9aa8b2] mt-1">
                     Used for order dispatch notifications and delivery updates.
@@ -938,7 +938,7 @@ export const UserProfileView: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="e.g. sarah.jenkins@gmail.com"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none disabled:opacity-85 disabled:cursor-not-allowed"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none disabled:opacity-85 disabled:cursor-not-allowed"
                     />
                     <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   </div>
@@ -954,7 +954,7 @@ export const UserProfileView: React.FC = () => {
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center">
-                      <MapPin className="w-3.5 h-3.5 text-[#e67e22] mr-1.5" />
+                      <MapPin className="w-3.5 h-3.5 text-[#2988c8] mr-1.5" />
                       Default Shipping Address
                     </h4>
                     <p className="text-[11px] text-slate-500 dark:text-[#9aa8b2]">
@@ -965,7 +965,7 @@ export const UserProfileView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setActiveTab('addresses')}
-                    className="text-xs font-bold text-[#e67e22] hover:underline cursor-pointer flex items-center space-x-1"
+                    className="text-xs font-bold text-[#2988c8] hover:underline cursor-pointer flex items-center space-x-1"
                   >
                     <span>Manage All Addresses</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -979,7 +979,7 @@ export const UserProfileView: React.FC = () => {
                         <span className="font-bold text-slate-900 dark:text-white">
                           {currentUser.address.recipientName || currentUser.fullName}
                         </span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#e67e22]/15 text-[#e67e22]">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#2988c8]/15 text-[#2988c8]">
                           {currentUser.address.label || 'Home'}
                         </span>
                       </div>
@@ -1010,7 +1010,7 @@ export const UserProfileView: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleOpenAddAddressModal}
-                      className="px-3.5 py-1.5 rounded-lg bg-[#e67e22] text-white text-xs font-bold hover:bg-[#d35400] transition-colors cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-lg bg-[#2988c8] text-white text-xs font-bold hover:bg-[#d97d10] transition-colors cursor-pointer"
                     >
                       Add Shipping Address
                     </button>
@@ -1031,7 +1031,7 @@ export const UserProfileView: React.FC = () => {
 
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer active:scale-98"
+                    className="px-5 py-2.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer active:scale-98"
                   >
                     <Save className="w-4 h-4" />
                     <span>Save Profile</span>
@@ -1046,16 +1046,16 @@ export const UserProfileView: React.FC = () => {
           <div className="lg:col-span-4 space-y-6">
             
             {/* Live Profile Snapshot */}
-            <div className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center">
-                <Sparkles className="w-3.5 h-3.5 text-[#e67e22] mr-1.5" />
+                <Sparkles className="w-3.5 h-3.5 text-[#2988c8] mr-1.5" />
                 Live Contact Summary
               </h4>
 
               <div className="space-y-3 text-xs divide-y divide-slate-100 dark:divide-slate-800">
                 <div className="pt-2 first:pt-0 flex items-start justify-between">
                   <span className="text-slate-500 dark:text-slate-400">Username:</span>
-                  <span className="font-mono font-bold text-[#e67e22] text-right">@{currentUser.username}</span>
+                  <span className="font-mono font-bold text-[#2988c8] text-right">@{currentUser.username}</span>
                 </div>
 
                 <div className="pt-2 flex items-start justify-between">
@@ -1093,15 +1093,15 @@ export const UserProfileView: React.FC = () => {
             </div>
 
             {/* Accessible Stores Mini List */}
-            <div className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
+            <div className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center">
-                  <StoreIcon className="w-3.5 h-3.5 text-[#e67e22] mr-1.5" />
+                  <StoreIcon className="w-3.5 h-3.5 text-[#2988c8] mr-1.5" />
                   Your Accessible Stores ({grantedStores.length})
                 </h4>
                 <button
                   onClick={() => navigate('/')}
-                  className="text-[11px] font-bold text-[#e67e22] hover:underline cursor-pointer"
+                  className="text-[11px] font-bold text-[#2988c8] hover:underline cursor-pointer"
                 >
                   Shop Now
                 </button>
@@ -1115,7 +1115,7 @@ export const UserProfileView: React.FC = () => {
                       dispatch(setActiveStore(store.id));
                       navigate('/store');
                     }}
-                    className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 hover:border-[#e67e22] dark:hover:border-[#e67e22] transition-all cursor-pointer flex items-center space-x-3"
+                    className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 hover:border-[#2988c8] dark:hover:border-[#2988c8] transition-all cursor-pointer flex items-center space-x-3"
                   >
                     <img
                       src={store.logoUrl}
@@ -1145,10 +1145,10 @@ export const UserProfileView: React.FC = () => {
       {activeTab === 'security' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          <div className="lg:col-span-8 bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="lg:col-span-8 bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm space-y-6">
             <div className="border-b border-slate-200 dark:border-slate-700 pb-4">
               <div className="flex items-center space-x-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#e67e22]/15 text-[#e67e22] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-[#2988c8]/15 text-[#2988c8] flex items-center justify-center">
                   <Lock className="w-5 h-5" />
                 </div>
                 <div>
@@ -1165,14 +1165,14 @@ export const UserProfileView: React.FC = () => {
             {/* Current Credentials Status Card */}
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center">
-                <KeyRound className="w-3.5 h-3.5 text-[#e67e22] mr-1.5" />
+                <KeyRound className="w-3.5 h-3.5 text-[#2988c8] mr-1.5" />
                 Account Credentials Overview
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                   <span className="text-[10px] text-slate-400 block uppercase font-bold">Assigned Username</span>
-                  <span className="text-sm font-mono font-bold text-[#e67e22]">@{currentUser.username}</span>
+                  <span className="text-sm font-mono font-bold text-[#2988c8]">@{currentUser.username}</span>
                   <p className="text-[10px] text-slate-500 mt-0.5">Assigned by the store</p>
                 </div>
 
@@ -1215,7 +1215,7 @@ export const UserProfileView: React.FC = () => {
                     value={currentOrTempPassword}
                     onChange={(e) => setCurrentOrTempPassword(e.target.value)}
                     placeholder="Enter current or temporary password"
-                    className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                    className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                   />
                   <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   <button
@@ -1240,7 +1240,7 @@ export const UserProfileView: React.FC = () => {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Min. 6 characters"
-                      className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                      className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                     />
                     <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   </div>
@@ -1257,7 +1257,7 @@ export const UserProfileView: React.FC = () => {
                       value={confirmNewPassword}
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
                       placeholder="Re-enter new password"
-                      className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                      className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                     />
                     <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   </div>
@@ -1275,7 +1275,7 @@ export const UserProfileView: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isChangingPassword || !newPassword || !confirmNewPassword}
-                  className="px-5 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer disabled:opacity-50 active:scale-98"
+                  className="px-5 py-2.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer disabled:opacity-50 active:scale-98"
                 >
                   {isChangingPassword ? (
                     <>
@@ -1294,7 +1294,7 @@ export const UserProfileView: React.FC = () => {
           </div>
 
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm space-y-3.5">
+            <div className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm space-y-3.5">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center">
                 <ShieldCheck className="w-4 h-4 text-emerald-500 mr-1.5" />
                 Store Credential Guide
@@ -1329,7 +1329,7 @@ export const UserProfileView: React.FC = () => {
             <button
               type="button"
               onClick={handleOpenAddAddressModal}
-              className="px-4 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer self-start sm:self-auto active:scale-98"
+              className="px-4 py-2.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer self-start sm:self-auto active:scale-98"
             >
               <Plus className="w-4 h-4" />
               <span>Add New Address</span>
@@ -1346,22 +1346,22 @@ export const UserProfileView: React.FC = () => {
                   key={addr.id || index}
                   className={`rounded-2xl border p-5 transition-all relative flex flex-col justify-between ${
                     isDefault
-                      ? 'border-[#e67e22] bg-amber-50/40 dark:bg-amber-950/20 shadow-md ring-2 ring-[#e67e22]'
-                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a2530] hover:border-slate-300'
+                      ? 'border-[#2988c8] bg-amber-50/40 dark:bg-amber-950/20 shadow-md ring-2 ring-[#2988c8]'
+                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-[#212832] hover:border-slate-300'
                   }`}
                 >
                   <div>
                     {/* Top Row: Label Badge & Default Pill */}
                     <div className="flex items-center justify-between mb-3">
                       <span className="px-2.5 py-1 rounded-lg text-xs font-bold flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
-                        {label === 'Home' && <Home className="w-3.5 h-3.5 text-[#e67e22]" />}
+                        {label === 'Home' && <Home className="w-3.5 h-3.5 text-[#2988c8]" />}
                         {label === 'Work' && <Briefcase className="w-3.5 h-3.5 text-blue-500" />}
                         {label === 'Other' && <MapPin className="w-3.5 h-3.5 text-slate-400" />}
                         <span>{label}</span>
                       </span>
 
                       {isDefault ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#e67e22] text-white flex items-center space-x-1">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#2988c8] text-white flex items-center space-x-1">
                           <Star className="w-3 h-3 fill-current" />
                           <span>Default</span>
                         </span>
@@ -1369,7 +1369,7 @@ export const UserProfileView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => addr.id && dispatch(setDefaultAddress(addr.id))}
-                          className="text-[11px] font-semibold text-slate-500 hover:text-[#e67e22] dark:hover:text-[#e67e22] transition-colors cursor-pointer"
+                          className="text-[11px] font-semibold text-slate-500 hover:text-[#2988c8] dark:hover:text-[#2988c8] transition-colors cursor-pointer"
                         >
                           Set as Default
                         </button>
@@ -1397,7 +1397,7 @@ export const UserProfileView: React.FC = () => {
 
                       {(addr.phone || currentUser.mobileNumber) && (
                         <p className="pt-2 text-[11px] font-mono text-slate-700 dark:text-slate-300 flex items-center space-x-1">
-                          <Phone className="w-3 h-3 text-[#e67e22]" />
+                          <Phone className="w-3 h-3 text-[#2988c8]" />
                           <span>{addr.phone || currentUser.mobileNumber}</span>
                         </p>
                       )}
@@ -1448,7 +1448,7 @@ export const UserProfileView: React.FC = () => {
 
             <button
               onClick={() => navigate('/')}
-              className="px-4 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer self-start sm:self-auto"
+              className="px-4 py-2.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer self-start sm:self-auto"
             >
               <StoreIcon className="w-4 h-4" />
               <span>Browse Store Catalogs</span>
@@ -1456,7 +1456,7 @@ export const UserProfileView: React.FC = () => {
           </div>
 
           {userOrders.length === 0 ? (
-            <div className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 p-12 text-center shadow-sm">
+            <div className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 p-12 text-center shadow-sm">
               <ShoppingBag className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
               <h4 className="text-sm font-bold text-slate-900 dark:text-white">No Orders Placed Yet</h4>
               <p className="text-xs text-slate-500 dark:text-[#9aa8b2] mt-1 max-w-sm mx-auto">
@@ -1464,7 +1464,7 @@ export const UserProfileView: React.FC = () => {
               </p>
               <button
                 onClick={() => navigate('/')}
-                className="mt-4 px-4 py-2 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-sm transition-colors cursor-pointer"
+                className="mt-4 px-4 py-2 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-xs shadow-sm transition-colors cursor-pointer"
               >
                 Start Shopping Now
               </button>
@@ -1474,7 +1474,7 @@ export const UserProfileView: React.FC = () => {
               {userOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -1505,7 +1505,7 @@ export const UserProfileView: React.FC = () => {
                   <div className="flex items-center space-x-4 self-end md:self-center">
                     <div className="text-right">
                       <span className="text-[10px] text-slate-400 block uppercase font-bold">Total Paid</span>
-                      <span className="font-mono font-bold text-sm text-[#e67e22]">
+                      <span className="font-mono font-bold text-sm text-[#2988c8]">
                         ${order.grandTotal.toFixed(2)}
                       </span>
                     </div>
@@ -1515,7 +1515,7 @@ export const UserProfileView: React.FC = () => {
                         dispatch(setActiveOrder(order));
                         dispatch(toggleOrderModal(true));
                       }}
-                      className="px-3.5 py-2 rounded-xl bg-slate-900 text-white dark:bg-slate-800 hover:bg-[#e67e22] dark:hover:bg-[#e67e22] text-xs font-bold transition-colors cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                      className="px-3.5 py-2 rounded-xl bg-slate-900 text-white dark:bg-slate-800 hover:bg-[#2988c8] dark:hover:bg-[#2988c8] text-xs font-bold transition-colors cursor-pointer flex items-center space-x-1.5 shadow-sm"
                     >
                       <Package className="w-3.5 h-3.5" />
                       <span>Track Order</span>
@@ -1531,12 +1531,12 @@ export const UserProfileView: React.FC = () => {
       {/* Address Add / Edit Modal */}
       {isAddressModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 max-w-lg w-full overflow-hidden shadow-2xl animate-in zoom-in-95 my-8">
+          <div className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 max-w-lg w-full overflow-hidden shadow-2xl animate-in zoom-in-95 my-8">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white">
               <div className="flex items-center space-x-2.5">
-                <MapPin className="w-5 h-5 text-[#e67e22]" />
+                <MapPin className="w-5 h-5 text-[#2988c8]" />
                 <div>
                   <h3 className="font-bold text-sm text-white">
                     {editingAddressId ? 'Edit Delivery Address' : 'Add New Delivery Address'}
@@ -1571,7 +1571,7 @@ export const UserProfileView: React.FC = () => {
                       onClick={() => setModalAddrLabel(label)}
                       className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 border transition-all cursor-pointer ${
                         modalAddrLabel === label
-                          ? 'border-[#e67e22] bg-[#e67e22]/15 text-[#e67e22] dark:text-amber-400 font-extrabold'
+                          ? 'border-[#2988c8] bg-[#2988c8]/15 text-[#2988c8] dark:text-amber-400 font-extrabold'
                           : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }`}
                     >
@@ -1595,7 +1595,7 @@ export const UserProfileView: React.FC = () => {
                   value={modalAddrRecipient}
                   onChange={(e) => setModalAddrRecipient(e.target.value)}
                   placeholder="e.g. Sarah Jenkins"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                 />
               </div>
 
@@ -1610,7 +1610,7 @@ export const UserProfileView: React.FC = () => {
                   value={modalAddrStreet}
                   onChange={(e) => setModalAddrStreet(e.target.value)}
                   placeholder="e.g. 742 Evergreen Terrace"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                 />
               </div>
 
@@ -1624,7 +1624,7 @@ export const UserProfileView: React.FC = () => {
                   value={modalAddrApartment}
                   onChange={(e) => setModalAddrApartment(e.target.value)}
                   placeholder="e.g. Apt 4B, Floor 2"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                 />
               </div>
 
@@ -1640,7 +1640,7 @@ export const UserProfileView: React.FC = () => {
                     value={modalAddrCity}
                     onChange={(e) => setModalAddrCity(e.target.value)}
                     placeholder="e.g. Austin"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                   />
                 </div>
 
@@ -1654,7 +1654,7 @@ export const UserProfileView: React.FC = () => {
                     value={modalAddrState}
                     onChange={(e) => setModalAddrState(e.target.value)}
                     placeholder="TX"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                   />
                 </div>
 
@@ -1668,7 +1668,7 @@ export const UserProfileView: React.FC = () => {
                     value={modalAddrZip}
                     onChange={(e) => setModalAddrZip(e.target.value)}
                     placeholder="78759"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                   />
                 </div>
               </div>
@@ -1684,7 +1684,7 @@ export const UserProfileView: React.FC = () => {
                     value={modalAddrPhone}
                     onChange={(e) => setModalAddrPhone(e.target.value)}
                     placeholder="e.g. +1 (512) 890-2144"
-                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                   />
                   <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                 </div>
@@ -1697,7 +1697,7 @@ export const UserProfileView: React.FC = () => {
                     type="checkbox"
                     checked={modalAddrIsDefault}
                     onChange={(e) => setModalAddrIsDefault(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#e67e22] focus:ring-[#e67e22] border-slate-300 dark:border-slate-700"
+                    className="w-4 h-4 rounded text-[#2988c8] focus:ring-[#2988c8] border-slate-300 dark:border-slate-700"
                   />
                   <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                     Set this as my default shipping address
@@ -1717,7 +1717,7 @@ export const UserProfileView: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-1.5 cursor-pointer active:scale-98"
+                  className="px-5 py-2 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-1.5 cursor-pointer active:scale-98"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>{editingAddressId ? 'Update Address' : 'Save Address'}</span>

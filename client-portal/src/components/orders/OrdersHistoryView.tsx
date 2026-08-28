@@ -32,7 +32,7 @@ export const OrdersHistoryView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 text-[#e67e22] text-xs font-semibold mb-2">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 text-[#2988c8] text-xs font-semibold mb-2">
             <Clock className="w-3.5 h-3.5" />
             <span>Audit & Procurement History</span>
           </div>
@@ -46,7 +46,7 @@ export const OrdersHistoryView: React.FC = () => {
 
         <button
           onClick={() => navigate('/')}
-          className="px-4 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-semibold shadow-md transition-colors self-start sm:self-center flex items-center space-x-2 cursor-pointer"
+          className="px-4 py-2.5 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white text-xs font-semibold shadow-md transition-colors self-start sm:self-center flex items-center space-x-2 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>New Tenant Procurement</span>
@@ -55,7 +55,7 @@ export const OrdersHistoryView: React.FC = () => {
 
       {/* Orders List */}
       {orders.length === 0 ? (
-        <div className="p-16 text-center bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700">
+        <div className="p-16 text-center bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700">
           <Clock className="w-12 h-12 text-slate-400 mx-auto mb-3" />
           <h3 className="text-base font-bold text-slate-900 dark:text-white">
             No Orders Recorded Yet
@@ -70,10 +70,10 @@ export const OrdersHistoryView: React.FC = () => {
             <div
               key={order.id}
               onClick={() => handleSelectOrder(order)}
-              className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm hover:shadow-md hover:border-[#e67e22] dark:hover:border-[#e67e22] transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm hover:shadow-md hover:border-[#2988c8] dark:hover:border-[#2988c8] transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#e67e22] shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#2988c8] shrink-0">
                   <Package className="w-6 h-6" />
                 </div>
                 <div>
@@ -105,12 +105,12 @@ export const OrdersHistoryView: React.FC = () => {
               <div className="flex items-center justify-between md:justify-end space-x-6 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
                 <div className="text-right">
                   <span className="text-[10px] text-slate-400 block">Total Authorized</span>
-                  <span className="text-base font-extrabold text-[#1a2530] dark:text-white">
+                  <span className="text-base font-extrabold text-[#212832] dark:text-white">
                     ${order.grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
 
-                <div className="flex items-center text-xs text-[#e67e22] font-semibold">
+                <div className="flex items-center text-xs text-[#2988c8] font-semibold">
                   <span>View Details</span>
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </div>

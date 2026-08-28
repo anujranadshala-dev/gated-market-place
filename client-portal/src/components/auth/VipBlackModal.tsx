@@ -47,7 +47,7 @@ export const VipBlackModal: React.FC<VipBlackModalProps> = ({ isOpen, onClose })
           particleCount: 100,
           spread: 90,
           origin: { y: 0.5 },
-          colors: ['#e67e22', '#f39c12', '#ffd700', '#ffffff', '#2c3e50']
+          colors: ['#2988c8', '#f39c12', '#ffd700', '#ffffff', '#2c3e50']
         });
       } catch (e) {}
 
@@ -67,7 +67,7 @@ export const VipBlackModal: React.FC<VipBlackModalProps> = ({ isOpen, onClose })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#0f172a] via-[#111827] to-[#090d16] text-white rounded-3xl border border-amber-500/40 shadow-2xl shadow-amber-500/10 overflow-hidden animate-in zoom-in-95 my-8">
+      <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#212832] via-[#212832] to-[#171c23] text-white rounded-3xl border border-amber-500/40 shadow-2xl shadow-amber-500/10 overflow-hidden animate-in zoom-in-95 my-8">
         
         {/* Decorative ambient glows */}
         <div className="absolute -top-24 -left-24 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -230,7 +230,7 @@ export const VipBlackModal: React.FC<VipBlackModalProps> = ({ isOpen, onClose })
               <button
                 onClick={handleSubscribe}
                 disabled={isProcessing || showSuccess}
-                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 via-[#e67e22] to-amber-600 hover:from-amber-400 hover:via-amber-500 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-[0.99] disabled:opacity-50"
+                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 via-[#2988c8] to-amber-600 hover:from-amber-400 hover:via-amber-500 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-[0.99] disabled:opacity-50"
               >
                 {showSuccess ? (
                   <>

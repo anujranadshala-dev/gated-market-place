@@ -300,9 +300,9 @@ export const TenantStoreGrid: React.FC = () => {
       <div className="space-y-4">
         
         {/* User Identity & Store Invitation Access Bar */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#212832] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-[#e67e22]/10 text-[#e67e22] flex items-center justify-center font-bold text-base shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#2988c8]/10 text-[#2988c8] flex items-center justify-center font-bold text-base shrink-0">
               <KeyRound className="w-5 h-5" />
             </div>
             <div>
@@ -338,12 +338,12 @@ export const TenantStoreGrid: React.FC = () => {
         {/* Tab Controls & Category Pills */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Main Tabs */}
-          {/* <div className="flex items-center space-x-1.5 bg-white dark:bg-[#0f172a] p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs"> */}
+          {/* <div className="flex items-center space-x-1.5 bg-white dark:bg-[#212832] p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs"> */}
             <span
               // onClick={() => setFilterTab('invited')}
               className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all flex items-center space-x-1.5 ${
                 // filterTab === 'invited'
-                   'bg-[#0f172a] text-white dark:bg-[#e67e22] dark:text-white shadow-xs'
+                   'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-xs'
                   // : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
@@ -355,7 +355,7 @@ export const TenantStoreGrid: React.FC = () => {
               onClick={() => setFilterTab('all')}
               className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 filterTab === 'all'
-                  ? 'bg-[#0f172a] text-white dark:bg-[#e67e22] dark:text-white shadow-xs'
+                  ? 'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
@@ -371,7 +371,7 @@ export const TenantStoreGrid: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search stores or industries..."
-              className="w-full pl-9 pr-3 py-2 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-[#e67e22] focus:outline-none shadow-xs"
+              className="w-full pl-9 pr-3 py-2 bg-white dark:bg-[#212832] border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-[#2988c8] focus:outline-none shadow-xs"
             />
           </div>
         </div>
@@ -384,8 +384,8 @@ export const TenantStoreGrid: React.FC = () => {
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer active:scale-95 ${
                 selectedCategory === cat
-                  ? 'bg-[#0f172a] text-white dark:bg-[#e67e22] dark:text-white shadow-xs'
-                  : 'bg-white dark:bg-[#0f172a] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-[#212832] text-white dark:bg-[#2988c8] dark:text-white shadow-xs'
+                  : 'bg-white dark:bg-[#212832] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               {cat === 'ALL' ? 'All Industries' : cat}
@@ -397,8 +397,8 @@ export const TenantStoreGrid: React.FC = () => {
 
       {/* 3. Stores Grid */}
       {filteredStores.length === 0 ? (
-        <div className="p-12 text-center bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <ShieldAlert className="w-10 h-10 text-[#e67e22] mx-auto mb-3" />
+        <div className="p-12 text-center bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <ShieldAlert className="w-10 h-10 text-[#2988c8] mx-auto mb-3" />
           <h3 className="text-base font-bold text-slate-900 dark:text-white">
             No Stores Matching Your Filters
           </h3>
@@ -411,7 +411,7 @@ export const TenantStoreGrid: React.FC = () => {
               setSelectedCategory('ALL');
               setFilterTab('all');
             }}
-            className="mt-4 px-4 py-2 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-semibold cursor-pointer"
+            className="mt-4 px-4 py-2 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white text-xs font-semibold cursor-pointer"
           >
             Reset Filters
           </span> */}
@@ -427,8 +427,8 @@ export const TenantStoreGrid: React.FC = () => {
                 onClick={() => handleOpenStore(store)}
                 className={`group rounded-3xl border transition-all duration-200 overflow-hidden flex flex-col justify-between cursor-pointer ${
                   isInvited
-                    ? 'bg-white dark:bg-[#0f172a] border-slate-200 dark:border-slate-800 hover:border-[#e67e22] dark:hover:border-[#e67e22] shadow-sm hover:shadow-xl'
-                    : 'bg-slate-50/70 dark:bg-[#111827] border-slate-200 dark:border-slate-800/80 opacity-85 hover:opacity-100 hover:border-amber-400'
+                    ? 'bg-white dark:bg-[#212832] border-slate-200 dark:border-slate-800 hover:border-[#2988c8] dark:hover:border-[#2988c8] shadow-sm hover:shadow-xl'
+                    : 'bg-slate-50/70 dark:bg-[#212832] border-slate-200 dark:border-slate-800/80 opacity-85 hover:opacity-100 hover:border-amber-400'
                 }`}
               >
                 <div>
@@ -483,7 +483,7 @@ export const TenantStoreGrid: React.FC = () => {
                         className="w-12 h-12 rounded-2xl object-cover ring-2 ring-white dark:ring-slate-800 shadow-md -mt-8 shrink-0 bg-white dark:bg-slate-900"
                       />
                       <div className="min-w-0">
-                        <h3 className="font-bold text-base text-slate-900 dark:text-white leading-snug group-hover:text-[#e67e22] transition-colors">
+                        <h3 className="font-bold text-base text-slate-900 dark:text-white leading-snug group-hover:text-[#2988c8] transition-colors">
                           {store.name}
                         </h3>
                         <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
@@ -531,7 +531,7 @@ export const TenantStoreGrid: React.FC = () => {
                         e.stopPropagation();
                         handleOpenStore(store);
                       }}
-                      className="w-full py-2.5 px-4 rounded-xl bg-[#0f172a] hover:bg-[#e67e22] dark:bg-[#1e293b] dark:hover:bg-[#e67e22] text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer group-hover:shadow-md active:scale-98"
+                      className="w-full py-2.5 px-4 rounded-xl bg-[#212832] hover:bg-[#2988c8] dark:bg-[#212832] dark:hover:bg-[#2988c8] text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer group-hover:shadow-md active:scale-98"
                     >
                       <StoreIcon className="w-4 h-4" />
                       <span>Enter Store & View Products</span>
@@ -546,7 +546,7 @@ export const TenantStoreGrid: React.FC = () => {
                       }}
                       className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs shadow-sm transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
                     >
-                      <KeyRound className="w-3.5 h-3.5 text-[#e67e22]" />
+                      <KeyRound className="w-3.5 h-3.5 text-[#2988c8]" />
                       <span>Redeem Invite Code to Unlock</span>
                     </button>
                   )}
@@ -561,10 +561,10 @@ export const TenantStoreGrid: React.FC = () => {
       {/* 4. Redeem Token Modal */}
       {isInviteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95">
+          <div className="bg-white dark:bg-[#212832] rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl animate-in zoom-in-95">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-xl bg-[#e67e22] text-white flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-[#2988c8] text-white flex items-center justify-center">
                   <KeyRound className="w-4 h-4" />
                 </div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -593,7 +593,7 @@ export const TenantStoreGrid: React.FC = () => {
                   value={inviteCodeInput}
                   onChange={(e) => setInviteCodeInput(e.target.value)}
                   placeholder="e.g. AERO-DEF-900"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                   autoFocus
                 />
               </div>
@@ -617,35 +617,35 @@ export const TenantStoreGrid: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setInviteCodeInput('AERO-DEF-900')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#e67e22] text-[#e67e22] cursor-pointer"
+                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
                   >
                     AERO-DEF-900 (AeroVanguard)
                   </button>
                   <button
                     type="button"
                     onClick={() => setInviteCodeInput('BIO-CLINICAL-100')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#e67e22] text-[#e67e22] cursor-pointer"
+                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
                   >
                     BIO-CLINICAL-100 (BioVance)
                   </button>
                   <button
                     type="button"
                     onClick={() => setInviteCodeInput('NEXUS-VIP-2026')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#e67e22] text-[#e67e22] cursor-pointer"
+                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
                   >
                     NEXUS-VIP-2026 (Nexus Robotics)
                   </button>
                   <button
                     type="button"
                     onClick={() => setInviteCodeInput('VERDANT-GO-777')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#e67e22] text-[#e67e22] cursor-pointer"
+                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
                   >
                     VERDANT-GO-777 (Verdant Agritech)
                   </button>
                   <button
                     type="button"
                     onClick={() => setInviteCodeInput('LUMINA-PRO-555')}
-                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#e67e22] text-[#e67e22] cursor-pointer"
+                    className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-[#2988c8] text-[#2988c8] cursor-pointer"
                   >
                     LUMINA-PRO-555 (Lumina Photonics)
                   </button>
@@ -669,7 +669,7 @@ export const TenantStoreGrid: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white text-xs font-bold transition-colors cursor-pointer"
                 >
                   Verify & Redeem
                 </button>

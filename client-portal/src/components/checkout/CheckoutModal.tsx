@@ -152,12 +152,12 @@ export const CheckoutModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white dark:bg-[#1a2530] rounded-2xl border border-slate-200 dark:border-slate-700 max-w-4xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 my-8">
+      <div className="bg-white dark:bg-[#212832] rounded-2xl border border-slate-200 dark:border-slate-700 max-w-4xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 my-8">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-[#e67e22] text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-[#2988c8] text-white flex items-center justify-center shadow-xs">
               <Lock className="w-5 h-5" />
             </div>
             <div>
@@ -188,7 +188,7 @@ export const CheckoutModal: React.FC = () => {
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center">
-                    <Truck className="w-4 h-4 text-[#e67e22] mr-1.5" />
+                    <Truck className="w-4 h-4 text-[#2988c8] mr-1.5" />
                     Delivery & Shipping Address
                   </h4>
                   <span className="text-[11px] text-slate-500 dark:text-[#9aa8b2]">
@@ -208,7 +208,7 @@ export const CheckoutModal: React.FC = () => {
                         value={recipientName}
                         onChange={(e) => setRecipientName(e.target.value)}
                         placeholder="e.g. Sarah Jenkins"
-                        className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                        className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                       />
                       <UserIcon className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
                     </div>
@@ -225,9 +225,9 @@ export const CheckoutModal: React.FC = () => {
                         value={recipientPhone}
                         onChange={(e) => setRecipientPhone(e.target.value)}
                         placeholder="e.g. +1 (512) 890-2144"
-                        className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                        className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                       />
-                      <Phone className="w-3.5 h-3.5 text-[#e67e22] absolute left-2.5 top-2.5" />
+                      <Phone className="w-3.5 h-3.5 text-[#2988c8] absolute left-2.5 top-2.5" />
                     </div>
                   </div>
                 </div>
@@ -243,7 +243,7 @@ export const CheckoutModal: React.FC = () => {
                       value={addressLine}
                       onChange={(e) => setAddressLine(e.target.value)}
                       placeholder="e.g. 742 Evergreen Terrace"
-                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                     />
                   </div>
 
@@ -256,7 +256,7 @@ export const CheckoutModal: React.FC = () => {
                       value={apartment}
                       onChange={(e) => setApartment(e.target.value)}
                       placeholder="Apt 4B"
-                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                     />
                   </div>
                 </div>
@@ -272,7 +272,7 @@ export const CheckoutModal: React.FC = () => {
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder="Austin"
-                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                     />
                   </div>
                   <div>
@@ -285,7 +285,7 @@ export const CheckoutModal: React.FC = () => {
                       value={state}
                       onChange={(e) => setState(e.target.value)}
                       placeholder="TX"
-                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                     />
                   </div>
                   <div>
@@ -298,7 +298,7 @@ export const CheckoutModal: React.FC = () => {
                       value={zipCode}
                       onChange={(e) => setZipCode(e.target.value)}
                       placeholder="78759"
-                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                      className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                     />
                   </div>
                 </div>
@@ -312,7 +312,7 @@ export const CheckoutModal: React.FC = () => {
                     value={deliveryNotes}
                     onChange={(e) => setDeliveryNotes(e.target.value)}
                     placeholder="e.g. Leave package by the front door or call upon arrival"
-                    className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e67e22] focus:outline-none"
+                    className="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-[#2988c8] focus:outline-none"
                   />
                 </div>
               </div>
@@ -328,11 +328,11 @@ export const CheckoutModal: React.FC = () => {
                     onClick={() => setPaymentMethod('CARD')}
                     className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                       paymentMethod === 'CARD'
-                        ? 'border-[#e67e22] bg-amber-50/80 dark:bg-amber-950/40 ring-2 ring-[#e67e22]'
+                        ? 'border-[#2988c8] bg-amber-50/80 dark:bg-amber-950/40 ring-2 ring-[#2988c8]'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <CreditCard className="w-4 h-4 text-[#e67e22] mb-1" />
+                    <CreditCard className="w-4 h-4 text-[#2988c8] mb-1" />
                     <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
                       Credit Card
                     </p>
@@ -346,11 +346,11 @@ export const CheckoutModal: React.FC = () => {
                     onClick={() => setPaymentMethod('UPI_WALLET')}
                     className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                       paymentMethod === 'UPI_WALLET'
-                        ? 'border-[#e67e22] bg-amber-50/80 dark:bg-amber-950/40 ring-2 ring-[#e67e22]'
+                        ? 'border-[#2988c8] bg-amber-50/80 dark:bg-amber-950/40 ring-2 ring-[#2988c8]'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <Smartphone className="w-4 h-4 text-[#e67e22] mb-1" />
+                    <Smartphone className="w-4 h-4 text-[#2988c8] mb-1" />
                     <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
                       UPI / Wallet
                     </p>
@@ -364,11 +364,11 @@ export const CheckoutModal: React.FC = () => {
                     onClick={() => setPaymentMethod('COD')}
                     className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                       paymentMethod === 'COD'
-                        ? 'border-[#e67e22] bg-amber-50/80 dark:bg-amber-950/40 ring-2 ring-[#e67e22]'
+                        ? 'border-[#2988c8] bg-amber-50/80 dark:bg-amber-950/40 ring-2 ring-[#2988c8]'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <Banknote className="w-4 h-4 text-[#e67e22] mb-1" />
+                    <Banknote className="w-4 h-4 text-[#2988c8] mb-1" />
                     <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
                       Cash on Delivery
                     </p>
@@ -382,11 +382,11 @@ export const CheckoutModal: React.FC = () => {
                     onClick={() => setPaymentMethod('NET_BANKING')}
                     className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                       paymentMethod === 'NET_BANKING'
-                        ? 'border-[#e67e22] bg-amber-50/80 dark:bg-amber-950/40 ring-2 ring-[#e67e22]'
+                        ? 'border-[#2988c8] bg-amber-50/80 dark:bg-amber-950/40 ring-2 ring-[#2988c8]'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                     }`}
                   >
-                    <Building className="w-4 h-4 text-[#e67e22] mb-1" />
+                    <Building className="w-4 h-4 text-[#2988c8] mb-1" />
                     <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
                       Net Banking
                     </p>
@@ -468,7 +468,7 @@ export const CheckoutModal: React.FC = () => {
                   </div>
 
                   {tierDiscountAmount > 0 && (
-                    <div className="flex justify-between text-[#e67e22] dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-1 rounded-lg border border-amber-200 dark:border-amber-900/60">
+                    <div className="flex justify-between text-[#2988c8] dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-1 rounded-lg border border-amber-200 dark:border-amber-900/60">
                       <span className="flex items-center space-x-1">
                         <Crown className="w-3.5 h-3.5" />
                         <span>{userGatedTier} Tier Discount ({tierDiscountPercent}%):</span>
@@ -496,7 +496,7 @@ export const CheckoutModal: React.FC = () => {
 
                   <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-sm font-bold text-slate-900 dark:text-white">
                     <span>Total to Pay:</span>
-                    <span className="text-base text-[#e67e22] font-mono">
+                    <span className="text-base text-[#2988c8] font-mono">
                       ${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -508,7 +508,7 @@ export const CheckoutModal: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-70 active:scale-98"
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#2988c8] hover:bg-[#d97d10] text-white font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-70 active:scale-98"
                 >
                   {isSubmitting ? (
                     <>

@@ -2,16 +2,90 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  /* 5-Color Master Palette aligned with Admin Portal */
+  --color-palette-azure: #2988c8;
+  --color-palette-amber: #d97d10;
+  --color-palette-navy: #0b3c5d;
+  --color-palette-charcoal: #212832;
+  --color-palette-silver: #a5a8ac;
+
+  /* Theme mappings for indigo -> Azure Blue (#2988c8) */
+  --color-indigo-50: #f0f7fc;
+  --color-indigo-100: #dceef9;
+  --color-indigo-200: #bde0f4;
+  --color-indigo-300: #93ceee;
+  --color-indigo-400: #5cb5e5;
+  --color-indigo-500: #2988c8;
+  --color-indigo-600: #2988c8;
+  --color-indigo-700: #206fa3;
+  --color-indigo-800: #1a5982;
+  --color-indigo-900: #0b3c5d;
+  --color-indigo-950: #062338;
+
+  /* Theme mappings for amber -> Warm Ochre Amber (#d97d10) */
+  --color-amber-50: #fef8f0;
+  --color-amber-100: #fdecd9;
+  --color-amber-200: #fbd9b3;
+  --color-amber-300: #f7bf84;
+  --color-amber-400: #f19f4a;
+  --color-amber-500: #d97d10;
+  --color-amber-600: #d97d10;
+  --color-amber-700: #b86307;
+  --color-amber-800: #934e06;
+  --color-amber-900: #743e08;
+  --color-amber-950: #3f1e03;
+
+  /* Theme mappings for purple -> Deep Marine Navy (#0b3c5d) */
+  --color-purple-50: #edf4f9;
+  --color-purple-100: #d5e6f1;
+  --color-purple-200: #b0d0e4;
+  --color-purple-300: #7fb2d2;
+  --color-purple-400: #4a90be;
+  --color-purple-500: #0b3c5d;
+  --color-purple-600: #0b3c5d;
+  --color-purple-700: #08314c;
+  --color-purple-800: #06253b;
+  --color-purple-900: #051c2c;
+  --color-purple-950: #03101a;
+
+  /* Theme mappings for sky -> Azure Blue (#2988c8) */
+  --color-sky-50: #f0f7fc;
+  --color-sky-100: #dceef9;
+  --color-sky-200: #bde0f4;
+  --color-sky-300: #93ceee;
+  --color-sky-400: #5cb5e5;
+  --color-sky-500: #2988c8;
+  --color-sky-600: #2988c8;
+  --color-sky-700: #206fa3;
+  --color-sky-800: #1a5982;
+  --color-sky-900: #0b3c5d;
+  --color-sky-950: #062338;
+
+  /* Theme mappings for slate -> Midnight Charcoal (#212832) & Cool Silver (#a5a8ac) */
+  --color-slate-50: #f6f8fa;
+  --color-slate-100: #edf0f3;
+  --color-slate-200: #e0e3e7;
+  --color-slate-300: #c9ccd1;
+  --color-slate-400: #a5a8ac;
+  --color-slate-500: #7e848d;
+  --color-slate-600: #58606b;
+  --color-slate-700: #384250;
+  --color-slate-800: #29323f;
+  --color-slate-900: #212832;
+  --color-slate-950: #171c23;
+}
+
 @layer base {
   :root {
-    --color-primary: #e67e22;
-    --color-primary-hover: #d35400;
-    --color-primary-dark: #b84900;
-    --color-charcoal-dark: #0f172a;
-    --color-charcoal-card: #1e293b;
-    --color-deep-navy: #0a2540;
-    --color-cool-gray: #94a3b8;
-    --color-cool-gray-light: #f8fafc;
+    --color-primary: #2988c8;
+    --color-primary-hover: #d97d10;
+    --color-primary-dark: #206fa3;
+    --color-charcoal-dark: #212832;
+    --color-charcoal-card: #212832;
+    --color-deep-navy: #0b3c5d;
+    --color-cool-gray: #a5a8ac;
+    --color-cool-gray-light: #f6f8fa;
   }
 
   html {
@@ -24,8 +98,8 @@
   }
 
   body {
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: #f6f8fa;
+    color: #212832;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -33,8 +107,8 @@
   }
 
   .dark body {
-    background-color: #0b0f17;
-    color: #f8fafc;
+    background-color: #171c23;
+    color: #f6f8fa;
   }
 }
 
@@ -49,12 +123,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #c9ccd1;
   border-radius: 9999px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #384250;
   border-radius: 9999px;
 }
 
@@ -75,7 +149,7 @@
 }
 
 .dark .glass-panel {
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(33, 40, 50, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
