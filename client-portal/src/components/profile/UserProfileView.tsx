@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   User as UserIcon, 
   Mail, 
@@ -52,7 +53,7 @@ import {
 } from '../../store/slices/authSlice';
 import { getUserGatedTier, getTierProgress, GATED_TIERS } from '../../utils/tierUtils';
 import { VipBlackModal } from '../auth/VipBlackModal';
-import { setCurrentView, setActiveStore } from '../../store/slices/tenantSlice';
+import { setActiveStore } from '../../store/slices/tenantSlice';
 import { setActiveOrder, toggleOrderModal } from '../../store/slices/orderSlice';
 import { UserAddress } from '../../types';
 import confetti from 'canvas-confetti';
@@ -67,6 +68,7 @@ const AVATAR_PRESETS = [
 
 export const UserProfileView: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { currentUser } = useAppSelector((state) => state.auth);
   const { stores } = useAppSelector((state) => state.tenant);
   const { orders } = useAppSelector((state) => state.order);
@@ -133,7 +135,7 @@ export const UserProfileView: React.FC = () => {
           Please select a shopper profile from the top bar to view and edit details.
         </p>
         <button
-          onClick={() => dispatch(setCurrentView('dashboard'))}
+          onClick={() => navigate('/')}
           className="px-5 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-semibold text-xs transition-colors cursor-pointer"
         >
           Go to Store Catalog
@@ -1098,7 +1100,7 @@ export const UserProfileView: React.FC = () => {
                   Your Accessible Stores ({grantedStores.length})
                 </h4>
                 <button
-                  onClick={() => dispatch(setCurrentView('dashboard'))}
+                  onClick={() => navigate('/')}
                   className="text-[11px] font-bold text-[#e67e22] hover:underline cursor-pointer"
                 >
                   Shop Now
@@ -1111,7 +1113,7 @@ export const UserProfileView: React.FC = () => {
                     key={store.id}
                     onClick={() => {
                       dispatch(setActiveStore(store.id));
-                      dispatch(setCurrentView('store_catalog'));
+                      navigate('/store');
                     }}
                     className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 hover:border-[#e67e22] dark:hover:border-[#e67e22] transition-all cursor-pointer flex items-center space-x-3"
                   >
@@ -1445,7 +1447,7 @@ export const UserProfileView: React.FC = () => {
             </div>
 
             <button
-              onClick={() => dispatch(setCurrentView('dashboard'))}
+              onClick={() => navigate('/')}
               className="px-4 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer self-start sm:self-auto"
             >
               <StoreIcon className="w-4 h-4" />
@@ -1461,7 +1463,7 @@ export const UserProfileView: React.FC = () => {
                 Your completed online purchases and live shipping tracking will appear right here.
               </p>
               <button
-                onClick={() => dispatch(setCurrentView('dashboard'))}
+                onClick={() => navigate('/')}
                 className="mt-4 px-4 py-2 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white font-bold text-xs shadow-sm transition-colors cursor-pointer"
               >
                 Start Shopping Now

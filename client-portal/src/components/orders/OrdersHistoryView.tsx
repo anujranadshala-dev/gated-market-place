@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Clock, 
   CheckCircle2, 
@@ -12,11 +13,11 @@ import {
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { setActiveOrder, toggleOrderModal } from '../../store/slices/orderSlice';
-import { setCurrentView } from '../../store/slices/tenantSlice';
 import { Order } from '../../types';
 
 export const OrdersHistoryView: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { orders } = useAppSelector((state) => state.order);
   const { currentUser } = useAppSelector((state) => state.auth);
 
@@ -44,7 +45,7 @@ export const OrdersHistoryView: React.FC = () => {
         </div>
 
         <button
-          onClick={() => dispatch(setCurrentView('dashboard'))}
+          onClick={() => navigate('/')}
           className="px-4 py-2.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-semibold shadow-md transition-colors self-start sm:self-center flex items-center space-x-2 cursor-pointer"
         >
           <Plus className="w-4 h-4" />

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   KeyRound, 
   ShieldCheck, 
@@ -20,7 +21,6 @@ import {
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { loginWithCredentials } from '../../store/slices/authSlice';
-import { setCurrentView } from '../../store/slices/tenantSlice';
 import { STORE_ISSUED_CREDENTIALS, PRESET_USERS } from '../../data/mockData';
 import confetti from 'canvas-confetti';
 
@@ -32,6 +32,7 @@ export const StoreCredentialsAuth: React.FC<StoreCredentialsAuthProps> = ({
   onSuccessRedirect 
 }) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { verificationLoading, verificationError } = useAppSelector((state) => state.auth);
 
   const [usernameOrEmail, setUsernameOrEmail] = useState('alex.rivera');
@@ -71,7 +72,7 @@ export const StoreCredentialsAuth: React.FC<StoreCredentialsAuthProps> = ({
       } catch (err) {}
 
       setTimeout(() => {
-        dispatch(setCurrentView('dashboard'));
+        navigate('/');
         if (onSuccessRedirect) onSuccessRedirect();
       }, 1000);
     }, 600);

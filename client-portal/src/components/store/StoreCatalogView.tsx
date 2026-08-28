@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Search, 
@@ -21,7 +22,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { setActiveStore, setCurrentView, setSelectedProductId } from '../../store/slices/tenantSlice';
+import { setActiveStore, setSelectedProductId } from '../../store/slices/tenantSlice';
 import { addItemToCart, toggleCartDrawer } from '../../store/slices/cartSlice';
 import { getUserGatedTier, GATED_TIERS } from '../../utils/tierUtils';
 import { ProductDetailModal } from './ProductDetailModal';
@@ -30,6 +31,7 @@ import { Product, Store } from '../../types';
 
 export const StoreCatalogView: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { stores, products, activeStoreId, selectedProductId } = useAppSelector((state) => state.tenant);
   const { currentUser } = useAppSelector((state) => state.auth);
   const { orders } = useAppSelector((state) => state.order);
@@ -117,7 +119,7 @@ export const StoreCatalogView: React.FC = () => {
             <button
               onClick={() => {
                 dispatch(setActiveStore(null));
-                dispatch(setCurrentView('dashboard'));
+                navigate('/');
               }}
               className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer"
             >
@@ -151,7 +153,7 @@ export const StoreCatalogView: React.FC = () => {
           <button
             onClick={() => {
               dispatch(setActiveStore(null));
-              dispatch(setCurrentView('dashboard'));
+              navigate('/');
             }}
             className="p-2 rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#e67e22] dark:hover:text-[#e67e22] hover:border-[#e67e22] transition-all cursor-pointer shadow-xs active:scale-95 flex items-center space-x-1.5 text-xs font-bold"
           >

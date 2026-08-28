@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './store/store';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
@@ -11,13 +12,14 @@ import { UserProfileView } from './components/profile/UserProfileView';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { CheckoutModal } from './components/checkout/CheckoutModal';
 import { OrderTrackingModal } from './components/orders/OrderTrackingModal';
-import { setCurrentView } from './store/slices/tenantSlice';
+import { setActiveStore } from './store/slices/tenantSlice';
 
 export default function App() {
   const dispatch = useAppDispatch();
-  const { currentView } = useAppSelector((state) => state.tenant);
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   const isDark = useAppSelector((state) => state.theme.isDark);
+  const location = useLocation();
+  const navigate = useNavigate();
 
 
   // Sync dark theme on root html
@@ -34,9 +36,9 @@ export default function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     if (token) {
-      dispatch(setCurrentView('magic_link_auth'));
+      navigate('/login');
     }
-  }, [dispatch]);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#121921] text-slate-800 dark:text-slate-100 transition-colors duration-200">
@@ -46,18 +48,18 @@ export default function App() {
 
       {/* Main Header with Theme & Cart Controls */}
       <Header
-        onOpenMagicLinkSimulator={() => dispatch(setCurrentView('magic_link_auth'))}
+        onOpenMagicLinkSimulator={() => navigate('/login')}
       />
 
       {/* Main Body Dynamic View Router */}
       <main className="flex-1">
-        {currentView === 'dashboard' && <TenantStoreGrid />}
-        {currentView === 'store_catalog' && <StoreCatalogView />}
-        {currentView === 'magic_link_auth' && (
-          <MagicLinkHandler onSuccessRedirect={() => dispatch(setCurrentView('dashboard'))} />
-        )}
-        {currentView === 'orders_history' && <OrdersHistoryView />}
-        {currentView === 'profile' && <UserProfileView />}
+        <Routes>
+          <Route path="/" element={<TenantStoreGrid />} />
+          <Route path="/login" element={<MagicLinkHandler onSuccessRedirect={() => navigate('/')} />} />
+          <Route path="/store" element={<StoreCatalogView />} />
+          <Route path="/orders" element={<OrdersHistoryView />} />
+          <Route path="/profile" element={<UserProfileView />} />
+        </Routes>
       </main>
 
       {/* Global Redux Modals & Drawers */}

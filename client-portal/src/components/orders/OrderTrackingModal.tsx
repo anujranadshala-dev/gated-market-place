@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   X, 
   CheckCircle2, 
@@ -15,11 +16,11 @@ import {
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { toggleOrderModal, advanceOrderStatus } from '../../store/slices/orderSlice';
-import { setCurrentView } from '../../store/slices/tenantSlice';
 import { Order } from '../../types';
 
 export const OrderTrackingModal: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { activeOrder, isOrderModalOpen, orders } = useAppSelector((state) => state.order);
 
   if (!isOrderModalOpen || !activeOrder) return null;
@@ -210,7 +211,7 @@ export const OrderTrackingModal: React.FC = () => {
             <button
               onClick={() => {
                 dispatch(toggleOrderModal(false));
-                dispatch(setCurrentView('dashboard'));
+                navigate('/');
               }}
               className="px-4 py-2 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-semibold shadow-md transition-colors cursor-pointer"
             >

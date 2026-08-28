@@ -11,7 +11,6 @@ interface TenantState {
   minPriceFilter: number;
   maxPriceFilter: number;
   selectedProductId: string | null;
-  currentView: 'dashboard' | 'store_catalog' | 'magic_link_auth' | 'architecture_blueprint' | 'orders_history' | 'profile';
 }
 
 const initialState: TenantState = {
@@ -23,7 +22,6 @@ const initialState: TenantState = {
   minPriceFilter: 0,
   maxPriceFilter: 50000,
   selectedProductId: null,
-  currentView: 'dashboard'
 };
 
 export const tenantSlice = createSlice({
@@ -34,15 +32,6 @@ export const tenantSlice = createSlice({
       state.activeStoreId = action.payload;
       state.selectedCategory = 'ALL';
       state.searchQuery = '';
-      if (action.payload) {
-        state.currentView = 'store_catalog';
-      }
-    },
-    setCurrentView: (
-      state,
-      action: PayloadAction<TenantState['currentView']>
-    ) => {
-      state.currentView = action.payload;
     },
     setSelectedCategory: (state, action: PayloadAction<string>) => {
       state.selectedCategory = action.payload;
@@ -68,7 +57,6 @@ export const tenantSlice = createSlice({
 
 export const {
   setActiveStore,
-  setCurrentView,
   setSelectedCategory,
   setSearchQuery,
   setPriceFilter,

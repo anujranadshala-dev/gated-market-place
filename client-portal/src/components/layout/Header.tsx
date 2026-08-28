@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShieldCheck, 
   ShoppingCart, 
@@ -22,7 +23,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { toggleTheme } from '../../store/slices/themeSlice';
 import { toggleCartDrawer } from '../../store/slices/cartSlice';
-import { setCurrentView, setActiveStore } from '../../store/slices/tenantSlice';
+import { setActiveStore } from '../../store/slices/tenantSlice';
 import { logout } from '../../store/slices/authSlice';
 import { getUserGatedTier, GATED_TIERS } from '../../utils/tierUtils';
 
@@ -32,9 +33,11 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const isDark = useAppSelector((state) => state.theme.isDark);
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { stores, activeStoreId, currentView } = useAppSelector((state) => state.tenant);
+  const { stores, activeStoreId } = useAppSelector((state) => state.tenant);
   const { items } = useAppSelector((state) => state.cart);
   const { orders } = useAppSelector((state) => state.order);
 
@@ -59,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
             <button
               onClick={() => {
                 dispatch(setActiveStore(null));
-                dispatch(setCurrentView('dashboard'));
+                navigate('/');
               }}
               className="flex items-center space-x-3 group text-left cursor-pointer focus:outline-none"
             >
@@ -86,10 +89,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
               <button
                 onClick={() => {
                   dispatch(setActiveStore(null));
-                  dispatch(setCurrentView('dashboard'));
+                  navigate('/');
                 }}
                 className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 active:scale-95 ${
-                  currentView === 'dashboard'
+                  location.pathname === '/'
                     ? 'text-white bg-[#0f172a] dark:bg-[#e67e22] shadow-xs'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
@@ -97,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                 <StoreIcon className="w-4 h-4" />
                 <span>Invited Stores</span>
                 <span className={`ml-1 text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
-                  currentView === 'dashboard' ? 'bg-white/20 text-white' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                  location.pathname === '/' ? 'bg-white/20 text-white' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
                 }`}>
                   {accessibleStoresCount}
                 </span>
@@ -105,9 +108,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
 
               {activeStore && (
                 <button
-                  onClick={() => dispatch(setCurrentView('store_catalog'))}
+                  onClick={() => navigate('/store')}
                   className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 active:scale-95 ${
-                    currentView === 'store_catalog'
+                    location.pathname === '/store'
                       ? 'text-white bg-[#0f172a] dark:bg-[#e67e22] shadow-xs'
                       : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
@@ -118,9 +121,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
               )}
 
               <button
-                onClick={() => dispatch(setCurrentView('orders_history'))}
+                onClick={() => navigate('/orders')}
                 className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 active:scale-95 ${
-                  currentView === 'orders_history'
+                  location.pathname === '/orders'
                     ? 'text-white bg-[#0f172a] dark:bg-[#e67e22] shadow-xs'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
@@ -135,9 +138,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
               </button>
 
               <button
-                onClick={() => dispatch(setCurrentView('profile'))}
+                onClick={() => navigate('/profile')}
                 className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 active:scale-95 ${
-                  currentView === 'profile'
+                  location.pathname === '/profile'
                     ? 'text-white bg-[#0f172a] dark:bg-[#e67e22] shadow-xs'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
@@ -185,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                 
                 {/* Shopper Tier Pill */}
                 <button
-                  onClick={() => dispatch(setCurrentView('profile'))}
+                  onClick={() => navigate('/profile')}
                   className={`hidden sm:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider ${tierConfig.badgeClass} shadow-xs border cursor-pointer hover:opacity-90 active:scale-95 transition-all`}
                   title={`Your Spend Tier is ${userGatedTier} (${tierConfig.discountPercent}% Discount). Click to view breakdown.`}
                 >
@@ -255,7 +258,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                       <button
                         onClick={() => {
                           setIsUserMenuOpen(false);
-                          dispatch(setCurrentView('profile'));
+                          navigate('/profile');
                         }}
                         className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center space-x-2 cursor-pointer"
                       >
@@ -266,7 +269,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                       <button
                         onClick={() => {
                           setIsUserMenuOpen(false);
-                          dispatch(setCurrentView('orders_history'));
+                          navigate('/orders');
                         }}
                         className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center space-x-2 cursor-pointer"
                       >
@@ -289,7 +292,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
                         onClick={() => {
                           setIsUserMenuOpen(false);
                           dispatch(logout());
-                          dispatch(setCurrentView('magic_link_auth'));
+                          navigate('/login');
                         }}
                         className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center space-x-2 cursor-pointer"
                       >
@@ -302,7 +305,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
               </div>
             ) : (
               <button
-                onClick={() => dispatch(setCurrentView('magic_link_auth'))}
+                onClick={() => navigate('/login')}
                 className="px-3.5 py-1.5 rounded-xl bg-[#e67e22] hover:bg-[#d35400] text-white text-xs font-bold transition-colors shadow-xs"
               >
                 Sign In
@@ -329,7 +332,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
           <button
             onClick={() => {
               dispatch(setActiveStore(null));
-              dispatch(setCurrentView('dashboard'));
+              navigate('/');
               setIsMobileMenuOpen(false);
             }}
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-bold text-slate-800 dark:text-white"
@@ -346,7 +349,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
           {activeStore && (
             <button
               onClick={() => {
-                dispatch(setCurrentView('store_catalog'));
+                navigate('/store');
                 setIsMobileMenuOpen(false);
               }}
               className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-bold text-slate-800 dark:text-white"
@@ -361,7 +364,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
 
           <button
             onClick={() => {
-              dispatch(setCurrentView('orders_history'));
+              navigate('/orders');
               setIsMobileMenuOpen(false);
             }}
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-bold text-slate-800 dark:text-white"
@@ -379,7 +382,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMagicLinkSimulator }) => {
 
           <button
             onClick={() => {
-              dispatch(setCurrentView('profile'));
+              navigate('/profile');
               setIsMobileMenuOpen(false);
             }}
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 text-xs font-bold text-slate-800 dark:text-white"

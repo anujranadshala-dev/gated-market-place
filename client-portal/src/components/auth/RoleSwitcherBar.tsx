@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { KeyRound, Sparkles, ChevronUp, ChevronDown } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { switchUserPreset } from '../../store/slices/authSlice';
-import { setCurrentView, setActiveStore } from '../../store/slices/tenantSlice';
+import { setActiveStore } from '../../store/slices/tenantSlice';
 import { PRESET_USERS } from '../../data/mockData';
 
 export const RoleSwitcherBar: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { currentUser } = useAppSelector((state) => state.auth);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -31,7 +33,7 @@ export const RoleSwitcherBar: React.FC = () => {
                 onClick={() => {
                   dispatch(switchUserPreset(user.id));
                   dispatch(setActiveStore(null));
-                  dispatch(setCurrentView('dashboard'));
+                  navigate('/');
                 }}
                 title={`Username: @${user.username} | Password: ${user.temporaryPassword} | Invited to: ${user.accessibleStores.length} stores`}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all duration-150 flex items-center space-x-1.5 cursor-pointer active:scale-95 ${
@@ -55,7 +57,7 @@ export const RoleSwitcherBar: React.FC = () => {
 
           <button
             onClick={() => {
-              dispatch(setCurrentView('magic_link_auth'));
+              navigate('/login');
             }}
             className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 flex items-center space-x-1 cursor-pointer transition-colors active:scale-95"
           >

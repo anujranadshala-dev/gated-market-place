@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Store as StoreIcon, 
   ShieldCheck, 
@@ -20,7 +21,7 @@ import {
   Plus
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { setActiveStore, setCurrentView } from '../../store/slices/tenantSlice';
+import { setActiveStore } from '../../store/slices/tenantSlice';
 import { redeemInviteCode, simulateAddSpend } from '../../store/slices/authSlice';
 import { 
   getUserGatedTier, 
@@ -33,34 +34,29 @@ import confetti from 'canvas-confetti';
 
 export const TenantStoreGrid: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { currentUser } = useAppSelector((state) => state.auth);
   const { stores } = useAppSelector((state) => state.tenant);
   const { orders } = useAppSelector((state) => state.order);
 
   const [searchTerm, setSearchTerm] = useState('');
-  // const [filterTab, setFilterTab] = useState<'invited' | 'all'>('invited');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   
-  // Redeem Token Modal State
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteCodeInput, setInviteCodeInput] = useState('');
   const [inviteError, setInviteError] = useState('');
   const [inviteSuccess, setInviteSuccess] = useState(false);
 
-  // VIP Black Subscription Modal State
   const [isVipModalOpen, setIsVipModalOpen] = useState(false);
 
-  // Determine user's Spend Tier automatically
   const userGatedTier = getUserGatedTier(currentUser, orders);
   const tierConfig = GATED_TIERS[userGatedTier];
   const tierProgress = getTierProgress(currentUser, orders);
 
-  // Count user's invited stores
   const invitedStoresCount = stores.filter((st) => 
     currentUser?.accessibleStores?.includes(st.id) || currentUser?.isVipBlackSubscribed
   ).length;
 
-  // Distinct store categories
   const categories = ['ALL', ...Array.from(new Set(stores.map((s) => s.category)))];
 
   const handleOpenStore = (store: Store) => {
@@ -70,7 +66,7 @@ export const TenantStoreGrid: React.FC = () => {
       return;
     }
     dispatch(setActiveStore(store.id));
-    dispatch(setCurrentView('store_catalog'));
+    navigate('/store');
   };
 
   const handleSimulateSpend = (amount: number) => {
