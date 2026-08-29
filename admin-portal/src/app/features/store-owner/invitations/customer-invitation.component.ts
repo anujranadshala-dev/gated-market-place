@@ -11,15 +11,6 @@ import {
 } from '../../../core/models/invitation.model';
 import { StatusBadgeComponent } from '../../../shared/components/badge/status-badge.component';
 
-/**
- * Modern Angular 21 Standalone Customer Access & Credential Provisioning Component
- *
- * Tiering Architecture:
- * - Gated Tier is NOT manually assigned.
- * - New clients start at BRONZE ($0 spend).
- * - Tiers elevate automatically as client spends on store: Silver ($2,500+) -> Gold ($10,000+).
- * - VIP_BLACK is unlocked exclusively on a subscription basis.
- */
 @Component({
   selector: 'app-customer-invitation',
   standalone: true,
@@ -32,7 +23,6 @@ export class CustomerInvitationComponent {
   readonly storeState = inject(StoreState);
   readonly authStore = inject(AuthStore);
 
-  // Provisioning Form Signals (No manual tier selection!)
   readonly recipientEmail = signal<string>('');
   readonly recipientName = signal<string>('');
   readonly username = signal<string>('');
@@ -40,44 +30,43 @@ export class CustomerInvitationComponent {
   readonly customMessage = signal<string>('');
   readonly showPasswordInForm = signal<boolean>(false);
 
-  // Status & Feedback Signals
   readonly isSubmitting = signal<boolean>(false);
   readonly lastDispatchedAccount = signal<CustomerInvitation | null>(null);
   readonly toastMessage = signal<string | null>(null);
 
-  // Password Management Modal Signals
   readonly isPasswordModalOpen = signal<boolean>(false);
   readonly selectedAccountForPassword = signal<CustomerInvitation | null>(null);
   readonly modalNewPassword = signal<string>('');
-  readonly modalIsTemp = signal<boolean>(true);
   readonly modalShowPassword = signal<boolean>(false);
 
-  // Customer Spend Simulation Modal Signals
   readonly isSpendModalOpen = signal<boolean>(false);
   readonly selectedAccountForSpend = signal<CustomerInvitation | null>(null);
   readonly spendAddAmount = signal<number>(1500);
 
-  // VIP Black Subscription Modal Signals
   readonly isSubscriptionModalOpen = signal<boolean>(false);
   readonly selectedAccountForSub = signal<CustomerInvitation | null>(null);
   readonly subPlanChoice = signal<'MONTHLY' | 'ANNUAL'>('MONTHLY');
 
-  // Visibility toggle for table rows
   readonly revealedPasswords = signal<Record<string, boolean>>({});
+  readonly resettingPasswordId = signal<string | null>(null);
 
-  // Computed Validation Signals
   readonly isEmailValid = computed<boolean>(() => {
     const email = this.recipientEmail().trim();
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   });
 
+  readonly isGmailEmail = computed<boolean>(() => {
+    const email = this.recipientEmail().trim().toLowerCase();
+    const regex = /^[^\s@]+@gmail\.com$/;
+    return regex.test(email);
+  });
+
   readonly isFormValid = computed<boolean>(() => {
-    return this.isEmailValid();
+    return this.isEmailValid() && this.isGmailEmail();
   });
 
   constructor() {
-    // Generate an initial sample temporary password
     this.generateNewFormPassword();
   }
 
@@ -110,32 +99,27 @@ export class CustomerInvitationComponent {
     return getCustomerTierProgress(account.totalSpend, account.hasVipBlackSubscription);
   }
 
-  public dispatchCredentials(): void {
+  public async dispatchCredentials(): Promise<void> {
     if (!this.isFormValid()) {
       this.showToast('Please provide a valid recipient email address.');
       return;
     }
 
-    const currentStoreId =
-      this.authStore.assignedStoreId() || this.storeState.activeStore()?.id || 'str_vance_01';
-
     this.isSubmitting.set(true);
 
-    setTimeout(() => {
-      const account = this.invitationState.sendInvitation({
-        storeId: currentStoreId,
+    try {
+      const account = await this.invitationState.sendInvitation({
+        storeId: this.authStore.assignedStoreId() || this.storeState.activeStore()?.id || '',
         recipientEmail: this.recipientEmail(),
         recipientName: this.recipientName() || undefined,
         username: this.username() || undefined,
         tempPassword: this.tempPassword() || undefined,
         customMessage: this.customMessage() || undefined,
-        mustChangePassword: false,
+        mustChangePassword: true,
       });
 
       this.lastDispatchedAccount.set(account);
-      this.isSubmitting.set(false);
 
-      // Reset form signals & regenerate new temp password for next client
       this.recipientEmail.set('');
       this.recipientName.set('');
       this.username.set('');
@@ -143,9 +127,13 @@ export class CustomerInvitationComponent {
       this.generateNewFormPassword();
 
       this.showToast(
-        `Credentials provisioned for ${account.recipientEmail}! Initial Tier: Bronze ($0 spend).`
+        `Credentials provisioned for ${account.recipientEmail}! Initial Tier: Bronze. An email has been sent with login details.`
       );
-    }, 400);
+    } catch (error: any) {
+      this.showToast(error.error?.message || 'Failed to provision credentials.');
+    } finally {
+      this.isSubmitting.set(false);
+    }
   }
 
   public copyText(text: string, label: string = 'Text'): void {
@@ -159,7 +147,6 @@ export class CustomerInvitationComponent {
     this.showToast(`Full login credentials for ${account.username} copied to clipboard!`);
   }
 
-  // --- Spend Simulation Modal ---
   public openSpendModal(account: CustomerInvitation): void {
     this.selectedAccountForSpend.set(account);
     this.spendAddAmount.set(1500);
@@ -174,14 +161,13 @@ export class CustomerInvitationComponent {
   public executeAddSpend(): void {
     const account = this.selectedAccountForSpend();
     const amount = Number(this.spendAddAmount());
-    if (!account || amount <= 0) return;
+    if (!account || !account.id || amount <= 0) return;
 
     this.invitationState.addCustomerSpend(account.id, amount);
-    this.showToast(`Recorded $${amount.toLocaleString()} purchase for ${account.username}. Tier updated!`);
+    this.showToast(`Recorded $${amount.toLocaleString()} purchase for ${account.username || 'client'}. Tier updated!`);
     this.closeSpendModal();
   }
 
-  // --- VIP Black Subscription Modal ---
   public openSubscriptionModal(account: CustomerInvitation): void {
     this.selectedAccountForSub.set(account);
     this.subPlanChoice.set(account.subscriptionPlan === 'ANNUAL' ? 'ANNUAL' : 'MONTHLY');
@@ -195,22 +181,20 @@ export class CustomerInvitationComponent {
 
   public toggleSubscription(account: CustomerInvitation, activate: boolean): void {
     const plan = this.subPlanChoice();
+    if (!account.id) return;
     this.invitationState.toggleVipBlackSubscription(account.id, activate, plan);
     if (activate) {
-      this.showToast(`VIP Black Concierge Subscription activated for ${account.username}!`);
+      this.showToast(`VIP Black Concierge Subscription activated for ${account.username || 'client'}!`);
     } else {
-      this.showToast(`VIP Black Subscription cancelled for ${account.username}. Tier reverted to spend level.`);
+      this.showToast(`VIP Black Subscription cancelled for ${account.username || 'client'}. Tier reverted to spend level.`);
     }
     this.closeSubscriptionModal();
   }
 
-  // --- Password Reset / Change Modal Actions ---
   public openPasswordModal(account: CustomerInvitation): void {
     this.selectedAccountForPassword.set(account);
-    const newTemp = this.invitationState.generateSecureTempPassword(account.storeName);
-    this.modalNewPassword.set(newTemp);
-    this.modalIsTemp.set(true);
-    this.modalShowPassword.set(true);
+    this.modalNewPassword.set('');
+    this.modalShowPassword.set(false);
     this.isPasswordModalOpen.set(true);
   }
 
@@ -219,35 +203,31 @@ export class CustomerInvitationComponent {
     this.selectedAccountForPassword.set(null);
   }
 
-  public generateModalTempPassword(): void {
-    const account = this.selectedAccountForPassword();
-    const newTemp = this.invitationState.generateSecureTempPassword(account?.storeName);
-    this.modalNewPassword.set(newTemp);
-    this.modalIsTemp.set(true);
-  }
-
-  public saveNewPassword(): void {
+  public async saveNewPassword(): Promise<void> {
     const account = this.selectedAccountForPassword();
     const pwd = this.modalNewPassword().trim();
 
-    if (!account || !pwd) {
+    if (!account || !account.id || !pwd) {
       this.showToast('Please enter a valid password.');
       return;
     }
 
-    this.invitationState.changeClientPassword(
-      account.id,
-      pwd,
-      this.modalIsTemp(),
-      false
-    );
+    this.resettingPasswordId.set(account.id);
 
-    this.showToast(`Password for ${account.username} successfully updated!`);
-    this.closePasswordModal();
+    try {
+      const newTemp = await this.invitationState.resetPassword(account.id);
+      this.invitationState.changeClientPassword(account.id, newTemp, true);
+      this.showToast(`Password for ${account.username || 'client'} successfully updated!`);
+      this.closePasswordModal();
+    } catch (error: any) {
+      this.showToast(error.error?.message || 'Failed to reset password.');
+    } finally {
+      this.resettingPasswordId.set(null);
+    }
   }
 
-  public revokeAccount(id: string): void {
-    this.invitationState.revokeInvitation(id);
+  public async revokeAccount(id: string): Promise<void> {
+    await this.invitationState.deleteInvitation(id);
     this.showToast('Client access revoked.');
   }
 

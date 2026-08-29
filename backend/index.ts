@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import adminRoutes from './routes/route.js';
 import clientRoutes from './routes/clientRoutes.js';
+import adminClientRoutes from './routes/adminClientRoutes.js';
 import connectDB from './db.js';
 import cors from 'cors';
 
@@ -30,8 +31,11 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Hello World!");
 });
 
-// Mount admin authentication routes
+// Mount admin routes
 app.use('/api', adminRoutes);
+
+// Mount admin client management routes
+app.use('/api/admin', adminClientRoutes);
 
 // Mount client user routes
 app.use('/api/client', clientRoutes);

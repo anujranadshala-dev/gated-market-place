@@ -63,6 +63,9 @@
           @if (recipientEmail().length > 0 && !isEmailValid()) {
             <p class="text-[10px] text-rose-600 dark:text-rose-400 mt-1">Please enter a valid email address.</p>
           }
+          @if (recipientEmail().length > 0 && isEmailValid() && !isGmailEmail()) {
+            <p class="text-[10px] text-rose-600 dark:text-rose-400 mt-1">Only Gmail addresses (@gmail.com) are allowed for client invitations.</p>
+          }
         </div>
 
         <!-- Recipient Full Name -->
@@ -227,6 +230,11 @@
             <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">Credentials Dispatched!</span>
             <span class="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">Initial Tier: Bronze</span>
           </div>
+
+          <p class="text-[11px] text-slate-600 dark:text-slate-400">
+            An email with login instructions has been sent to <strong>{{ account.recipientEmail }}</strong>.
+            Share the credentials below securely with the client.
+          </p>
 
           <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800/60 space-y-2 shadow-xs">
             <div class="flex items-center justify-between">

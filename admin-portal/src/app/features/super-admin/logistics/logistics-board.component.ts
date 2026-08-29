@@ -55,6 +55,11 @@ export class LogisticsBoardComponent {
     this.closeDispatchModal();
   }
 
+  public async markAsOnTheWay(orderId: string): Promise<void> {
+    await this.orderState.markAsOnTheWay(orderId);
+    this.showToast(`Order is now 'On the way'.`);
+  }
+
   public async markAsDelivered(orderId: string, orderNumber: string): Promise<void> {
     await this.orderState.markDelivered(orderId);
     this.showToast(`Order ${orderNumber} fulfilled and marked as 'Delivered'.`);

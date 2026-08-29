@@ -151,7 +151,7 @@ export interface Order {
   taxTotal: number;
   shippingFee: number;
   grandTotal: number;
-  status: 'Pending' | 'Approved' | 'Processing' | 'Shipped' | 'Cancelled';
+  status: 'Pending' | 'Packed' | 'On the way' | 'Out_for_Delivery' | 'Delivered';
   paymentMethod: 'PO_INVOICE' | 'CORPORATE_CARD' | 'WIRE_TRANSFER' | 'NET_30';
   poNumber?: string;
   shippingAddress: {

@@ -80,6 +80,17 @@
         Packed
       </button>
       <button
+        (click)="orderState.setStatusFilter('On the way')"
+        [class.bg-indigo-600]="orderState.statusFilter() === 'On the way'"
+        [class.text-white]="orderState.statusFilter() === 'On the way'"
+        [class.shadow-xs]="orderState.statusFilter() === 'On the way'"
+        [class.text-slate-600]="orderState.statusFilter() !== 'On the way'"
+        [class.dark:text-slate-400]="orderState.statusFilter() !== 'On the way'"
+        class="px-3 py-1.5 rounded-lg hover:text-slate-900 dark:hover:text-slate-200 transition font-medium"
+      >
+        On the way
+      </button>
+      <button
         (click)="orderState.setStatusFilter('Out_for_Delivery')"
         [class.bg-indigo-600]="orderState.statusFilter() === 'Out_for_Delivery'"
         [class.text-white]="orderState.statusFilter() === 'Out_for_Delivery'"
@@ -195,8 +206,18 @@
                         <span>Mark as 'Packed'</span>
                       </button>
                     } @else if (order.status === 'Packed') {
-                      <span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-mono font-medium">
-                        Ready for Super Admin Dispatch &rarr;
+                      <button
+                        (click)="orderState.markAsOnTheWay(order.id)"
+                        class="px-3.5 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 text-xs font-bold shadow-xs transition flex items-center space-x-1"
+                      >
+                        <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>Mark as 'On the way'</span>
+                      </button>
+                    } @else if (order.status === 'On the way') {
+                      <span class="text-[11px] text-blue-600 dark:text-blue-400 font-mono font-medium">
+                        In transit &rarr;
                       </span>
                     }
                   </div>
@@ -290,7 +311,7 @@
         }
 
         <!-- Logistics Tracking Info (If already dispatched) -->
-        @if (order.status === 'Out_for_Delivery' || order.status === 'Delivered') {
+        @if (order.status === 'On the way' || order.status === 'Out_for_Delivery' || order.status === 'Delivered') {
           <div class="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 text-xs space-y-2">
             <div class="flex items-center justify-between">
               <span class="font-bold text-indigo-900 dark:text-indigo-200">Logistics Carrier Details</span>

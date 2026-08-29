@@ -1,4 +1,4 @@
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -25,11 +25,22 @@ export class SignupComponent {
   readonly errorMessage = signal<string | null>(null);
   readonly isLoading = signal<boolean>(false);
 
+  readonly isEmailValid = computed<boolean>(() => {
+    const email = this.email().trim();
+    const regex = /^[^\s@]+@gmail\.com$/i;
+    return regex.test(email);
+  });
+
   public onSubmit(): void {
     this.errorMessage.set(null);
 
     if (!this.name() || !this.email() || !this.password()) {
       this.errorMessage.set('Please fill in all required fields.');
+      return;
+    }
+
+    if (!this.isEmailValid()) {
+      this.errorMessage.set('Please use a valid Gmail address (@gmail.com).');
       return;
     }
 

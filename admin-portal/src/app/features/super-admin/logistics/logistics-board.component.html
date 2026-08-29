@@ -14,7 +14,7 @@
     <div>
       <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Central Logistics & Delivery Board</h1>
       <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-        Fulfillment operations hub: monitor merchant 'Packed' orders, assign carriers, and transition shipments to 'Delivered'.
+        Fulfillment operations hub: monitor merchant 'Packed' orders, assign carriers, and transition shipments through 'On the way' and 'Out for Delivery' to 'Delivered'.
       </p>
     </div>
 
@@ -31,8 +31,8 @@
     </div>
   </div>
 
-  <!-- 3-Column Logistics Pipeline Board -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+  <!-- 4-Column Logistics Pipeline Board -->
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
     <!-- COLUMN 1: PACKED (Ready for Dispatch) -->
     <div class="rounded-2xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800/60 p-5 space-y-4 shadow-xs">
       <!-- Column Header -->
@@ -95,13 +95,78 @@
       </div>
     </div>
 
-    <!-- COLUMN 2: OUT FOR DELIVERY (In Transit) -->
+    <!-- COLUMN 2: ON THE WAY (In Transit) -->
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800/60 p-5 space-y-4 shadow-xs">
+      <!-- Column Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-blue-900 dark:text-blue-200">2. On the way</h2>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[11px] font-mono font-bold border border-blue-200 dark:border-blue-800/60">
+          {{ orderState.onTheWayOrders().length }}
+        </span>
+      </div>
+
+      <p class="text-[11px] text-slate-500 dark:text-slate-400">
+        Shipment is in transit to the destination.
+      </p>
+
+      <!-- Cards List -->
+      <div class="space-y-3">
+        @if (orderState.onTheWayOrders().length === 0) {
+          <div class="p-8 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+            No shipments currently in transit.
+          </div>
+        } @else {
+          @for (order of orderState.onTheWayOrders(); track order.id) {
+            <div class="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-white dark:hover:bg-slate-800 transition space-y-3 shadow-xs">
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400">{{ order.orderNumber }}</span>
+                  <p class="text-[11px] font-semibold text-slate-800 dark:text-slate-200 mt-0.5">{{ order.storeName }}</p>
+                </div>
+                <app-status-badge [status]="order.status"></app-status-badge>
+              </div>
+
+              <!-- Carrier Info Box -->
+              <div class="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/60 text-[11px] space-y-1">
+                <div class="flex items-center justify-between text-blue-950 dark:text-blue-200 font-semibold">
+                  <span>{{ order.logistics.carrierName || 'Awaiting carrier' }}</span>
+                  <span class="text-[10px] text-blue-600 dark:text-blue-400 font-medium">In Transit</span>
+                </div>
+                <p class="font-mono text-slate-700 dark:text-slate-300 text-[10px]">Track: {{ order.logistics.trackingNumber || 'N/A' }}</p>
+                <p class="text-slate-600 dark:text-slate-400 text-[10px]">Driver: {{ order.logistics.driverName || 'N/A' }}</p>
+              </div>
+
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                <span>Destination: </span>
+                <strong class="text-slate-800 dark:text-slate-200">{{ order.shippingAddress.recipientName }}</strong>, {{ order.shippingAddress.city }}
+              </div>
+
+              <!-- Action: Dispatch Carrier -->
+              <button
+                (click)="openDispatchModal(order)"
+                class="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-sm shadow-blue-600/20"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+                </svg>
+                <span>Update Carrier & Dispatch</span>
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- COLUMN 3: OUT FOR DELIVERY (Final Mile) -->
     <div class="rounded-2xl bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/60 p-5 space-y-4 shadow-xs">
       <!-- Column Header -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
         <div class="flex items-center space-x-2">
           <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
-          <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">2. Out for Delivery</h2>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">3. Out for Delivery</h2>
         </div>
         <span class="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-mono font-bold border border-indigo-200 dark:border-indigo-800/60">
           {{ orderState.outForDeliveryOrders().length }}
@@ -166,7 +231,7 @@
       <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
         <div class="flex items-center space-x-2">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">3. Delivered & Fulfilled</h2>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">4. Delivered & Fulfilled</h2>
         </div>
         <span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[11px] font-mono font-bold border border-emerald-200 dark:border-emerald-800/60">
           {{ orderState.deliveredOrders().length }}

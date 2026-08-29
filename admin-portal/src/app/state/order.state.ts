@@ -53,6 +53,10 @@ export class OrderState {
     return this._orders().filter((o) => o.status === 'Out_for_Delivery');
   });
 
+  readonly onTheWayOrders = computed<Order[]>(() => {
+    return this._orders().filter((o) => o.status === 'On the way');
+  });
+
   readonly deliveredOrders = computed<Order[]>(() => {
     return this._orders().filter((o) => o.status === 'Delivered');
   });
@@ -85,7 +89,7 @@ export class OrderState {
   });
 
   readonly inTransitCount = computed<number>(() => {
-    return this._orders().filter((o) => o.status === 'Out_for_Delivery').length;
+    return this._orders().filter((o) => o.status === 'Out_for_Delivery' || o.status === 'On the way').length;
   });
 
   public async getOrders(): Promise<void> {
@@ -208,6 +212,17 @@ export class OrderState {
       logistics: {
         ...this._orders().find((o) => o.id === orderId)?.logistics || {},
         shippingNotes: packingNotes,
+      },
+    });
+  }
+
+  public async markAsOnTheWay(orderId: string): Promise<void> {
+    const existingLogistics = this._orders().find((o) => o.id === orderId)?.logistics || {};
+    await this.updateOrder(orderId, {
+      status: 'On the way',
+      logistics: {
+        ...existingLogistics,
+        dispatchedAt: new Date().toISOString(),
       },
     });
   }

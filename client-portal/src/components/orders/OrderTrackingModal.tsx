@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   X, 
@@ -8,14 +8,13 @@ import {
   FileText, 
   Building2, 
   Truck, 
-  Printer, 
-  ArrowRight,
+  Printer,
   RefreshCw,
   Package,
   Calendar
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
-import { toggleOrderModal, advanceOrderStatus } from '../../store/slices/orderSlice';
+import { toggleOrderModal } from '../../store/slices/orderSlice';
 import { Order } from '../../types';
 
 export const OrderTrackingModal: React.FC = () => {
@@ -23,26 +22,31 @@ export const OrderTrackingModal: React.FC = () => {
   const navigate = useNavigate();
   const { activeOrder, isOrderModalOpen, orders } = useAppSelector((state) => state.order);
 
-  if (!isOrderModalOpen || !activeOrder) return null;
+  // Sync activeOrder with latest data from orders array for live tracking
+  const latestActiveOrder = activeOrder && orders.length > 0
+    ? orders.find((o: Order) => o.id === activeOrder.id) || activeOrder
+    : activeOrder;
+
+  useEffect(() => {
+    if (latestActiveOrder && latestActiveOrder.status !== activeOrder?.status) {
+      dispatch(toggleOrderModal(false));
+      setTimeout(() => {
+        dispatch(toggleOrderModal(true));
+      }, 50);
+    }
+  }, [latestActiveOrder?.status, activeOrder?.status, dispatch]);
+
+  if (!isOrderModalOpen || !latestActiveOrder) return null;
 
   const steps: { key: Order['status']; label: string; desc: string }[] = [
     { key: 'Pending', label: 'Pending B2B Authorization', desc: 'Order received & queued in multi-tenant audit engine' },
-    { key: 'Approved', label: 'PO Verified & Approved', desc: 'Finance & Compliance review passed' },
-    { key: 'Processing', label: 'Tenant Assembly & QA', desc: 'Hardware calibration and ISO packaging' },
-    { key: 'Shipped', label: 'Freight Dispatched', desc: 'Carrier tracking and bill of lading active' }
+    { key: 'Packed', label: 'Packed & Ready', desc: 'Items verified, packed, and handed to logistics' },
+    { key: 'On the way', label: 'On the way', desc: 'Shipment is in transit to the destination' },
+    { key: 'Out_for_Delivery', label: 'Out for Delivery', desc: 'Carrier has the package for final delivery' },
+    { key: 'Delivered', label: 'Delivered', desc: 'Package successfully delivered to recipient' }
   ];
 
-  const currentStepIdx = steps.findIndex((s) => s.key === activeOrder.status);
-
-  const handleNextStatus = () => {
-    if (activeOrder.status === 'Pending') {
-      dispatch(advanceOrderStatus({ orderId: activeOrder.id, newStatus: 'Approved' }));
-    } else if (activeOrder.status === 'Approved') {
-      dispatch(advanceOrderStatus({ orderId: activeOrder.id, newStatus: 'Processing' }));
-    } else if (activeOrder.status === 'Processing') {
-      dispatch(advanceOrderStatus({ orderId: activeOrder.id, newStatus: 'Shipped' }));
-    }
-  };
+  const currentStepIdx = steps.findIndex((s) => s.key === latestActiveOrder.status);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
@@ -57,14 +61,14 @@ export const OrderTrackingModal: React.FC = () => {
             <div>
               <div className="flex items-center space-x-2">
                 <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                  Order Registered: {activeOrder.orderNumber}
+                  Order Registered: {latestActiveOrder.orderNumber}
                 </h2>
                 <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
-                  {activeOrder.status}
+                  {latestActiveOrder.status}
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-[#9aa8b2]">
-                Submitted by {activeOrder.organization}
+                Submitted by {latestActiveOrder.organization}
               </p>
             </div>
           </div>
@@ -85,15 +89,10 @@ export const OrderTrackingModal: React.FC = () => {
               <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 Live Lifecycle Tracking:
               </span>
-              {activeOrder.status !== 'Shipped' && (
-                <button
-                  onClick={handleNextStatus}
-                  className="px-2.5 py-1 rounded bg-[#2988c8] text-white text-[11px] font-medium hover:bg-[#d97d10] transition-colors flex items-center space-x-1 cursor-pointer"
-                >
-                  <span>Simulate Next Stage</span>
-                  <ArrowRight className="w-3 h-3" />
-                </button>
-              )}
+              <span className="flex items-center space-x-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                <RefreshCw className="w-3 h-3 animate-spin" />
+                <span>Auto-updating</span>
+              </span>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -136,11 +135,11 @@ export const OrderTrackingModal: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
               <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Payment & Terms</span>
               <span className="font-bold text-slate-900 dark:text-white">
-                {activeOrder.paymentMethod.replace('_', ' ')}
+                {latestActiveOrder.paymentMethod.replace('_', ' ')}
               </span>
-              {activeOrder.poNumber && (
+              {latestActiveOrder.poNumber && (
                 <p className="font-mono text-[11px] text-[#2988c8] mt-0.5">
-                  Ref: {activeOrder.poNumber}
+                  Ref: {latestActiveOrder.poNumber}
                 </p>
               )}
             </div>
@@ -148,17 +147,17 @@ export const OrderTrackingModal: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
               <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Shipping Destination</span>
               <span className="font-bold text-slate-900 dark:text-white">
-                {activeOrder.shippingAddress.company}
+                {latestActiveOrder.shippingAddress.company}
               </span>
               <p className="text-[11px] text-slate-500 dark:text-[#9aa8b2] truncate">
-                {activeOrder.shippingAddress.city}, {activeOrder.shippingAddress.state} {activeOrder.shippingAddress.zipCode}
+                {latestActiveOrder.shippingAddress.city}, {latestActiveOrder.shippingAddress.state} {latestActiveOrder.shippingAddress.zipCode}
               </p>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
               <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Grand Authorized Total</span>
               <span className="font-extrabold text-base text-[#212832] dark:text-white">
-                ${activeOrder.grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                ${latestActiveOrder.grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </span>
               <p className="text-[10px] text-slate-500">Tax & Freight included</p>
             </div>
@@ -181,7 +180,7 @@ export const OrderTrackingModal: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {activeOrder.items.map((item, idx) => (
+                  {latestActiveOrder.items.map((item, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
                       <td className="p-3">
                         <p className="font-bold text-slate-900 dark:text-white">{item.product.name}</p>

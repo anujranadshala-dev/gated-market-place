@@ -104,7 +104,7 @@ export function getUserLifetimeSpend(user?: User | null, orders?: Order[]): numb
   let orderSpend = 0;
   if (orders && orders.length > 0) {
     orderSpend = orders
-      .filter((o) => (o.userId === user.id || o.userEmail === user.email) && o.status !== 'Cancelled')
+      .filter((o) => o.userId === user.id || o.userEmail === user.email)
       .reduce((sum, o) => sum + o.grandTotal, 0);
   }
 

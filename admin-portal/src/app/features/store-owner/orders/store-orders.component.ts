@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderState } from '../../../state/order.state';
@@ -17,7 +17,7 @@ import { StatusBadgeComponent } from '../../../shared/components/badge/status-ba
   templateUrl: './store-orders.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StoreOrdersComponent {
+export class StoreOrdersComponent implements OnInit {
   readonly orderState = inject(OrderState);
   readonly authStore = inject(AuthStore);
 
@@ -25,6 +25,12 @@ export class StoreOrdersComponent {
   readonly selectedOrder = signal<Order | null>(null);
   readonly packingNotes = signal<string>('');
   readonly toastMessage = signal<string | null>(null);
+
+  constructor() {}
+
+  public ngOnInit(): void {
+    this.orderState.getOrders();
+  }
 
   public openOrderDetails(order: Order): void {
     this.selectedOrder.set(order);

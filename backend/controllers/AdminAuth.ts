@@ -12,6 +12,13 @@ export async function createAdminUser(req: Request, res: Response) {
         return res.status(400).json({ message: 'Missing required fields: email, name, password, role.' });
     }
 
+    const trimmedEmail = email.trim().toLowerCase();
+    const gmailRegex = /^[^\s@]+@gmail\.com$/;
+
+    if (!gmailRegex.test(trimmedEmail)) {
+        return res.status(400).json({ message: 'Only Gmail addresses are allowed for admin/owner accounts.' });
+    }
+
     try {
         // Check if a user with the given email already exists.
         const existingUser = await AdminUser.findOne({ email });

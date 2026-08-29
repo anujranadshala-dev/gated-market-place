@@ -6,6 +6,7 @@ import { Footer } from './components/layout/Footer';
 import { TenantStoreGrid } from './components/dashboard/TenantStoreGrid';
 import { StoreCatalogView } from './components/store/StoreCatalogView';
 import { StoreCredentialsAuth } from './components/auth/StoreCredentialsAuth';
+import { ForcePasswordChange } from './components/auth/ForcePasswordChange';
 import { OrdersHistoryView } from './components/orders/OrdersHistoryView';
 import { UserProfileView } from './components/profile/UserProfileView';
 import { CartDrawer } from './components/cart/CartDrawer';
@@ -46,12 +47,30 @@ export default function App() {
     }
   }, [isAuthenticated, dispatch]);
 
+  // Live order tracking: poll every 10s when user is on orders page or tracking modal is open
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const interval = setInterval(() => {
+      dispatch(fetchOrders());
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, dispatch]);
+
   // Redirect to login if not authenticated (except on login page)
   useEffect(() => {
     if (!isAuthenticated && location.pathname !== '/login') {
       navigate('/login');
     }
   }, [isAuthenticated, location.pathname, navigate]);
+
+  // Redirect to force password change if using temporary password
+  useEffect(() => {
+    if (isAuthenticated && currentUser?.isTemporaryPassword && location.pathname !== '/force-password-change') {
+      navigate('/force-password-change');
+    }
+  }, [isAuthenticated, currentUser, location.pathname, navigate]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -71,6 +90,18 @@ export default function App() {
     );
   }
 
+  // If using temporary password, show force password change
+  if (currentUser?.isTemporaryPassword && location.pathname !== '/force-password-change') {
+    return (
+      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#171c23] text-slate-800 dark:text-slate-100 transition-colors duration-200">
+        <Routes>
+          <Route path="/force-password-change" element={<ForcePasswordChange />} />
+        </Routes>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#171c23] text-slate-800 dark:text-slate-100 transition-colors duration-200">
       
@@ -82,9 +113,11 @@ export default function App() {
         <Routes>
           <Route path="/" element={<TenantStoreGrid />} />
           <Route path="/login" element={<StoreCredentialsAuth onSuccessRedirect={() => navigate('/')} />} />
+          <Route path="/force-password-change" element={<ForcePasswordChange />} />
           <Route path="/store" element={<StoreCatalogView />} />
           <Route path="/orders" element={<OrdersHistoryView />} />
           <Route path="/profile" element={<UserProfileView />} />
+          <Route path="*" element={<TenantStoreGrid />} />
         </Routes>
       </main>
 

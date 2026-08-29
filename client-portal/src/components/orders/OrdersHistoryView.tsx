@@ -84,9 +84,13 @@ export const OrdersHistoryView: React.FC = () => {
                     <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border ${
                       order.status === 'Pending'
                         ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300'
-                        : order.status === 'Approved'
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300'
-                        : order.status === 'Shipped'
+                        : order.status === 'Packed'
+                        ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 border-indigo-300'
+                        : order.status === 'On the way'
+                        ? 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border-blue-300'
+                        : order.status === 'Out_for_Delivery'
+                        ? 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 border-purple-300'
+                        : order.status === 'Delivered'
                         ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300'
                         : 'bg-slate-100 text-slate-800'
                     }`}>

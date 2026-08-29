@@ -3,7 +3,7 @@
  * Status Lifecycle: Pending -> Packed (Store Owner) -> Out_for_Delivery (Super Admin) -> Delivered (Super Admin)
  */
 
-export type OrderStatus = 'Pending' | 'Packed' | 'Out_for_Delivery' | 'Delivered' | 'Cancelled';
+export type OrderStatus = 'Pending' | 'Packed' | 'On the way' | 'Out_for_Delivery' | 'Delivered';
 
 export interface OrderItem {
   productId: string;

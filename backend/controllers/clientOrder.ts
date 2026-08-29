@@ -44,7 +44,7 @@ function mapOrderToClientFormat(orderDoc: IOrder) {
         taxTotal: orderDoc.taxAmount || 0,
         shippingFee: orderDoc.shippingFee || 0,
         grandTotal: orderDoc.totalAmount || 0,
-        status: orderDoc.status === 'Pending' ? 'Pending' : orderDoc.status === 'Packed' ? 'Processing' : orderDoc.status === 'Out_for_Delivery' ? 'Shipped' : orderDoc.status === 'Delivered' ? 'Approved' : 'Pending',
+        status: orderDoc.status || 'Pending',
         paymentMethod: 'PO_INVOICE',
         shippingAddress: {
             recipientName: orderDoc.shippingAddress?.recipientName || '',
