@@ -63,10 +63,10 @@ export function calculateCustomerTier(
   if (hasVipBlackSubscription) {
     return 'VIP_BLACK';
   }
-  if (totalSpend >= 10000) {
+  if (totalSpend >= 1000000) {
     return 'GOLD';
   }
-  if (totalSpend >= 2500) {
+  if (totalSpend >= 250000) {
     return 'SILVER';
   }
   return 'BRONZE';
@@ -101,26 +101,26 @@ export function getCustomerTierProgress(
     };
   }
 
-  if (totalSpend >= 10000) {
+  if (totalSpend >= 1000000) {
     return {
       currentTier: 'GOLD',
       nextTier: 'VIP_BLACK', // Can only upgrade to VIP Black via subscription
       currentSpend: totalSpend,
-      nextTierThreshold: 10000,
+      nextTierThreshold: 1000000,
       remainingToNextTier: 0,
       progressPercent: 100,
       isSubscriptionActive: false,
     };
   }
 
-  if (totalSpend >= 2500) {
-    const remaining = 10000 - totalSpend;
-    const progress = Math.min(100, Math.round(((totalSpend - 2500) / 7500) * 100));
+  if (totalSpend >= 250000) {
+    const remaining = 1000000 - totalSpend;
+    const progress = Math.min(100, Math.round(((totalSpend - 250000) / 750000) * 100));
     return {
       currentTier: 'SILVER',
       nextTier: 'GOLD',
       currentSpend: totalSpend,
-      nextTierThreshold: 10000,
+      nextTierThreshold: 1000000,
       remainingToNextTier: remaining,
       progressPercent: progress,
       isSubscriptionActive: false,
@@ -128,13 +128,13 @@ export function getCustomerTierProgress(
   }
 
   // Bronze
-  const remaining = 2500 - totalSpend;
-  const progress = Math.min(100, Math.round((totalSpend / 2500) * 100));
+  const remaining = 250000 - totalSpend;
+  const progress = Math.min(100, Math.round((totalSpend / 250000) * 100));
   return {
     currentTier: 'BRONZE',
     nextTier: 'SILVER',
     currentSpend: totalSpend,
-    nextTierThreshold: 2500,
+    nextTierThreshold: 250000,
     remainingToNextTier: remaining,
     progressPercent: progress,
     isSubscriptionActive: false,

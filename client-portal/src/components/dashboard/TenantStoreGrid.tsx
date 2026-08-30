@@ -176,11 +176,11 @@ export const TenantStoreGrid: React.FC = () => {
                     />
                   </div>
                   <div className="flex justify-between items-center text-[11px] mt-1.5 text-slate-400">
-                    <span>{tierProgress.currentTier} (${tierProgress.minSpendRequired})</span>
+                    <span>{tierProgress.currentTier} (₹{tierProgress.minSpendRequired.toLocaleString('en-IN')})</span>
                     <span className="font-bold text-amber-300">
                        Spend ₹{tierProgress.remainingSpend.toFixed(2)} more for {tierProgress.nextTier}
                     </span>
-                    <span>{tierProgress.nextTier} (${tierProgress.targetSpend})</span>
+                    <span>{tierProgress.nextTier} (₹{tierProgress.targetSpend.toLocaleString('en-IN')})</span>
                   </div>
                 </div>
               ) : tierProgress.isVipBlack ? (

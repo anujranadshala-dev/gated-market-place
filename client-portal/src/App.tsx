@@ -21,7 +21,7 @@ export default function App() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
+  const { initializing, isAuthenticated, currentUser, loginLoading } = useAppSelector((state) => state.auth);
   const isDark = useAppSelector((state) => state.theme.isDark);
 
   // Sync dark theme on root html
@@ -33,10 +33,12 @@ export default function App() {
     }
   }, [isDark]);
 
-  // Fetch current user and data on app load
+  // On app load: always try to restore session from cookie
   useEffect(() => {
-    dispatch(fetchCurrentUser());
-  }, [dispatch]);
+    if (initializing) {
+      dispatch(fetchCurrentUser());
+    }
+  }, [dispatch, initializing]);
 
   // Fetch data when user authenticates
   useEffect(() => {
@@ -47,7 +49,7 @@ export default function App() {
     }
   }, [isAuthenticated, dispatch]);
 
-  // Live order tracking: poll every 10s when user is on orders page or tracking modal is open
+  // Live order tracking: poll every 10s when user is authenticated
   useEffect(() => {
     if (!isAuthenticated) return;
     
@@ -58,32 +60,53 @@ export default function App() {
     return () => clearInterval(interval);
   }, [isAuthenticated, dispatch]);
 
-  // Redirect to login if not authenticated (except on login page)
+  // Auth guard: redirect to login if not authenticated
+  // Skip if we're currently logging in to avoid race conditions
   useEffect(() => {
-    if (!isAuthenticated && location.pathname !== '/login') {
-      navigate('/login');
+    if (!initializing && !isAuthenticated && !loginLoading && location.pathname !== '/login') {
+      navigate('/login', { replace: true });
     }
-  }, [isAuthenticated, location.pathname, navigate]);
+  }, [initializing, isAuthenticated, loginLoading, location.pathname, navigate]);
+
+  // If authenticated and on login page, redirect to home
+  useEffect(() => {
+    if (!initializing && isAuthenticated && location.pathname === '/login') {
+      navigate('/', { replace: true });
+    }
+  }, [initializing, isAuthenticated, location.pathname, navigate]);
 
   // Redirect to force password change if using temporary password
   useEffect(() => {
     if (isAuthenticated && currentUser?.isTemporaryPassword && location.pathname !== '/force-password-change') {
-      navigate('/force-password-change');
+      navigate('/force-password-change', { replace: true });
     }
   }, [isAuthenticated, currentUser, location.pathname, navigate]);
 
   const handleLogout = () => {
     dispatch(logout());
     dispatch(setActiveStore(null));
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
-  // If not authenticated and on login page, show login
+  // Show loading screen while checking auth
+  if (initializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#171c23]">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-[#2988c8] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, show only login page
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#171c23] text-slate-800 dark:text-slate-100 transition-colors duration-200">
         <Routes>
           <Route path="/login" element={<StoreCredentialsAuth onSuccessRedirect={() => navigate('/')} />} />
+          <Route path="*" element={<StoreCredentialsAuth onSuccessRedirect={() => navigate('/')} />} />
         </Routes>
         <Footer />
       </div>
@@ -96,6 +119,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#171c23] text-slate-800 dark:text-slate-100 transition-colors duration-200">
         <Routes>
           <Route path="/force-password-change" element={<ForcePasswordChange />} />
+          <Route path="*" element={<ForcePasswordChange />} />
         </Routes>
         <Footer />
       </div>

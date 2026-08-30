@@ -5,6 +5,7 @@ import { api } from '../../services/api';
 interface AuthState {
   currentUser: User | null;
   isAuthenticated: boolean;
+  initializing: boolean;
   magicToken: string | null;
   verificationLoading: boolean;
   verificationError: string | null;
@@ -21,6 +22,7 @@ interface AuthState {
 const initialState: AuthState = {
   currentUser: null,
   isAuthenticated: false,
+  initializing: true,
   magicToken: null,
   verificationLoading: false,
   verificationError: null,
@@ -215,6 +217,7 @@ export const authSlice = createSlice({
     logout: (state) => {
       state.currentUser = null;
       state.isAuthenticated = false;
+      state.initializing = false;
       state.magicToken = null;
       state.verificationError = null;
       state.loginError = null;
@@ -250,14 +253,19 @@ export const authSlice = createSlice({
         state.loginError = null;
         state.sessionExpiresAt = null;
       })
+      .addCase(fetchCurrentUser.pending, (state) => {
+        state.initializing = true;
+      })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.currentUser = action.payload;
         state.isAuthenticated = true;
+        state.initializing = false;
         state.sessionExpiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
       })
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.currentUser = null;
         state.isAuthenticated = false;
+        state.initializing = false;
         state.sessionExpiresAt = null;
       })
       .addCase(updateUserProfileApi.pending, (state) => {

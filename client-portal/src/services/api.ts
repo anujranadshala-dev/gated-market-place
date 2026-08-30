@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/client';
+const API_BASE = '/api/client';
 
 async function handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {

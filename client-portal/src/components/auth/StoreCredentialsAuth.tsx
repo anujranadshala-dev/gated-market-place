@@ -61,10 +61,7 @@ export const StoreCredentialsAuth: React.FC<StoreCredentialsAuthProps> = ({
         });
       } catch (err) {}
 
-      setTimeout(() => {
-        navigate('/');
-        if (onSuccessRedirect) onSuccessRedirect();
-      }, 1000);
+      // Auth guard in App.tsx will redirect authenticated users from /login to /
     } catch (error: any) {
       setLoginSuccess(false);
       setErrorMessage(error || 'Login failed. Please check your credentials.');
