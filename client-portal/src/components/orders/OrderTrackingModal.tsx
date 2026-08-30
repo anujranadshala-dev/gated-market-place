@@ -157,7 +157,7 @@ export const OrderTrackingModal: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
               <span className="text-slate-500 dark:text-slate-400 block text-[10px]">Grand Authorized Total</span>
               <span className="font-extrabold text-base text-[#212832] dark:text-white">
-                ${latestActiveOrder.grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                ₹{latestActiveOrder.grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </span>
               <p className="text-[10px] text-slate-500">Tax & Freight included</p>
             </div>
@@ -188,8 +188,8 @@ export const OrderTrackingModal: React.FC = () => {
                       </td>
                       <td className="p-3 text-slate-600 dark:text-slate-300">{item.storeName}</td>
                       <td className="p-3 text-center font-bold">{item.quantity}</td>
-                      <td className="p-3 text-right font-mono">${item.appliedUnitPrice.toFixed(2)}</td>
-                      <td className="p-3 text-right font-mono font-bold">${item.itemSubtotal.toFixed(2)}</td>
+                      <td className="p-3 text-right font-mono">₹{item.appliedUnitPrice.toFixed(2)}</td>
+                      <td className="p-3 text-right font-mono font-bold">₹{item.itemSubtotal.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>

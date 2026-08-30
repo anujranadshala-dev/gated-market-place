@@ -47,7 +47,7 @@ const storeSchema = new Schema<IStore>({
         default: 'STARTER',
     },
     logoUrl: String,
-    currency: String, // e.g., 'USD', 'EUR'
+    currency: String, // e.g., 'INR', 'EUR'
     gatingConfig: {
         requireInvitation: { type: Boolean, default: false },
         allowedEmailDomains: [String],

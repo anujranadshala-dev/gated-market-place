@@ -3,9 +3,9 @@
  * Manages provisioned client accounts, usernames, temporary passwords, and credential lifecycle.
  *
  * Tier Progression Logic:
- * - BRONZE: Base initial tier ($0 - $2,499 spend)
- * - SILVER: Automatically reached when total spend >= $2,500 ($2,500 - $9,999)
- * - GOLD: Automatically reached when total spend >= $10,000
+  * - BRONZE: Base initial tier (₹0 - ₹2,49,999 spend)
+  * - SILVER: Automatically reached when total spend >= ₹2.5L (₹2.5L - ₹9.99L)
+  * - GOLD: Automatically reached when total spend >= ₹10L
  * - VIP_BLACK: Exclusive subscription-based tier (VIP Black Concierge Membership)
  */
 

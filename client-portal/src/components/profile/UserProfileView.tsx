@@ -451,7 +451,7 @@ export const UserProfileView: React.FC = () => {
             </span>
             <div className="flex items-baseline space-x-1.5 mt-0.5">
               <span className="text-xl font-mono font-extrabold text-[#212832] dark:text-white">
-                ${tierProgress.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                     ₹{tierProgress.totalSpent.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </span>
             </div>
           </div>
@@ -600,7 +600,7 @@ export const UserProfileView: React.FC = () => {
                     Lifetime Store Spend:
                   </span>
                   <span className="text-xl font-mono font-extrabold text-white">
-                    ${tierProgress.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    ₹{tierProgress.totalSpent.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
 
@@ -684,9 +684,9 @@ export const UserProfileView: React.FC = () => {
                         </td>
                         <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300">
                           {t.level === 'VIP Black' ? (
-                            <span className="font-bold text-amber-500 dark:text-amber-400">$99/month Subscription</span>
+                            <span className="font-bold text-amber-500 dark:text-amber-400">₹8,000/month Subscription</span>
                           ) : (
-                            <span>${t.minSpend.toLocaleString()} Cumulative Spend</span>
+                            <span>₹{t.minSpend.toLocaleString('en-IN')} Cumulative Spend</span>
                           )}
                         </td>
                         <td className="py-3.5 px-4 font-bold text-emerald-600 dark:text-emerald-400">
@@ -701,7 +701,7 @@ export const UserProfileView: React.FC = () => {
                           ) : t.level === 'Gold' ? (
                             <span>10% Off + Free Shipping + Priority Picking</span>
                           ) : t.level === 'Silver' ? (
-                            <span>5% Off + Free Shipping over $75</span>
+                            <span>5% Off + Free Shipping over ₹6,000</span>
                           ) : (
                             <span>Base member pricing on all invited stores</span>
                           )}
@@ -755,7 +755,7 @@ export const UserProfileView: React.FC = () => {
                   className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-xs shadow-md transition-all flex items-center space-x-1.5 cursor-pointer active:scale-98"
                 >
                   <Crown className="w-4 h-4 fill-slate-950" />
-                  <span>Subscribe to VIP Black ($99/mo)</span>
+                  <span>Subscribe to VIP Black (₹8,000/mo)</span>
                 </button>
               )}
             </div>
@@ -768,7 +768,7 @@ export const UserProfileView: React.FC = () => {
                 </div>
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
                   <span className="text-slate-700 dark:text-slate-300 font-bold block">Current Plan</span>
-                  <span className="text-slate-500 dark:text-slate-400 mt-1 block">VIP Black Monthly Tier ($99/mo)</span>
+                   <span className="text-slate-500 dark:text-slate-400 mt-1 block">VIP Black Monthly Tier (₹8,000/mo)</span>
                 </div>
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
                   <span className="text-slate-700 dark:text-slate-300 font-bold block">Payment Method</span>
@@ -1435,7 +1435,7 @@ export const UserProfileView: React.FC = () => {
                         {order.status}
                       </span>
                       <span className="text-[11px] text-slate-500 dark:text-[#9aa8b2]">
-                        {new Date(order.createdAt).toLocaleDateString('en-US', {
+                        {new Date(order.createdAt).toLocaleDateString('en-IN', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric'
@@ -1456,7 +1456,7 @@ export const UserProfileView: React.FC = () => {
                     <div className="text-right">
                       <span className="text-[10px] text-slate-400 block uppercase font-bold">Total Paid</span>
                       <span className="font-mono font-bold text-sm text-[#2988c8]">
-                        ${order.grandTotal.toFixed(2)}
+                         ₹{order.grandTotal.toFixed(2)}
                       </span>
                     </div>
 

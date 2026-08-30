@@ -79,12 +79,12 @@ export const CartDrawer: React.FC = () => {
       estimatedShipping = 0; // Free 1-Day Priority Air
     } else if (userGatedTier === 'Gold') {
       estimatedShipping = 0; // Free Standard Shipping
-    } else if (userGatedTier === 'Silver' && taxableSubtotal >= 75) {
-      estimatedShipping = 0; // Free over $75
-    } else if (taxableSubtotal >= 150) {
-      estimatedShipping = 0; // Standard Free over $150
+    } else if (userGatedTier === 'Silver' && taxableSubtotal >= 6000) {
+      estimatedShipping = 0; // Free over ₹6,000
+    } else if (taxableSubtotal >= 12000) {
+      estimatedShipping = 0; // Standard Free over ₹12,000
     } else {
-      estimatedShipping = 9.99;
+      estimatedShipping = 799;
     }
   }
 
@@ -185,7 +185,7 @@ export const CartDrawer: React.FC = () => {
                   <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 flex items-center space-x-2 text-xs text-amber-800 dark:text-amber-300">
                     <Sparkles className="w-4 h-4 text-[#2988c8] shrink-0" />
                     <span>
-                      <strong>Volume Tier Applied:</strong> You're saving ${volumeDiscountSaved.toLocaleString('en-US', { minimumFractionDigits: 2 })} on bulk quantities!
+                      <strong>Volume Tier Applied:</strong> You're saving ₹{volumeDiscountSaved.toLocaleString('en-IN', { minimumFractionDigits: 2 })} on bulk quantities!
                     </span>
                   </div>
                 )}
@@ -230,7 +230,7 @@ export const CartDrawer: React.FC = () => {
                                 </h4>
                                 <div className="mt-1 flex items-center space-x-2 text-[11px]">
                                   <span className="font-bold text-slate-800 dark:text-slate-200">
-                                    ${item.appliedUnitPrice.toFixed(2)}
+                                     ₹{item.appliedUnitPrice.toFixed(2)}
                                   </span>
                                   {item.appliedDiscountPercent > 0 && (
                                     <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
@@ -286,7 +286,7 @@ export const CartDrawer: React.FC = () => {
 
                               <div className="text-right">
                                 <span className="text-xs font-extrabold text-slate-900 dark:text-white">
-                                  ${item.itemSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                  ₹{item.itemSubtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                 </span>
                               </div>
                             </div>
@@ -348,13 +348,13 @@ export const CartDrawer: React.FC = () => {
               <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
                 <div className="flex justify-between">
                   <span>List Price Subtotal:</span>
-                  <span>${rawSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  <span>₹{rawSubtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                 </div>
 
                 {volumeDiscountSaved > 0 && (
                   <div className="flex justify-between text-amber-600 dark:text-amber-400 font-semibold">
                     <span>Volume MOQ Rebate:</span>
-                    <span>-${volumeDiscountSaved.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span>-₹{volumeDiscountSaved.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
                 )}
 
@@ -365,20 +365,20 @@ export const CartDrawer: React.FC = () => {
                       <Crown className="w-3.5 h-3.5" />
                       <span>{userGatedTier} Tier ({tierDiscountPercent}% Off):</span>
                     </span>
-                    <span>-${tierDiscountAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span>-₹{tierDiscountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
                 )}
 
                 {couponDiscountAmount > 0 && (
                   <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
                     <span>Promo Code ({appliedPromoCode}):</span>
-                    <span>-${couponDiscountAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span>-₹{couponDiscountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between">
                   <span>Estimated Point-of-Sale Tax:</span>
-                  <span>${totalTax.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  <span>₹{totalTax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                 </div>
 
                 <div className="flex justify-between">
@@ -389,7 +389,7 @@ export const CartDrawer: React.FC = () => {
                         {userGatedTier === 'VIP Black' ? 'FREE Priority 1-Day (VIP)' : 'FREE Shipping'}
                       </strong>
                     ) : (
-                      `$${estimatedShipping.toFixed(2)}`
+                       `₹${estimatedShipping.toFixed(2)}`
                     )}
                   </span>
                 </div>
@@ -401,7 +401,7 @@ export const CartDrawer: React.FC = () => {
                   <span className="flex items-center space-x-1.5 truncate">
                     <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                     <span className="truncate">
-                      Spend <strong>${Math.max(0, tierProgress.targetSpend - (tierProgress.totalSpent + grandTotal)).toFixed(2)}</strong> more to unlock <strong>{tierProgress.nextTier} Tier</strong>!
+                       Spend <strong>₹{Math.max(0, tierProgress.targetSpend - (tierProgress.totalSpent + grandTotal)).toFixed(2)}</strong> more to unlock <strong>{tierProgress.nextTier} Tier</strong>!
                     </span>
                   </span>
                 </div>
@@ -409,10 +409,10 @@ export const CartDrawer: React.FC = () => {
 
               <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex justify-between items-baseline">
                 <span className="text-sm font-bold text-slate-900 dark:text-white">
-                  Grand Total (USD):
+                  Grand Total (INR):
                 </span>
                 <span className="text-xl font-extrabold text-[#212832] dark:text-white">
-                  ${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  ₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 

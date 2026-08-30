@@ -162,7 +162,7 @@ export const TenantStoreGrid: React.FC = () => {
                   Lifetime Spend:
                 </span>
                 <span className="text-lg font-mono font-extrabold text-white">
-                  ${tierProgress.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  ${tierProgress.totalSpent.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
@@ -178,7 +178,7 @@ export const TenantStoreGrid: React.FC = () => {
                   <div className="flex justify-between items-center text-[11px] mt-1.5 text-slate-400">
                     <span>{tierProgress.currentTier} (${tierProgress.minSpendRequired})</span>
                     <span className="font-bold text-amber-300">
-                      Spend ${tierProgress.remainingSpend.toFixed(2)} more for {tierProgress.nextTier}
+                       Spend ₹{tierProgress.remainingSpend.toFixed(2)} more for {tierProgress.nextTier}
                     </span>
                     <span>{tierProgress.nextTier} (${tierProgress.targetSpend})</span>
                   </div>

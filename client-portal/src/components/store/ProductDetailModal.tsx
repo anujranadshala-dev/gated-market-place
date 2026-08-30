@@ -140,7 +140,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                 <div className="flex items-baseline justify-between">
                   <div>
                     <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                      ${pricing.appliedUnitPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                       ₹{pricing.appliedUnitPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </span>
                     <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">/ unit</span>
                   </div>
@@ -167,7 +167,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                     <span>{userGatedTier} Shopper: Extra {tierConfig.discountPercent}% Off Applied</span>
                   </span>
                   <span className="font-bold text-emerald-700 dark:text-emerald-300">
-                    -${shopperTierDiscountAmount.toFixed(2)}
+                    -₹{shopperTierDiscountAmount.toFixed(2)}
                   </span>
                 </div>
               )}
@@ -200,7 +200,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                             {tier.minQuantity}+ Units
                           </p>
                           <p className="text-xs font-bold text-slate-900 dark:text-white">
-                            ${tier.unitPrice.toFixed(2)}
+                            ₹{tier.unitPrice.toFixed(2)}
                           </p>
                           <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
                             {tier.discountPercentage > 0 ? `-${tier.discountPercentage}% OFF` : 'Base Tier'}
@@ -249,7 +249,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                   <div className="text-right flex-1">
                     <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Item Subtotal</span>
                     <span className="text-base font-extrabold text-slate-900 dark:text-white">
-                      ${(tierConfig.discountPercent > 0 ? finalPriceWithTier : pricing.itemSubtotal).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                       ₹{(tierConfig.discountPercent > 0 ? finalPriceWithTier : pricing.itemSubtotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
@@ -280,7 +280,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
                 ) : (
                   <>
                     <ShoppingCart className="w-4 h-4" />
-                    <span>Add {quantity} Units to Cart (${(tierConfig.discountPercent > 0 ? finalPriceWithTier : pricing.itemSubtotal).toFixed(2)})</span>
+                    <span>Add {quantity} Units to Cart (₹{(tierConfig.discountPercent > 0 ? finalPriceWithTier : pricing.itemSubtotal).toFixed(2)})</span>
                   </>
                 )}
               </button>

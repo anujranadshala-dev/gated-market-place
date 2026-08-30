@@ -14,7 +14,7 @@ export const GATED_TIERS: Record<GatedTierLevel, GatedTierConfig> = {
     badgeClass: 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800',
     icon: '🥉',
     iconName: 'Shield',
-    shippingPerk: 'Standard shipping ($9.99 or free over $150)',
+    shippingPerk: 'Standard shipping (₹799 or free over ₹12,000)',
     perks: [
       'Welcome member pricing on all invited stores',
       'Track real-time order history & spend metrics',
@@ -35,10 +35,10 @@ export const GATED_TIERS: Record<GatedTierLevel, GatedTierConfig> = {
     badgeClass: 'bg-slate-200/90 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-400 dark:border-slate-600',
     icon: '🥈',
     iconName: 'Award',
-    shippingPerk: 'Free shipping on orders over $75',
+    shippingPerk: 'Free shipping on orders over ₹6,000',
     perks: [
       'Automatic 5% extra discount on every cart',
-      'Free shipping threshold lowered to $75',
+      'Free shipping threshold lowered to ₹6,000',
       'Priority customer support queue',
       'Spend progress tracked toward Gold Elite status'
     ]

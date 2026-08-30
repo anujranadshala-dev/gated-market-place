@@ -15,7 +15,7 @@ function mapStoreToClientFormat(storeDoc: IStore) {
         accessTier: 'Standard',
         requiresApproval: false,
         taxDefaultRate: 0.07,
-        currency: storeDoc.currency || 'USD',
+        currency: storeDoc.currency || 'INR',
         contactEmail: storeDoc.ownerEmail,
         slaGuarantee: 'Standard shipping',
         activePromos: [],

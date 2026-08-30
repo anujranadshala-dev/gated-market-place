@@ -121,11 +121,11 @@ export const VipBlackModal: React.FC<VipBlackModalProps> = ({ isOpen, onClose })
                   </div>
                 </div>
                 <div className="mt-3 flex items-baseline space-x-1">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-white">$199</span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-white">₹16,000</span>
                   <span className="text-xs text-slate-400 font-medium">/ year</span>
                 </div>
                 <p className="text-[11px] text-amber-300/90 mt-1">
-                  Equivalent to just $16.58 / month
+                  Equivalent to just ₹1,333 / month
                 </p>
               </div>
 
@@ -145,7 +145,7 @@ export const VipBlackModal: React.FC<VipBlackModalProps> = ({ isOpen, onClose })
                   </div>
                 </div>
                 <div className="mt-3 flex items-baseline space-x-1">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-white">$19.99</span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-white">₹1,600</span>
                   <span className="text-xs text-slate-400 font-medium">/ month</span>
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1">
@@ -246,7 +246,7 @@ export const VipBlackModal: React.FC<VipBlackModalProps> = ({ isOpen, onClose })
                   <>
                     <Crown className="w-4 h-4 text-slate-950 fill-slate-950" />
                     <span>
-                      Subscribe to VIP Black ({selectedPlan === 'annual' ? '$199 / yr' : '$19.99 / mo'})
+                       Subscribe to VIP Black ({selectedPlan === 'annual' ? '₹16,000 / yr' : '₹1,600 / mo'})
                     </span>
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </>

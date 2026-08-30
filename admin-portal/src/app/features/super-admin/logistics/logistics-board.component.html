@@ -76,7 +76,7 @@
               <!-- Item count & Amount -->
               <div class="pt-2 border-t border-slate-200/80 dark:border-slate-700 flex items-center justify-between text-xs">
                 <span class="text-slate-500 dark:text-slate-400">{{ order.items.length }} items</span>
-                <span class="font-bold text-slate-900 dark:text-slate-100 font-mono">${{ order.totalAmount | number:'1.2-2' }}</span>
+                <span class="font-bold text-slate-900 dark:text-slate-100 font-mono">₹{{ order.totalAmount | number:'1.2-2' }}</span>
               </div>
 
               <!-- Action: Dispatch Carrier -->
@@ -263,7 +263,7 @@
 
               <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                 <span>{{ order.logistics.carrierName }}</span>
-                <span class="font-bold text-slate-900 dark:text-slate-100 font-mono">${{ order.totalAmount | number:'1.2-2' }}</span>
+                <span class="font-bold text-slate-900 dark:text-slate-100 font-mono">₹{{ order.totalAmount | number:'1.2-2' }}</span>
               </div>
             </div>
           }

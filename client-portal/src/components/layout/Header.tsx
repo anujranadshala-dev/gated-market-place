@@ -25,7 +25,7 @@ import { toggleTheme } from '../../store/slices/themeSlice';
 import { toggleCartDrawer } from '../../store/slices/cartSlice';
 import { setActiveStore } from '../../store/slices/tenantSlice';
 import { logout } from '../../store/slices/authSlice';
-import { getUserGatedTier, GATED_TIERS } from '../../utils/tierUtils';
+import { getUserGatedTier, getUserLifetimeSpend, GATED_TIERS } from '../../utils/tierUtils';
 
 export const Header: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -47,6 +47,7 @@ export const Header: React.FC = () => {
   // Compute User Spend Tier
   const userGatedTier = getUserGatedTier(currentUser, orders);
   const tierConfig = GATED_TIERS[userGatedTier];
+  const totalSpent = getUserLifetimeSpend(currentUser, orders);
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 dark:bg-[#0b131c]/90 border-b border-slate-200/80 dark:border-slate-800 transition-colors duration-200 shadow-xs">
@@ -230,7 +231,7 @@ export const Header: React.FC = () => {
                       <div className="mt-2 flex items-center justify-between text-[11px] bg-slate-50 dark:bg-slate-900/60 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
                         <span className="text-slate-500 dark:text-slate-400">Total Spend:</span>
                         <span className="font-mono font-bold text-[#2988c8]">
-                          ${((currentUser.totalSpent || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          ₹{totalSpent.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                     </div>

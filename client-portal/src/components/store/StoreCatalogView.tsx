@@ -431,15 +431,15 @@ export const StoreCatalogView: React.FC = () => {
                           {tierConfig.discountPercent > 0 ? (
                             <div className="flex items-baseline space-x-1.5">
                               <span className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">
-                                ${memberPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                 ₹{memberPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                               </span>
                               <span className="text-xs text-slate-400 line-through">
-                                ${product.basePrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                 ₹{product.basePrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
                           ) : (
                             <span className="text-lg font-extrabold text-slate-900 dark:text-white">
-                              ${product.basePrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                               ₹{product.basePrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                             </span>
                           )}
                           <span className="text-[10px] text-slate-400 ml-1">/ unit</span>

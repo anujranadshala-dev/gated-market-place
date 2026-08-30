@@ -140,7 +140,7 @@ export const CheckoutModal: React.FC = () => {
         taxAmount: totalTax,
         discountAmount: totalDiscounts,
         totalAmount: grandTotal,
-        currency: 'USD',
+        currency: 'INR',
         paymentMethod: 'CORPORATE_CARD',
         notes: deliveryNotes,
       };
@@ -495,11 +495,11 @@ export const CheckoutModal: React.FC = () => {
                           {item.product.name}
                         </p>
                         <p className="text-[10px] text-slate-500 dark:text-[#9aa8b2]">
-                          Qty: {item.quantity} × ${item.appliedUnitPrice.toFixed(2)}
+                          Qty: {item.quantity} × ₹{item.appliedUnitPrice.toFixed(2)}
                         </p>
                       </div>
                       <span className="font-mono font-bold text-slate-900 dark:text-slate-100 shrink-0">
-                        ${item.itemSubtotal.toFixed(2)}
+                        ₹{item.itemSubtotal.toFixed(2)}
                       </span>
                     </div>
                   ))}
@@ -509,7 +509,7 @@ export const CheckoutModal: React.FC = () => {
                 <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
                   <div className="flex justify-between">
                     <span>Items Subtotal:</span>
-                    <span>${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span>₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
 
                   {tierDiscountAmount > 0 && (
@@ -518,31 +518,31 @@ export const CheckoutModal: React.FC = () => {
                         <Crown className="w-3.5 h-3.5" />
                         <span>{userGatedTier} Tier Discount ({tierDiscountPercent}%):</span>
                       </span>
-                      <span>-${tierDiscountAmount.toFixed(2)}</span>
+                      <span>-₹{tierDiscountAmount.toFixed(2)}</span>
                     </div>
                   )}
 
                   {couponDiscountAmount > 0 && (
                     <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
                       <span>Promo Discount ({appliedPromoCode}):</span>
-                      <span>-${couponDiscountAmount.toFixed(2)}</span>
+                      <span>-₹{couponDiscountAmount.toFixed(2)}</span>
                     </div>
                   )}
 
                   <div className="flex justify-between">
                     <span>Point-of-Sale Tax:</span>
-                    <span>${totalTax.toFixed(2)}</span>
+                    <span>₹{totalTax.toFixed(2)}</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span>Delivery Shipping:</span>
-                    <span>{shippingFee === 0 ? <strong className="text-emerald-600 font-bold">FREE</strong> : `$${shippingFee.toFixed(2)}`}</span>
+                    <span>{shippingFee === 0 ? <strong className="text-emerald-600 font-bold">FREE</strong> : `₹${shippingFee.toFixed(2)}`}</span>
                   </div>
 
                   <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-sm font-bold text-slate-900 dark:text-white">
                     <span>Total to Pay:</span>
                     <span className="text-base text-[#2988c8] font-mono">
-                      ${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      ₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>

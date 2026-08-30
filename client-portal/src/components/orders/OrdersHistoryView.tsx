@@ -110,7 +110,7 @@ export const OrdersHistoryView: React.FC = () => {
                 <div className="text-right">
                   <span className="text-[10px] text-slate-400 block">Total Authorized</span>
                   <span className="text-base font-extrabold text-[#212832] dark:text-white">
-                    ${order.grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    ₹{order.grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
 

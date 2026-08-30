@@ -157,7 +157,7 @@ export class StoreState {
       tier: dto.tier,
       status: 'ACTIVE',
       logoUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=150&auto=format&fit=crop&q=80',
-      currency: 'USD',
+      currency: 'INR',
       gatingConfig: {
         requireInvitation: dto.gatingConfig.requireInvitation ?? true,
         allowedEmailDomains: dto.gatingConfig.allowedEmailDomains ?? [],

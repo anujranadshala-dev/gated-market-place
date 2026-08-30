@@ -141,7 +141,7 @@ export class OrderState {
       taxAmount: dto.taxAmount || 0,
       discountAmount: dto.discountAmount || 0,
       totalAmount: dto.totalAmount || 0,
-      currency: dto.currency || 'USD',
+      currency: dto.currency || 'INR',
       paymentStatus: dto.paymentStatus || 'PENDING',
       logistics: dto.logistics || {},
     };

@@ -149,7 +149,7 @@ export async function createClientOrder(req: ClientAuthRequest, res: Response) {
             taxAmount: taxAmount || 0,
             discountAmount: discountAmount || 0,
             totalAmount: totalAmount || 0,
-            currency: currency || 'USD',
+            currency: currency || 'INR',
             status: 'Pending',
             paymentStatus: 'PENDING',
             logistics: {},

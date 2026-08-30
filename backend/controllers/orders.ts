@@ -59,7 +59,7 @@ export async function createOrder(req: AuthRequest, res: Response) {
             taxAmount: taxAmount || 0,
             discountAmount: discountAmount || 0,
             totalAmount: totalAmount || 0,
-            currency: currency || 'USD',
+            currency: currency || 'INR',
             status: 'Pending',
             paymentStatus: paymentStatus || 'PENDING',
             logistics: logistics || {},
