@@ -46,6 +46,10 @@ import {
   updateUserAddress, 
   deleteUserAddress, 
   setDefaultAddress,
+  addUserAddressApi,
+  updateUserAddressApi,
+  deleteUserAddressApi,
+  setDefaultAddressApi,
   cancelVipBlackSubscription,
   updateUserProfileApi,
   changeUserPasswordApi
@@ -248,7 +252,7 @@ export const UserProfileView: React.FC = () => {
     setIsAddressModalOpen(true);
   };
 
-  const handleSaveModalAddress = (e: React.FormEvent) => {
+  const handleSaveModalAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     const addressData: UserAddress = {
       label: modalAddrLabel,
@@ -263,15 +267,19 @@ export const UserProfileView: React.FC = () => {
       isDefault: modalAddrIsDefault
     };
 
-    if (editingAddressId) {
-      dispatch(updateUserAddress(addressData));
-    } else {
-      dispatch(addUserAddress(addressData));
+    try {
+      if (editingAddressId) {
+        await dispatch(updateUserAddressApi({ id: editingAddressId, data: addressData })).unwrap();
+      } else {
+        await dispatch(addUserAddressApi(addressData)).unwrap();
+      }
+      setIsAddressModalOpen(false);
+      setSaveSuccessMessage(editingAddressId ? 'Shipping address updated!' : 'New delivery address added!');
+      setTimeout(() => setSaveSuccessMessage(null), 3000);
+    } catch (error: any) {
+      setSaveSuccessMessage(error.message || 'Failed to save address');
+      setTimeout(() => setSaveSuccessMessage(null), 3000);
     }
-
-    setIsAddressModalOpen(false);
-    setSaveSuccessMessage(editingAddressId ? 'Shipping address updated!' : 'New delivery address added!');
-    setTimeout(() => setSaveSuccessMessage(null), 3000);
   };
 
   const userOrders = orders.filter(
@@ -1318,7 +1326,16 @@ export const UserProfileView: React.FC = () => {
                       ) : (
                         <button
                           type="button"
-                          onClick={() => addr.id && dispatch(setDefaultAddress(addr.id))}
+                          onClick={async () => {
+                            if (addr.id) {
+                              try {
+                                await dispatch(setDefaultAddressApi(addr.id)).unwrap();
+                              } catch (error: any) {
+                                setSaveSuccessMessage(error.message || 'Failed to set default address');
+                                setTimeout(() => setSaveSuccessMessage(null), 3000);
+                              }
+                            }
+                          }}
                           className="text-[11px] font-semibold text-slate-500 hover:text-[#2988c8] dark:hover:text-[#2988c8] transition-colors cursor-pointer"
                         >
                           Set as Default
@@ -1368,7 +1385,14 @@ export const UserProfileView: React.FC = () => {
                     {savedAddressesList.length > 1 && !isDefault && addr.id && (
                       <button
                         type="button"
-                        onClick={() => dispatch(deleteUserAddress(addr.id!))}
+                        onClick={async () => {
+                          try {
+                            await dispatch(deleteUserAddressApi(addr.id!)).unwrap();
+                          } catch (error: any) {
+                            setSaveSuccessMessage(error.message || 'Failed to delete address');
+                            setTimeout(() => setSaveSuccessMessage(null), 3000);
+                          }
+                        }}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                         title="Delete Address"
                       >

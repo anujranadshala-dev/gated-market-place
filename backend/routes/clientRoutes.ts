@@ -4,7 +4,11 @@ import {
     clientLogout,
     getClientMe,
     updateClientProfile,
-    changeClientPassword
+    changeClientPassword,
+    addClientAddress,
+    updateClientAddress,
+    deleteClientAddress,
+    setDefaultClientAddress
 } from '../controllers/clientAuth.js';
 import { clientProtect } from '../middleware/clientAuth.js';
 import {
@@ -28,6 +32,12 @@ router.post('/logout', clientLogout);
 router.get('/me', clientProtect, getClientMe);
 router.put('/profile', clientProtect, updateClientProfile);
 router.put('/password', clientProtect, changeClientPassword);
+
+// Address routes
+router.post('/addresses', clientProtect, addClientAddress);
+router.put('/addresses/:id', clientProtect, updateClientAddress);
+router.delete('/addresses/:id', clientProtect, deleteClientAddress);
+router.put('/addresses/:id/default', clientProtect, setDefaultClientAddress);
 
 // Client data routes
 router.get('/stores', clientProtect, getClientStores);

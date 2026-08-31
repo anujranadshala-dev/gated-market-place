@@ -95,6 +95,54 @@ export const changeUserPasswordApi = createAsyncThunk(
   }
 );
 
+export const addUserAddressApi = createAsyncThunk(
+  'auth/addUserAddressApi',
+  async (addressData: any, { rejectWithValue }) => {
+    try {
+      const response = await api.addAddress(addressData);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to add address');
+    }
+  }
+);
+
+export const updateUserAddressApi = createAsyncThunk(
+  'auth/updateUserAddressApi',
+  async ({ id, data }: { id: string; data: any }, { rejectWithValue }) => {
+    try {
+      const response = await api.updateAddress(id, data);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to update address');
+    }
+  }
+);
+
+export const deleteUserAddressApi = createAsyncThunk(
+  'auth/deleteUserAddressApi',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await api.deleteAddress(id);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to delete address');
+    }
+  }
+);
+
+export const setDefaultAddressApi = createAsyncThunk(
+  'auth/setDefaultAddressApi',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await api.setDefaultAddress(id);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to set default address');
+    }
+  }
+);
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -297,6 +345,78 @@ export const authSlice = createSlice({
       .addCase(changeUserPasswordApi.rejected, (state, action) => {
         state.passwordLoading = false;
         state.passwordError = action.payload as string;
+      })
+      .addCase(addUserAddressApi.pending, (state) => {
+        state.profileLoading = true;
+        state.profileError = null;
+      })
+      .addCase(addUserAddressApi.fulfilled, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = null;
+        if (action.payload?.savedAddresses && state.currentUser) {
+          state.currentUser.savedAddresses = action.payload.savedAddresses;
+        }
+        if (action.payload?.address_ && state.currentUser) {
+          state.currentUser.address = action.payload.address_;
+        }
+      })
+      .addCase(addUserAddressApi.rejected, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = action.payload as string;
+      })
+      .addCase(updateUserAddressApi.pending, (state) => {
+        state.profileLoading = true;
+        state.profileError = null;
+      })
+      .addCase(updateUserAddressApi.fulfilled, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = null;
+        if (action.payload?.savedAddresses && state.currentUser) {
+          state.currentUser.savedAddresses = action.payload.savedAddresses;
+        }
+        if (action.payload?.address_ && state.currentUser) {
+          state.currentUser.address = action.payload.address_;
+        }
+      })
+      .addCase(updateUserAddressApi.rejected, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = action.payload as string;
+      })
+      .addCase(deleteUserAddressApi.pending, (state) => {
+        state.profileLoading = true;
+        state.profileError = null;
+      })
+      .addCase(deleteUserAddressApi.fulfilled, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = null;
+        if (action.payload?.savedAddresses && state.currentUser) {
+          state.currentUser.savedAddresses = action.payload.savedAddresses;
+        }
+        if (action.payload?.address_ && state.currentUser) {
+          state.currentUser.address = action.payload.address_;
+        }
+      })
+      .addCase(deleteUserAddressApi.rejected, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = action.payload as string;
+      })
+      .addCase(setDefaultAddressApi.pending, (state) => {
+        state.profileLoading = true;
+        state.profileError = null;
+      })
+      .addCase(setDefaultAddressApi.fulfilled, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = null;
+        if (action.payload?.savedAddresses && state.currentUser) {
+          state.currentUser.savedAddresses = action.payload.savedAddresses;
+        }
+        if (action.payload?.address_ && state.currentUser) {
+          state.currentUser.address = action.payload.address_;
+        }
+      })
+      .addCase(setDefaultAddressApi.rejected, (state, action) => {
+        state.profileLoading = false;
+        state.profileError = action.payload as string;
       });
   }
 });

@@ -104,7 +104,7 @@ export async function loginAdminUser(req: Request, res: Response) {
         // Return user information to the client. The token is now in a cookie.
         res.status(200).json({
             message: 'Login successful',
-            user: { id: user._id, email: user.email, name: user.name, role: user.role, assignedStoreId: user.assignedStoreId, avatarUrl: user.avatarUrl },
+            user: { _id: user._id, email: user.email, name: user.name, role: user.role, assignedStoreId: user.assignedStoreId, avatarUrl: user.avatarUrl },
         });
     } catch (error) {
         console.error('Error during admin login:', error);
@@ -124,7 +124,27 @@ export async function logoutAdminUser(req: Request, res: Response) {
 }
 
 export async function getMe(req: AuthRequest, res: Response) {
-    // The user object is attached to the request by the 'protect' middleware.
-    // We can send it back directly without another database query.
-    res.status(200).json({ user: req.user });
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({
+            user: {
+                _id: user._id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                assignedStoreId: user.assignedStoreId,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                lastLoginAt: user.lastLoginAt,
+                avatarUrl: user.avatarUrl,
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching admin user:', error);
+        res.status(500).json({ message: 'Server error while fetching profile.' });
+    }
 }

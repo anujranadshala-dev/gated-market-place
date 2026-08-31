@@ -84,4 +84,40 @@ export const api = {
         });
         return handleResponse<{ message: string; orderId: string; orderNumber: string }>(res);
     },
+
+    async addAddress(addressData: any) {
+        const res = await fetch(`${API_BASE}/addresses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(addressData),
+            credentials: 'include',
+        });
+        return handleResponse<{ message: string; address: any; savedAddresses: any[]; address_: any }>(res);
+    },
+
+    async updateAddress(id: string, addressData: any) {
+        const res = await fetch(`${API_BASE}/addresses/${encodeURIComponent(id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(addressData),
+            credentials: 'include',
+        });
+        return handleResponse<{ message: string; address: any; savedAddresses: any[]; address_: any }>(res);
+    },
+
+    async deleteAddress(id: string) {
+        const res = await fetch(`${API_BASE}/addresses/${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+        return handleResponse<{ message: string; savedAddresses: any[]; address_: any }>(res);
+    },
+
+    async setDefaultAddress(id: string) {
+        const res = await fetch(`${API_BASE}/addresses/${encodeURIComponent(id)}/default`, {
+            method: 'PUT',
+            credentials: 'include',
+        });
+        return handleResponse<{ message: string; address_: any; savedAddresses: any[] }>(res);
+    },
 };
