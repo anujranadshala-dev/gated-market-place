@@ -38,7 +38,6 @@ async function main() {
         console.error(`No admin user found with email ${EMAIL}`);
     } else {
         console.log(`Updated ${result.modifiedCount} admin user(s) for ${EMAIL}`);
-        console.log(`New password: ${NEW_PASSWORD}`);
     }
 
     await mongoose.disconnect();

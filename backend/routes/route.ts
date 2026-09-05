@@ -10,6 +10,7 @@ import {
     refreshAdminToken
 } from '../controllers/AdminAuth.js';
 import { protect, authorize } from '../middleware/auth.js';
+import csrf from 'csurf';
 
 import { createStore, getStore, updateStore, deleteStore } from '../controllers/store.js'
 import { createProduct, getProduct, updateProduct, deleteProduct } from '../controllers/products.js'
@@ -17,6 +18,8 @@ import { createOrder, getOrder, updateOrder, deleteOrder } from '../controllers/
 import rateLimit from 'express-rate-limit';
 
 const router = Router();
+
+const csrfProtection = csrf({ cookie: { httpOnly: true, secure: true, sameSite: 'strict' } });
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -56,29 +59,29 @@ if (process.env.ALLOW_PUBLIC_REGISTRATION === 'true') {
 }
 
 // Protected routes that require authentication
-router.post('/logout', protect, logoutAdminUser);
+router.post('/logout', protect, csrfProtection, logoutAdminUser);
 router.get('/me', protect, getMe);
 
 // Admin password management - only SUPER_ADMIN can change other admin passwords
-router.put('/admins/change-password', protect, authorize('SUPER_ADMIN'), changeAdminPassword);
+router.put('/admins/change-password', protect, csrfProtection, authorize('SUPER_ADMIN'), changeAdminPassword);
 
 // Store management: only the omnipotent Super Admin may create stores.
 // Read/update/delete are shared with Store Owners (ownership enforced in controllers).
-router.post('/create-store', protect, authorize('SUPER_ADMIN'), createStore)
+router.post('/create-store', protect, csrfProtection, authorize('SUPER_ADMIN'), createStore)
 router.get('/stores', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), getStore)
-router.put('/stores/:storeId', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), updateStore)
-router.delete('/stores/:storeId', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), deleteStore)
+router.put('/stores/:storeId', protect, csrfProtection, authorize('STORE_OWNER', 'SUPER_ADMIN'), updateStore)
+router.delete('/stores/:storeId', protect, csrfProtection, authorize('STORE_OWNER', 'SUPER_ADMIN'), deleteStore)
 
 // Product management: shared between Store Owners (own store) and Super Admin (all).
-router.post('/create-product', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), createProduct)
+router.post('/create-product', protect, csrfProtection, authorize('STORE_OWNER', 'SUPER_ADMIN'), createProduct)
 router.get('/products', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), getProduct)
-router.put('/products/:productId', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), updateProduct)
-router.delete('/products/:productId', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), deleteProduct)
+router.put('/products/:productId', protect, csrfProtection, authorize('STORE_OWNER', 'SUPER_ADMIN'), updateProduct)
+router.delete('/products/:productId', protect, csrfProtection, authorize('STORE_OWNER', 'SUPER_ADMIN'), deleteProduct)
 
 // Order management: shared between Store Owners (own store) and Super Admin (all).
-router.post('/create-order', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), createOrder)
+router.post('/create-order', protect, csrfProtection, authorize('STORE_OWNER', 'SUPER_ADMIN'), createOrder)
 router.get('/orders', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), getOrder)
-router.put('/orders/:orderId', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), updateOrder)
-router.delete('/orders/:orderId', protect, authorize('STORE_OWNER', 'SUPER_ADMIN'), deleteOrder)
+router.put('/orders/:orderId', protect, csrfProtection, authorize('STORE_OWNER', 'SUPER_ADMIN'), updateOrder)
+router.delete('/orders/:orderId', protect, csrfProtection, authorize('STORE_OWNER', 'SUPER_ADMIN'), deleteOrder)
 
 export default router;

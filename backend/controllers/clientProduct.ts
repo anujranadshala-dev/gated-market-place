@@ -1,8 +1,8 @@
-import store, { IStore } from '../models/store.js';
-import product, { IProduct } from '../models/product.js';
+import store from '../models/store.js';
+import product from '../models/product.js';
 import ClientUser from '../models/clientUser.js';
 import { ClientAuthRequest } from '../middleware/clientAuth.js';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 function mapProductToClientFormat(productDoc: any, storeName?: string) {
     return {

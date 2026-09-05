@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import ClientUser, { IClientUser, IAddress } from '../models/clientUser.js';
+import ClientUser, { IAddress } from '../models/clientUser.js';
 import { ClientAuthRequest } from '../middleware/clientAuth.js';
 import { hashPassword } from '../utils/crypto.js';
+import { isProduction } from '../utils/config.js';
+import { logAudit } from '../utils/audit.js';
 
-const isProduction = process.env.NODE_ENV === 'production';
 
 export async function clientLogin(req: Request, res: Response) {
     const { usernameOrEmail, password } = req.body;
@@ -423,6 +424,10 @@ export async function changeClientPassword(req: ClientAuthRequest, res: Response
         user.password = await bcrypt.hash(hashPassword(newPassword), salt);
         user.passwordLastChangedAt = new Date();
         await user.save();
+
+        logAudit('CLIENT_PASSWORD_CHANGED', user._id.toString(), 'SHOP_USER', {
+            email: user.email,
+        });
 
         res.status(200).json({ message: 'Password changed successfully.' });
     } catch (error) {

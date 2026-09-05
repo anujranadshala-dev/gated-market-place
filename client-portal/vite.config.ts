@@ -22,7 +22,6 @@ export default defineConfig(({mode}) => {
         '/api': {
           target: process.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000',
           changeOrigin: true,
-          secure: false,
         },
       },
     },

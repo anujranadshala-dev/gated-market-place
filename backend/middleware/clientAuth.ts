@@ -39,7 +39,7 @@ export const clientProtect = async (req: ClientAuthRequest, res: Response, next:
         };
 
         next();
-    } catch (error) {
+    } catch {
         return res.status(401).json({ message: 'Not authorized to access this route' });
     }
 };

@@ -50,13 +50,13 @@ export default function App() {
     }
   }, [isAuthenticated, dispatch]);
 
-  // Live order tracking: poll every 10s when user is authenticated
+  // Live order tracking: poll every 30s when user is authenticated
   useEffect(() => {
     if (!isAuthenticated) return;
     
     const interval = setInterval(() => {
       dispatch(fetchOrders());
-    }, 10000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [isAuthenticated, dispatch]);

@@ -10,6 +10,7 @@ import clientRoutes from './routes/clientRoutes.js';
 import adminClientRoutes from './routes/adminClientRoutes.js';
 import connectDB from './db.js';
 import cors from 'cors';
+import { isProduction, config } from './utils/config.js';
 
 dotenv.config();
 
@@ -17,8 +18,7 @@ connectDB();
 
 const app = express();
 
-const isProduction = process.env.NODE_ENV === 'production';
-const corsOrigins = process.env.CORS_ORIGINS?.split(',').map(o => o.trim()) || ['http://localhost:3000', 'http://localhost:3001'];
+const corsOrigins = config.corsOrigins;
 
 const corsOptions = {
     origin: corsOrigins,
@@ -57,14 +57,6 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(mongoSanitize());
 app.use(cookieParser());
 
-const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5,
-    message: { message: 'Too many login attempts, please try again after 15 minutes.' },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
@@ -80,21 +72,36 @@ app.get('/api/csrf-token', csrfProtection, (req: Request, res: Response) => {
 });
 
 app.get("/health", (req: Request, res: Response) => {
-    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+    res.status(200).json({ status: 'ok' });
 });
 
 app.use('/api', adminRoutes);
 app.use('/api/admin', adminClientRoutes);
 app.use('/api/client', clientRoutes);
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error(`${new Date().toISOString()} - ${err.message}`, { stack: err.stack, method: req.method, path: req.path, ip: req.ip });
     res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+const gracefulShutdown = () => {
+    console.log('Received shutdown signal. Closing server gracefully...');
+    server.close(() => {
+        console.log('HTTP server closed.');
+        process.exit(0);
+    });
+    setTimeout(() => {
+        console.error('Could not close connections in time, forcefully shutting down');
+        process.exit(1);
+    }, 10000);
+};
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
 
 export default app;

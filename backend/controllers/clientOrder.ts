@@ -1,8 +1,9 @@
 import order, { IOrder } from '../models/order.js';
-import store, { IStore } from '../models/store.js';
+import store from '../models/store.js';
 import ClientUser from '../models/clientUser.js';
 import { ClientAuthRequest } from '../middleware/clientAuth.js';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { logAudit } from '../utils/audit.js';
 
 function mapOrderToClientFormat(orderDoc: IOrder) {
     return {
@@ -46,6 +47,7 @@ function mapOrderToClientFormat(orderDoc: IOrder) {
         grandTotal: orderDoc.totalAmount || 0,
         status: orderDoc.status || 'Pending',
         paymentMethod: 'PO_INVOICE',
+        currency: orderDoc.currency || 'INR',
         shippingAddress: {
             recipientName: orderDoc.shippingAddress?.recipientName || '',
             company: '',
@@ -95,10 +97,30 @@ export async function createClientOrder(req: ClientAuthRequest, res: Response) {
             return res.status(401).json({ message: 'Not authorized' });
         }
 
-        const { storeId, customer, shippingAddress, items, subtotal, shippingFee, taxAmount, discountAmount, totalAmount, currency, paymentMethod, notes } = req.body;
+        const { storeId, customer, shippingAddress, items, subtotal, shippingFee, taxAmount, discountAmount, totalAmount, currency } = req.body;
 
         if (!storeId || !customer || !shippingAddress || !items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ message: 'Missing required fields: storeId, customer, shippingAddress, items' });
+        }
+
+        if (subtotal !== undefined && (typeof subtotal !== 'number' || subtotal < 0)) {
+            return res.status(400).json({ message: 'Subtotal must be a non-negative number' });
+        }
+
+        if (shippingFee !== undefined && (typeof shippingFee !== 'number' || shippingFee < 0)) {
+            return res.status(400).json({ message: 'Shipping fee must be a non-negative number' });
+        }
+
+        if (taxAmount !== undefined && (typeof taxAmount !== 'number' || taxAmount < 0)) {
+            return res.status(400).json({ message: 'Tax amount must be a non-negative number' });
+        }
+
+        if (discountAmount !== undefined && (typeof discountAmount !== 'number' || discountAmount < 0)) {
+            return res.status(400).json({ message: 'Discount amount must be a non-negative number' });
+        }
+
+        if (totalAmount !== undefined && (typeof totalAmount !== 'number' || totalAmount < 0)) {
+            return res.status(400).json({ message: 'Total amount must be a non-negative number' });
         }
 
         const clientUser = await ClientUser.findById(req.clientUser.userId);
@@ -156,6 +178,13 @@ export async function createClientOrder(req: ClientAuthRequest, res: Response) {
         });
 
         await newOrder.save();
+
+        logAudit('CLIENT_ORDER_CREATED', newOrder._id.toString(), 'SHOP_USER', {
+            storeId,
+            orderNumber: newOrder.orderNumber,
+            totalAmount: newOrder.totalAmount,
+            clientUserId: req.clientUser.userId,
+        });
 
         res.status(201).json({
             message: 'Order created successfully.',

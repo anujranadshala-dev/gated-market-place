@@ -1,7 +1,7 @@
 import store, { IStore } from '../models/store.js';
 import ClientUser from '../models/clientUser.js';
 import { ClientAuthRequest } from '../middleware/clientAuth.js';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 function mapStoreToClientFormat(storeDoc: IStore) {
     return {

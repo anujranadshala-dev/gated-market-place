@@ -22,4 +22,9 @@ COPY --from=builder /app/dist ./dist
 
 EXPOSE 5000
 
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+USER nodejs
+
 CMD ["node", "dist/index.js"]

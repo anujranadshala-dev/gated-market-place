@@ -6,8 +6,9 @@ import crypto from 'crypto';
 import { AuthRequest } from '../middleware/auth.js';
 import { hashPassword } from '../utils/crypto.js';
 import { sendEmailVerificationEmail } from '../utils/email.js';
+import { logAudit } from '../utils/audit.js';
+import { isProduction } from '../utils/config.js';
 
-const isProduction = process.env.NODE_ENV === 'production';
 const ACCOUNT_LOCKOUT_THRESHOLD = 5;
 const ACCOUNT_LOCKOUT_DURATION = 15 * 60 * 1000;
 
@@ -120,6 +121,10 @@ export async function loginAdminUser(req: Request, res: Response) {
         user.lockedUntil = undefined;
         user.lastLoginAt = new Date();
         await user.save({ timestamps: false });
+
+        logAudit('ADMIN_LOGIN', user._id.toString(), user.role, {
+            email: user.email,
+        });
 
         const payload = {
             userId: user._id,
@@ -256,6 +261,11 @@ export async function changeAdminPassword(req: AuthRequest, res: Response) {
         const salt = await bcrypt.genSalt(10);
         adminUser.password = await bcrypt.hash(hashPassword(newPassword), salt);
         await adminUser.save({ timestamps: false });
+
+        logAudit('ADMIN_PASSWORD_CHANGED', adminUser._id.toString(), req.user!.role, {
+            email: adminUser.email,
+            targetEmail: adminUser.email,
+        });
 
         const isSuperAdmin = req.user?.role === 'SUPER_ADMIN';
         if (isSuperAdmin && adminUser.email !== req.user?.email) {

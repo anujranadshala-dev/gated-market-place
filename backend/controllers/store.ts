@@ -1,11 +1,12 @@
 import store, { IStore } from '../models/store.js'
-import AdminUser, { IAdminUser } from '../models/AdminUser.js';
-import product, { IProduct } from '../models/product.js';
+import AdminUser from '../models/AdminUser.js';
+import product from '../models/product.js';
 import ClientUser from '../models/clientUser.js';
 import { AuthRequest } from '../middleware/auth.js';
-import { Request, Response } from 'express'
+import { Response } from 'express'
+import { logAudit } from '../utils/audit.js';
 
-export async function createStore(req: Request, res: Response) {
+export async function createStore(req: AuthRequest, res: Response) {
     const { ownerEmail, ...storeData } = req.body as IStore;
 
     // Basic validation for required fields.
@@ -24,8 +25,12 @@ export async function createStore(req: Request, res: Response) {
             ownerEmail: ownerEmail,
             ...storeData
         });
-        console.log(newStore)
         await newStore.save();
+
+        logAudit('STORE_CREATED', newStore._id.toString(), req.user!.role, {
+            ownerEmail,
+            name: newStore.name,
+        });
 
         await AdminUser.findOneAndUpdate(
             { email: ownerEmail },
@@ -80,11 +85,23 @@ export async function updateStore(req: AuthRequest, res: Response) {
             }
         }
 
+        const allowedFields = ['name', 'slug', 'description', 'logoUrl', 'currency', 'gatingConfig', 'metrics'];
+        const filteredUpdates: any = {};
+        for (const field of allowedFields) {
+            if (field in updates) {
+                filteredUpdates[field] = updates[field];
+            }
+        }
+
         const updatedStore = await store.findByIdAndUpdate(
             storeId,
-            { $set: updates },
+            { $set: filteredUpdates },
             { new: true }
         );
+
+        logAudit('STORE_UPDATED', storeId, req.user!.role, {
+            fields: Object.keys(filteredUpdates),
+        });
 
         res.status(200).json({ message: 'Store updated successfully.', store: updatedStore });
     } catch (error) {
@@ -118,6 +135,8 @@ export async function deleteStore(req: AuthRequest, res: Response) {
             { $pull: { accessibleStoresId: storeId } }
         );
         await store.findByIdAndDelete(storeId);
+
+        logAudit('STORE_DELETED', storeId, req.user!.role, {});
 
         res.status(200).json({ message: 'Store deleted successfully.' });
     } catch (error) {

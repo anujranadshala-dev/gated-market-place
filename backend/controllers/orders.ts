@@ -1,7 +1,8 @@
-import order, { IOrder } from '../models/order.js'
-import store, { IStore } from '../models/store.js'
+import order from '../models/order.js'
+import store from '../models/store.js'
 import { AuthRequest } from '../middleware/auth.js';
-import { Request, Response } from 'express'
+import { Response } from 'express'
+import { logAudit } from '../utils/audit.js';
 
 export async function createOrder(req: AuthRequest, res: Response) {
     const {
@@ -26,6 +27,26 @@ export async function createOrder(req: AuthRequest, res: Response) {
 
     if (!customer.name || !customer.email || !customer.tier) {
         return res.status(400).json({ message: 'Missing required customer fields: name, email, tier' });
+    }
+
+    if (subtotal !== undefined && (typeof subtotal !== 'number' || subtotal < 0)) {
+        return res.status(400).json({ message: 'Subtotal must be a non-negative number' });
+    }
+
+    if (shippingFee !== undefined && (typeof shippingFee !== 'number' || shippingFee < 0)) {
+        return res.status(400).json({ message: 'Shipping fee must be a non-negative number' });
+    }
+
+    if (taxAmount !== undefined && (typeof taxAmount !== 'number' || taxAmount < 0)) {
+        return res.status(400).json({ message: 'Tax amount must be a non-negative number' });
+    }
+
+    if (discountAmount !== undefined && (typeof discountAmount !== 'number' || discountAmount < 0)) {
+        return res.status(400).json({ message: 'Discount amount must be a non-negative number' });
+    }
+
+    if (totalAmount !== undefined && (typeof totalAmount !== 'number' || totalAmount < 0)) {
+        return res.status(400).json({ message: 'Total amount must be a non-negative number' });
     }
 
     try {
@@ -66,6 +87,12 @@ export async function createOrder(req: AuthRequest, res: Response) {
         });
 
         await newOrder.save();
+
+        logAudit('ORDER_CREATED', newOrder._id.toString(), req.user!.role, {
+            storeId: targetStoreId,
+            orderNumber: newOrder.orderNumber,
+            totalAmount: newOrder.totalAmount,
+        });
 
         res.status(201).json({ message: 'Order created successfully.', orderId: newOrder._id, orderNumber: newOrder.orderNumber });
     } catch (error) {
@@ -120,11 +147,23 @@ export async function updateOrder(req: AuthRequest, res: Response) {
             }
         }
 
+        const allowedFields = ['orderNumber', 'customer', 'shippingAddress', 'items', 'subtotal', 'shippingFee', 'taxAmount', 'discountAmount', 'totalAmount', 'currency', 'status', 'paymentStatus', 'logistics'];
+        const filteredUpdates: any = {};
+        for (const field of allowedFields) {
+            if (field in updates) {
+                filteredUpdates[field] = updates[field];
+            }
+        }
+
         const updatedOrder = await order.findByIdAndUpdate(
             orderId,
-            { $set: updates },
+            { $set: filteredUpdates },
             { new: true }
         );
+
+        logAudit('ORDER_UPDATED', orderId, req.user!.role, {
+            fields: Object.keys(filteredUpdates),
+        });
 
         res.status(200).json({ message: 'Order updated successfully.', order: updatedOrder });
     } catch (error) {
@@ -154,6 +193,11 @@ export async function deleteOrder(req: AuthRequest, res: Response) {
         }
 
         await order.findByIdAndDelete(orderId);
+
+        logAudit('ORDER_DELETED', orderId, req.user!.role, {
+            storeId: existingOrder.storeId,
+            orderNumber: existingOrder.orderNumber,
+        });
 
         res.status(200).json({ message: 'Order deleted successfully.' });
     } catch (error) {

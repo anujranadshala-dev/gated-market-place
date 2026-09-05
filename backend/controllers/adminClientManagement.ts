@@ -1,11 +1,12 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import bcrypt from 'bcryptjs';
 import ClientUser from '../models/clientUser.js';
-import AdminUser, { IAdminUser } from '../models/AdminUser.js';
+import AdminUser from '../models/AdminUser.js';
 import store, { IStore } from '../models/store.js';
-import { protect, authorize, AuthRequest } from '../middleware/auth.js';
+import { AuthRequest } from '../middleware/auth.js';
 import { sendClientCredentialsEmail, sendPasswordChangedBySuperAdminEmail } from '../utils/email.js';
 import { hashPassword } from '../utils/crypto.js';
+import { logAudit } from '../utils/audit.js';
 
 function generateTempPassword(): string {
     const randomDigits = Math.floor(1000 + Math.random() * 9000);
@@ -67,6 +68,12 @@ export async function createClientUser(req: AuthRequest, res: Response) {
 
         await newClientUser.save();
 
+        logAudit('CLIENT_USER_CREATED', newClientUser._id.toString(), user.role, {
+            email: newClientUser.email,
+            username: newClientUser.username,
+            storeId: targetStoreId,
+        });
+
         const storeDoc = await store.findById(targetStoreId).select('name ownerName ownerEmail');
         const storeName = (storeDoc as IStore | null)?.name || 'Gated Marketplace';
         const ownerName = (storeDoc as IStore | null)?.ownerName || 'Store Owner';
@@ -82,7 +89,6 @@ export async function createClientUser(req: AuthRequest, res: Response) {
                 accessibleStores: newClientUser.accessibleStoresId,
                 assignedTier: newClientUser.assignedTier,
                 status: newClientUser.status,
-                tempPassword,
             }
         };
 
@@ -257,6 +263,11 @@ export async function resetClientPassword(req: AuthRequest, res: Response) {
         clientUser.status = 'Pending First Login';
         await clientUser.save();
 
+        logAudit('CLIENT_PASSWORD_RESET', clientUser._id.toString(), req.user!.role, {
+            email: clientUser.email,
+            username: clientUser.username,
+        });
+
         const storeDoc = await store.findOne({ _id: { $in: clientUser.accessibleStoresId } }).select('name ownerName ownerEmail');
         const storeName = (storeDoc as IStore | null)?.name || 'Gated Marketplace';
         const ownerName = (storeDoc as IStore | null)?.ownerName || 'Store Owner';
@@ -277,7 +288,9 @@ export async function resetClientPassword(req: AuthRequest, res: Response) {
 
         res.status(200).json({
             message: 'Password reset successfully.',
-            tempPassword: newTempPassword,
+            clientUserId: clientUser._id,
+            username: clientUser.username,
+            email: clientUser.email,
         });
     } catch (error) {
         console.error('Error resetting password:', error);
@@ -305,6 +318,12 @@ export async function changeClientPassword(req: AuthRequest, res: Response) {
         clientUser.status = markAsTemp ? 'Pending First Login' : 'Active';
         await clientUser.save();
 
+        logAudit('CLIENT_PASSWORD_CHANGED', clientUser._id.toString(), req.user!.role, {
+            email: clientUser.email,
+            username: clientUser.username,
+            markAsTemp: !!markAsTemp,
+        });
+
         const isSuperAdmin = req.user?.role === 'SUPER_ADMIN';
         const shouldEmail = sendEmail === true || isSuperAdmin;
 
@@ -328,7 +347,9 @@ export async function changeClientPassword(req: AuthRequest, res: Response) {
 
         res.status(200).json({
             message: 'Password changed successfully.',
-            tempPassword: newPassword,
+            clientUserId: clientUser._id,
+            username: clientUser.username,
+            email: clientUser.email,
             status: clientUser.status,
             emailSent: shouldEmail,
         });
@@ -348,6 +369,11 @@ export async function deleteClientUser(req: AuthRequest, res: Response) {
         }
 
         await ClientUser.findByIdAndDelete(clientUserId);
+
+        logAudit('CLIENT_USER_DELETED', clientUserId, req.user!.role, {
+            email: clientUser.email,
+            username: clientUser.username,
+        });
 
         res.status(200).json({ message: 'Client user deleted successfully.' });
     } catch (error) {

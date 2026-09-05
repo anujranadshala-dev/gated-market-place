@@ -11,6 +11,9 @@
     "allowJs": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "paths": {
       "@/*": ["./src/*"]
     },
