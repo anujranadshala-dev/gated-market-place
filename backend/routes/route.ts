@@ -6,21 +6,54 @@ import {
     getMe,
     changeAdminPassword,
     verifyEmail,
-    resendVerificationEmail
+    resendVerificationEmail,
+    refreshAdminToken
 } from '../controllers/AdminAuth.js';
 import { protect, authorize } from '../middleware/auth.js';
 
 import { createStore, getStore, updateStore, deleteStore } from '../controllers/store.js'
 import { createProduct, getProduct, updateProduct, deleteProduct } from '../controllers/products.js'
 import { createOrder, getOrder, updateOrder, deleteOrder } from '../controllers/orders.js'
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { message: 'Too many login attempts, please try again after 15 minutes.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 3,
+    message: { message: 'Too many registration attempts, please try again after 1 hour.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const refreshLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { message: 'Too many token refresh attempts, please try again after 15 minutes.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // Public routes
-router.post('/register', createAdminUser);
-router.post('/login', loginAdminUser);
+router.post('/login', loginLimiter, loginAdminUser);
 router.post('/verify-email', verifyEmail);
 router.post('/resend-verification', resendVerificationEmail);
+
+router.post('/refresh', refreshLimiter, refreshAdminToken);
+
+// Registration is disabled by default in production.
+// Enable only in development by setting ALLOW_PUBLIC_REGISTRATION=true
+if (process.env.ALLOW_PUBLIC_REGISTRATION === 'true') {
+    router.post('/register', registerLimiter, createAdminUser);
+}
 
 // Protected routes that require authentication
 router.post('/logout', protect, logoutAdminUser);

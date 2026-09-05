@@ -14,6 +14,9 @@ export interface IAdminUser extends Document {
     isEmailVerified: boolean;
     emailVerificationToken?: string;
     emailVerificationExpires?: Date;
+    loginAttempts?: number;
+    lockedUntil?: Date;
+    isLocked?: boolean;
 }
 
 const adminUserSchema = new Schema<IAdminUser>({
@@ -32,6 +35,9 @@ const adminUserSchema = new Schema<IAdminUser>({
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: String,
     emailVerificationExpires: Date,
+    loginAttempts: { type: Number, default: 0 },
+    lockedUntil: Date,
+    isLocked: { type: Boolean, default: false },
 }, {
     timestamps: true,
 });

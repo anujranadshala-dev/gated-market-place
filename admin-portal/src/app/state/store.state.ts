@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { Store, CreateStoreDto, StoreStatus, StoreTier } from '../core/models/store.model';
 import { AuthStore } from '../core/auth/auth.store';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 /**
  * Modern Angular 21 Signal Store for Store Management & Multi-Tenant Oversight

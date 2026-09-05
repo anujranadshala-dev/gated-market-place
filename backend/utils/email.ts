@@ -24,9 +24,6 @@ export const transporter = nodemailer.createTransport({
     user: smtpUser,
     pass: smtpPass,
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
 });
 
 export async function sendClientCredentialsEmail({

@@ -5,7 +5,7 @@ import { Product, CreateProductDto, ProductStatus, GatedAccessTier } from '../co
 import { AuthStore } from '../core/auth/auth.store';
 import { StoreState } from './store.state';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 /**
  * Modern Angular 21 Signal Store for Product Inventory & Catalog Management
@@ -204,10 +204,13 @@ export class ProductState {
   }
 
   public async updateStock(productId: string, newStock: number): Promise<void> {
+    const existing = this._products().find((p) => p.id === productId)?.inventory;
     await this.updateProduct(productId, {
       inventory: {
-        ...this._products().find((p) => p.id === productId)?.inventory || {},
         stockQuantity: Math.max(0, newStock),
+        lowStockThreshold: existing?.lowStockThreshold ?? 0,
+        sku: existing?.sku ?? '',
+        weightKg: existing?.weightKg ?? 1,
       },
     });
   }

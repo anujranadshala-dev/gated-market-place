@@ -55,7 +55,7 @@ export interface IOrder extends Document {
   discountAmount: number;
   totalAmount: number;
   currency: string;
-  status: 'Pending' | 'Packed' | 'Out_for_Delivery' | 'Delivered' | 'Cancelled';
+  status: 'Pending' | 'Packed' | 'On the way' | 'Out_for_Delivery' | 'Delivered' | 'Cancelled';
   paymentStatus: 'PAID' | 'PENDING' | 'FAILED';
   logistics: ILogistics;
   packedAt?: Date;
@@ -121,7 +121,7 @@ const orderSchema = new Schema<IOrder>({
   currency: { type: String, required: true },
   status: {
     type: String,
-    enum: ['Pending', 'Packed', 'On the way', 'Out_for_Delivery', 'Delivered'],
+    enum: ['Pending', 'Packed', 'On the way', 'Out_for_Delivery', 'Delivered', 'Cancelled'],
     default: 'Pending',
   },
   paymentStatus: {

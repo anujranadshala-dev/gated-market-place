@@ -8,7 +8,8 @@ import {
     addClientAddress,
     updateClientAddress,
     deleteClientAddress,
-    setDefaultClientAddress
+    setDefaultClientAddress,
+    refreshClientToken
 } from '../controllers/clientAuth.js';
 import { clientProtect } from '../middleware/clientAuth.js';
 import {
@@ -21,11 +22,30 @@ import {
     getClientOrders,
     createClientOrder
 } from '../controllers/clientOrder.js';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { message: 'Too many login attempts, please try again after 15 minutes.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const refreshLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { message: 'Too many token refresh attempts, please try again after 15 minutes.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+router.post('/refresh', refreshLimiter, refreshClientToken);
+
 // Public routes
-router.post('/login', clientLogin);
+router.post('/login', loginLimiter, clientLogin);
 router.post('/logout', clientLogout);
 
 // Protected client user routes

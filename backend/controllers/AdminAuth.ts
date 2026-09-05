@@ -7,11 +7,15 @@ import { AuthRequest } from '../middleware/auth.js';
 import { hashPassword } from '../utils/crypto.js';
 import { sendEmailVerificationEmail } from '../utils/email.js';
 
+const isProduction = process.env.NODE_ENV === 'production';
+const ACCOUNT_LOCKOUT_THRESHOLD = 5;
+const ACCOUNT_LOCKOUT_DURATION = 15 * 60 * 1000;
+
 export async function createAdminUser(req: Request, res: Response) {
     const { email, name, password, role, assignedStoreId } = req.body as IAdminUser;
 
-    if (!email || !name || !password || !role) {
-        return res.status(400).json({ message: 'Missing required fields: email, name, password, role.' });
+    if (!email || !name || !password) {
+        return res.status(400).json({ message: 'Missing required fields: email, name, password.' });
     }
 
     const trimmedEmail = email.trim().toLowerCase();
@@ -21,6 +25,8 @@ export async function createAdminUser(req: Request, res: Response) {
         return res.status(400).json({ message: 'Only Gmail addresses are allowed for admin/owner accounts.' });
     }
 
+    const normalizedRole = role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : 'STORE_OWNER';
+
     try {
         const existingUser = await AdminUser.findOne({ email: trimmedEmail });
         if (existingUser) {
@@ -28,7 +34,7 @@ export async function createAdminUser(req: Request, res: Response) {
         }
 
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(hashPassword(password), salt);
 
         const emailVerificationToken = crypto.randomBytes(32).toString('hex');
         const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -37,7 +43,7 @@ export async function createAdminUser(req: Request, res: Response) {
             email: trimmedEmail,
             name,
             password: hashedPassword,
-            role,
+            role: normalizedRole,
             assignedStoreId,
             isEmailVerified: false,
             emailVerificationToken,
@@ -82,6 +88,11 @@ export async function loginAdminUser(req: Request, res: Response) {
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
 
+        if (user.isLocked && user.lockedUntil && user.lockedUntil > new Date()) {
+            const remaining = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 1000 / 60);
+            return res.status(403).json({ message: `Account is locked. Try again in ${remaining} minutes.` });
+        }
+
         if (!user.isEmailVerified) {
             return res.status(403).json({ message: 'Please verify your email before logging in.' });
         }
@@ -94,9 +105,19 @@ export async function loginAdminUser(req: Request, res: Response) {
         }
 
         if (!isMatch) {
+            user.loginAttempts = (user.loginAttempts || 0) + 1;
+            if (user.loginAttempts >= ACCOUNT_LOCKOUT_THRESHOLD) {
+                user.lockedUntil = new Date(Date.now() + ACCOUNT_LOCKOUT_DURATION);
+                user.loginAttempts = 0;
+                await user.save({ timestamps: false });
+                return res.status(403).json({ message: 'Account locked due to too many failed attempts. Try again in 15 minutes.' });
+            }
+            await user.save({ timestamps: false });
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
 
+        user.loginAttempts = 0;
+        user.lockedUntil = undefined;
         user.lastLoginAt = new Date();
         await user.save({ timestamps: false });
 
@@ -108,18 +129,29 @@ export async function loginAdminUser(req: Request, res: Response) {
             assignedStoreId: user.assignedStoreId,
         };
 
+        const accessTokenExpiresIn = '15m';
+        const refreshTokenExpiresIn = '7d';
+
         if (!process.env.JWT_SECRET) {
             console.error('JWT_SECRET is not defined in environment variables.');
             throw new Error('Server configuration error: JWT secret is missing.');
         }
-        const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: '1d',
+
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: accessTokenExpiresIn });
+        const refreshToken = jwt.sign({ ...payload, type: 'refresh' }, process.env.JWT_SECRET, { expiresIn: refreshTokenExpiresIn });
+
+        res.cookie('token', accessToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: isProduction,
+            maxAge: 15 * 60 * 1000,
         });
 
-        res.cookie('token', token, {
+        res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            sameSite: 'lax',
-            maxAge: 24 * 60 * 60 * 1000,
+            sameSite: 'strict',
+            secure: isProduction,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
         res.status(200).json({
@@ -132,11 +164,73 @@ export async function loginAdminUser(req: Request, res: Response) {
     }
 }
 
+export async function refreshAdminToken(req: Request, res: Response) {
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+        return res.status(401).json({ message: 'Refresh token not found.' });
+    }
+
+    try {
+        if (!process.env.JWT_SECRET) {
+            throw new Error('Server configuration error: JWT secret is missing.');
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
+
+        if ((decoded as any).type !== 'refresh') {
+            return res.status(401).json({ message: 'Invalid token type.' });
+        }
+
+        const user = await AdminUser.findById(decoded.userId).select('-password');
+        if (!user || !user.isEmailVerified) {
+            return res.status(401).json({ message: 'User not found or email not verified.' });
+        }
+
+        const payload = {
+            userId: user._id,
+            role: user.role,
+            name: user.name,
+            email: user.email,
+            assignedStoreId: user.assignedStoreId,
+        };
+
+        const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
+        const newRefreshToken = jwt.sign({ ...payload, type: 'refresh' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        res.cookie('token', newAccessToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: isProduction,
+            maxAge: 15 * 60 * 1000,
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: isProduction,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.status(200).json({ message: 'Token refreshed successfully.' });
+    } catch (error) {
+        console.error('Error refreshing admin token:', error);
+        res.status(401).json({ message: 'Invalid refresh token.' });
+    }
+}
+
 export async function logoutAdminUser(req: Request, res: Response) {
     res.cookie('token', '', {
         httpOnly: true,
         expires: new Date(0),
-        sameSite: 'lax',
+        sameSite: 'strict',
+        secure: isProduction,
+    });
+
+    res.cookie('refreshToken', '', {
+        httpOnly: true,
+        expires: new Date(0),
+        sameSite: 'strict',
+        secure: isProduction,
     });
 
     res.status(200).json({ message: 'Logout successful.' });
@@ -160,7 +254,7 @@ export async function changeAdminPassword(req: AuthRequest, res: Response) {
         }
 
         const salt = await bcrypt.genSalt(10);
-        adminUser.password = await bcrypt.hash(newPassword, salt);
+        adminUser.password = await bcrypt.hash(hashPassword(newPassword), salt);
         await adminUser.save({ timestamps: false });
 
         const isSuperAdmin = req.user?.role === 'SUPER_ADMIN';

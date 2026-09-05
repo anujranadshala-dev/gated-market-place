@@ -4,6 +4,9 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import ClientUser, { IClientUser, IAddress } from '../models/clientUser.js';
 import { ClientAuthRequest } from '../middleware/clientAuth.js';
+import { hashPassword } from '../utils/crypto.js';
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 export async function clientLogin(req: Request, res: Response) {
     const { usernameOrEmail, password } = req.body;
@@ -41,12 +44,25 @@ export async function clientLogin(req: Request, res: Response) {
         };
 
         const token = jwt.sign(payload, process.env.JWT_SECRET!, {
+            expiresIn: '15m',
+        });
+
+        const refreshToken = jwt.sign({ ...payload, type: 'clientRefresh' }, process.env.JWT_SECRET!, {
             expiresIn: '7d',
         });
 
         res.cookie('clientToken', token, {
             httpOnly: true,
-            sameSite: 'lax',
+            sameSite: 'strict',
+            secure: isProduction,
+            maxAge: 15 * 60 * 1000,
+            path: '/',
+        });
+
+        res.cookie('clientRefreshToken', refreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: isProduction,
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/',
         });
@@ -86,10 +102,18 @@ export async function clientLogin(req: Request, res: Response) {
 export async function clientLogout(req: Request, res: Response) {
     res.cookie('clientToken', '', {
         httpOnly: true,
-        sameSite: 'lax',
         expires: new Date(0),
+        sameSite: 'strict',
+        secure: isProduction,
         path: '/',
-        secure: false,
+    });
+
+    res.cookie('clientRefreshToken', '', {
+        httpOnly: true,
+        expires: new Date(0),
+        sameSite: 'strict',
+        secure: isProduction,
+        path: '/',
     });
 
     res.status(200).json({ message: 'Logout successful.' });
@@ -396,7 +420,7 @@ export async function changeClientPassword(req: ClientAuthRequest, res: Response
         }
 
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(newPassword, salt);
+        user.password = await bcrypt.hash(hashPassword(newPassword), salt);
         user.passwordLastChangedAt = new Date();
         await user.save();
 
@@ -404,6 +428,62 @@ export async function changeClientPassword(req: ClientAuthRequest, res: Response
     } catch (error) {
         console.error('Error changing password:', error);
         res.status(500).json({ message: 'Server error while changing password.' });
+    }
+}
+
+export async function refreshClientToken(req: Request, res: Response) {
+    const token = req.cookies.clientRefreshToken;
+
+    if (!token) {
+        return res.status(401).json({ message: 'Refresh token not found.' });
+    }
+
+    try {
+        if (!process.env.JWT_SECRET) {
+            throw new Error('Server configuration error: JWT secret is missing.');
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
+
+        if ((decoded as any).type !== 'clientRefresh') {
+            return res.status(401).json({ message: 'Invalid token type.' });
+        }
+
+        const user = await ClientUser.findById(decoded.userId).select('-password');
+        if (!user) {
+            return res.status(401).json({ message: 'User not found.' });
+        }
+
+        const payload = {
+            userId: user._id,
+            username: user.username,
+            email: user.email,
+            fullName: user.fullName,
+            role: 'SHOP_USER',
+        };
+
+        const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: '15m' });
+        const newRefreshToken = jwt.sign({ ...payload, type: 'clientRefresh' }, process.env.JWT_SECRET!, { expiresIn: '7d' });
+
+        res.cookie('clientToken', newAccessToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: isProduction,
+            maxAge: 15 * 60 * 1000,
+            path: '/',
+        });
+
+        res.cookie('clientRefreshToken', newRefreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: isProduction,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/',
+        });
+
+        res.status(200).json({ message: 'Token refreshed successfully.' });
+    } catch (error) {
+        console.error('Error refreshing client token:', error);
+        res.status(401).json({ message: 'Invalid refresh token.' });
     }
 }
 
