@@ -4,7 +4,9 @@ import {
     loginAdminUser,
     logoutAdminUser,
     getMe,
-    changeAdminPassword
+    changeAdminPassword,
+    verifyEmail,
+    resendVerificationEmail
 } from '../controllers/AdminAuth.js';
 import { protect, authorize } from '../middleware/auth.js';
 
@@ -17,6 +19,8 @@ const router = Router();
 // Public routes
 router.post('/register', createAdminUser);
 router.post('/login', loginAdminUser);
+router.post('/verify-email', verifyEmail);
+router.post('/resend-verification', resendVerificationEmail);
 
 // Protected routes that require authentication
 router.post('/logout', protect, logoutAdminUser);

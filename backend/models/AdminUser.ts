@@ -11,6 +11,9 @@ export interface IAdminUser extends Document {
     lastLoginAt?: Date;
     passwordLastChangedAt?: Date;
     avatarUrl: string;
+    isEmailVerified: boolean;
+    emailVerificationToken?: string;
+    emailVerificationExpires?: Date;
 }
 
 const adminUserSchema = new Schema<IAdminUser>({
@@ -25,7 +28,10 @@ const adminUserSchema = new Schema<IAdminUser>({
     assignedStoreId: String,
     lastLoginAt: Date,
     passwordLastChangedAt: Date,
-    avatarUrl: String
+    avatarUrl: String,
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: String,
+    emailVerificationExpires: Date,
 }, {
     timestamps: true,
 });

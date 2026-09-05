@@ -24,7 +24,30 @@
         </div>
       }
 
-      <form (ngSubmit)="onSubmit()" class="space-y-3 text-xs">
+      @if (showVerificationPending()) {
+        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-700 dark:text-emerald-300 space-y-3">
+          <p class="font-bold">Account created!</p>
+          <p>We've sent a verification email to <strong>{{ registeredEmail() }}</strong>. Please check your inbox and click the link to verify your email address.</p>
+          <p class="text-[10px] text-emerald-600 dark:text-emerald-400">Didn't receive it? Check your spam folder or click below to resend.</p>
+          <button
+            type="button"
+            (click)="onResendVerification()"
+            class="text-emerald-800 dark:text-emerald-200 font-semibold underline hover:text-emerald-900 dark:hover:text-emerald-100 transition"
+          >
+            Resend verification email
+          </button>
+          <div class="pt-2">
+            <button
+              type="button"
+              (click)="navigateToLogin()"
+              class="text-emerald-800 dark:text-emerald-200 font-semibold hover:text-emerald-900 dark:hover:text-emerald-100 transition"
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      } @else {
+        <form (ngSubmit)="onSubmit()" class="space-y-3 text-xs">
         <div>
           <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Full Name</label>
           <input
@@ -116,6 +139,7 @@
           </button>
         </p>
       </div>
+      }
     </div>
   </div>
 </div>

@@ -31,6 +31,9 @@ export class SignupComponent {
     return regex.test(email);
   });
 
+  readonly showVerificationPending = signal<boolean>(false);
+  readonly registeredEmail = signal<string>('');
+
   public onSubmit(): void {
     this.errorMessage.set(null);
 
@@ -63,10 +66,17 @@ export class SignupComponent {
       role: this.role(),
     }).then((success) => {
       this.isLoading.set(false);
-      if (!success) {
+      if (success) {
+        this.registeredEmail.set(this.email());
+        this.showVerificationPending.set(true);
+      } else {
         this.errorMessage.set('Sign up failed. Please try again.');
       }
     });
+  }
+
+  public onResendVerification(): void {
+    this.authStore.resendVerificationEmail(this.registeredEmail());
   }
 
   public navigateToLogin(): void {

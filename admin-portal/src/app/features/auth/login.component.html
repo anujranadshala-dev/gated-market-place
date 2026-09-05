@@ -38,10 +38,24 @@
             />
           </div>
 
-          @if (authStore.authError()) {
+          @if (authStore.authError() && !isUnverifiedError()) {
             <div class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center space-x-2">
               <span class="font-bold">Error:</span>
               <span>{{ authStore.authError() }}</span>
+            </div>
+          }
+
+          @if (isUnverifiedError()) {
+            <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs space-y-2">
+              <p class="font-bold">Email not verified</p>
+              <p>Please verify your email before logging in. Didn't receive the email?</p>
+              <button
+                type="button"
+                (click)="onResendVerification()"
+                class="text-amber-800 dark:text-amber-200 font-semibold underline hover:text-amber-900 dark:hover:text-amber-100 transition"
+              >
+                Resend verification email
+              </button>
             </div>
           }
 

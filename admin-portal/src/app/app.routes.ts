@@ -15,6 +15,12 @@ export const APP_ROUTES: Routes = [
     title: 'Create Account - GatedPulse Marketplace',
   },
   {
+    path: 'verify-email',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/verify-email.component').then((m) => m.VerifyEmailComponent),
+    title: 'Verify Email - GatedPulse Marketplace',
+  },
+  {
     path: 'store-owner',
     canActivate: [authGuard],
     loadChildren: () =>

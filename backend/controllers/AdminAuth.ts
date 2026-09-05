@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { AuthRequest } from '../middleware/auth.js';
 import { hashPassword } from '../utils/crypto.js';
+import { sendEmailVerificationEmail } from '../utils/email.js';
 
 export async function createAdminUser(req: Request, res: Response) {
     const { email, name, password, role, assignedStoreId } = req.body as IAdminUser;
@@ -21,7 +22,7 @@ export async function createAdminUser(req: Request, res: Response) {
     }
 
     try {
-        const existingUser = await AdminUser.findOne({ email });
+        const existingUser = await AdminUser.findOne({ email: trimmedEmail });
         if (existingUser) {
             return res.status(409).json({ message: 'Admin user with this email already exists.' });
         }
@@ -29,17 +30,38 @@ export async function createAdminUser(req: Request, res: Response) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+        const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
         const newAdminUser = new AdminUser({
-            email,
+            email: trimmedEmail,
             name,
             password: hashedPassword,
             role,
             assignedStoreId,
+            isEmailVerified: false,
+            emailVerificationToken,
+            emailVerificationExpires,
         });
 
         await newAdminUser.save();
 
-        res.status(201).json({ message: 'Admin user created successfully.', userId: newAdminUser._id });
+        const frontendUrl = process.env.ADMIN_PORTAL_URL || 'http://localhost:3000';
+        const verificationUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}&email=${encodeURIComponent(trimmedEmail)}`;
+
+        sendEmailVerificationEmail({
+            recipientEmail: trimmedEmail,
+            recipientName: name,
+            verificationUrl,
+        }).catch((emailError) => {
+            console.error('Failed to send verification email:', emailError);
+        });
+
+        res.status(201).json({
+            message: 'Admin user created successfully. Please verify your email before logging in.',
+            requiresVerification: true,
+            email: trimmedEmail,
+        });
     } catch (error) {
         console.error('Error creating admin user:', error);
         res.status(500).json({ message: 'Server error while creating admin user.' });
@@ -54,10 +76,14 @@ export async function loginAdminUser(req: Request, res: Response) {
     }
 
     try {
-        const user = await AdminUser.findOne({ email }).select('+password');
+        const user = await AdminUser.findOne({ email: email.trim().toLowerCase() }).select('+password');
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials.' });
+        }
+
+        if (!user.isEmailVerified) {
+            return res.status(403).json({ message: 'Please verify your email before logging in.' });
         }
 
         let isMatch = await bcrypt.compare(password, user.password);
@@ -98,7 +124,7 @@ export async function loginAdminUser(req: Request, res: Response) {
 
         res.status(200).json({
             message: 'Login successful',
-            user: { _id: user._id, email: user.email, name: user.name, role: user.role, assignedStoreId: user.assignedStoreId, avatarUrl: user.avatarUrl },
+            user: { _id: user._id, email: user.email, name: user.name, role: user.role, assignedStoreId: user.assignedStoreId, avatarUrl: user.avatarUrl, isEmailVerified: user.isEmailVerified },
         });
     } catch (error) {
         console.error('Error during admin login:', error);
@@ -179,10 +205,92 @@ export async function getMe(req: AuthRequest, res: Response) {
                 updatedAt: user.updatedAt,
                 lastLoginAt: user.lastLoginAt,
                 avatarUrl: user.avatarUrl,
+                isEmailVerified: user.isEmailVerified,
             }
         });
     } catch (error) {
         console.error('Error fetching admin user:', error);
         res.status(500).json({ message: 'Server error while fetching profile.' });
+    }
+}
+
+export async function verifyEmail(req: Request, res: Response) {
+    const { email, token } = req.body;
+
+    if (!email || !token) {
+        return res.status(400).json({ message: 'Email and token are required.' });
+    }
+
+    try {
+        const user = await AdminUser.findOne({ email: email.trim().toLowerCase() });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        if (user.isEmailVerified) {
+            return res.status(200).json({ message: 'Email is already verified. You can log in.' });
+        }
+
+        if (!user.emailVerificationToken || user.emailVerificationToken !== token) {
+            return res.status(400).json({ message: 'Invalid verification token.' });
+        }
+
+        if (user.emailVerificationExpires && user.emailVerificationExpires < new Date()) {
+            return res.status(400).json({ message: 'Verification token has expired. Please request a new one.' });
+        }
+
+        user.isEmailVerified = true;
+        user.emailVerificationToken = undefined;
+        user.emailVerificationExpires = undefined;
+        await user.save({ timestamps: false });
+
+        res.status(200).json({ message: 'Email verified successfully. You can now log in.' });
+    } catch (error) {
+        console.error('Error verifying email:', error);
+        res.status(500).json({ message: 'Server error while verifying email.' });
+    }
+}
+
+export async function resendVerificationEmail(req: Request, res: Response) {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required.' });
+    }
+
+    try {
+        const user = await AdminUser.findOne({ email: email.trim().toLowerCase() });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        if (user.isEmailVerified) {
+            return res.status(200).json({ message: 'Email is already verified.' });
+        }
+
+        const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+        const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        user.emailVerificationToken = emailVerificationToken;
+        user.emailVerificationExpires = emailVerificationExpires;
+        await user.save({ timestamps: false });
+
+        const frontendUrl = process.env.ADMIN_PORTAL_URL || 'http://localhost:3000';
+        const verificationUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}&email=${encodeURIComponent(user.email)}`;
+
+        sendEmailVerificationEmail({
+            recipientEmail: user.email,
+            recipientName: user.name,
+            verificationUrl,
+        }).catch((emailError) => {
+            console.error('Failed to resend verification email:', emailError);
+        });
+
+        res.status(200).json({ message: 'Verification email sent. Please check your inbox.' });
+    } catch (error) {
+        console.error('Error resending verification email:', error);
+        res.status(500).json({ message: 'Server error while resending verification email.' });
     }
 }

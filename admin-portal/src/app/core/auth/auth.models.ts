@@ -11,11 +11,12 @@ export interface User {
   name: string;
   role: UserRole;
   avatarUrl?: string;
-  assignedStoreId?: string; // Present for STORE_OWNER
+  assignedStoreId?: string;
   assignedStoreName?: string;
   createdAt: string;
   lastLoginAt: string;
   isVerified: boolean;
+  isEmailVerified: boolean;
 }
 
 export interface AuthSession {
@@ -60,13 +61,15 @@ export interface BackendMeResponse {
     createdAt: Date;
     updatedAt: Date;
     lastLoginAt?: Date;
-    avatarUrl: string
+    avatarUrl: string;
+    isEmailVerified: boolean;
   };
 }
 
 export interface BackendRegisterResponse {
   message: string;
-  userId: string;
+  requiresVerification: boolean;
+  email: string;
 }
 
 export interface GatedPermission {

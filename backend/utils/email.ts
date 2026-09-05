@@ -256,3 +256,75 @@ This is an automated security notification. Please do not reply to this email.
     html,
   });
 }
+
+export async function sendEmailVerificationEmail({
+  recipientEmail,
+  recipientName,
+  verificationUrl,
+}: {
+  recipientEmail: string;
+  recipientName?: string;
+  verificationUrl: string;
+}) {
+  const subject = 'Verify your email - GatedPulse Admin Portal';
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1f2937;">
+      <div style="background: linear-gradient(135deg, #1e293b, #2988c8); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Verify Your Email</h1>
+        <p style="color: #e2e8f0; margin: 8px 0 0; font-size: 14px;">GatedPulse Admin Portal</p>
+      </div>
+
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="font-size: 16px; margin-bottom: 20px;">Hello ${recipientName || 'User'},</p>
+        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+          Thank you for creating an account with GatedPulse. Please verify your email address by clicking the button below.
+          This link will expire in 24 hours.
+        </p>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verificationUrl}" style="background: #2988c8; color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block;">
+            Verify Email Address
+          </a>
+        </div>
+
+        <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
+          If you did not create an account, you can safely ignore this email.
+        </p>
+
+        <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
+          If the button above does not work, copy and paste this link into your browser:
+          <br>
+          <a href="${verificationUrl}" style="color: #2988c8; word-break: break-all;">${verificationUrl}</a>
+        </p>
+      </div>
+
+      <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; text-align: center;">
+        <p style="font-size: 12px; color: #94a3b8; margin: 0;">This is an automated message. Please do not reply to this email.</p>
+      </div>
+    </div>
+  `;
+
+  const text = `
+Verify Your Email - GatedPulse Admin Portal
+
+Hello ${recipientName || 'User'},
+
+Thank you for creating an account with GatedPulse. Please verify your email address by visiting the link below:
+${verificationUrl}
+
+This link will expire in 24 hours.
+
+If you did not create an account, you can safely ignore this email.
+
+This is an automated message. Please do not reply to this email.
+  `;
+
+  await transporter.sendMail({
+    from: `"${fromName}" <${fromEmail}>`,
+    to: recipientEmail,
+    subject,
+    text,
+    html,
+  });
+}
