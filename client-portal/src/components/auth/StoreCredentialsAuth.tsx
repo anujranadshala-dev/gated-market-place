@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { loginWithCredentials, clearLoginError } from '../../store/slices/authSlice';
+import { useToast } from '../../hooks/useToast';
 import confetti from 'canvas-confetti';
 
 interface StoreCredentialsAuthProps {
@@ -28,6 +29,7 @@ export const StoreCredentialsAuth: React.FC<StoreCredentialsAuthProps> = ({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { verificationLoading, verificationError, loginLoading, loginError } = useAppSelector((state) => state.auth);
+  const { showSuccess, showError } = useToast();
 
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,6 +54,7 @@ export const StoreCredentialsAuth: React.FC<StoreCredentialsAuthProps> = ({
       })).unwrap();
       
       setLoginSuccess(true);
+      showSuccess('Login successful! Welcome back.');
 
       try {
         confetti({
@@ -64,7 +67,9 @@ export const StoreCredentialsAuth: React.FC<StoreCredentialsAuthProps> = ({
       // Auth guard in App.tsx will redirect authenticated users from /login to /
     } catch (error: any) {
       setLoginSuccess(false);
-      setErrorMessage(error || 'Login failed. Please check your credentials.');
+      const msg = error || 'Login failed. Please check your credentials.';
+      setErrorMessage(msg);
+      showError(msg);
     }
   };
 

@@ -379,7 +379,7 @@ export const TenantStoreGrid: React.FC = () => {
                           {store.name}
                         </h3>
                         <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
-                          {store.totalProductsCount} Precision Products • Tax: {(store.taxDefaultRate * 100).toFixed(1)}%
+                          {store.totalProductsCount} Precision Products • Tax: {((store.taxDefaultRate ?? 0) * 100).toFixed(1)}%
                         </p>
                       </div>
                     </div>

@@ -3,7 +3,8 @@ import {
     createAdminUser,
     loginAdminUser,
     logoutAdminUser,
-    getMe
+    getMe,
+    changeAdminPassword
 } from '../controllers/AdminAuth.js';
 import { protect, authorize } from '../middleware/auth.js';
 
@@ -20,6 +21,9 @@ router.post('/login', loginAdminUser);
 // Protected routes that require authentication
 router.post('/logout', protect, logoutAdminUser);
 router.get('/me', protect, getMe);
+
+// Admin password management - only SUPER_ADMIN can change other admin passwords
+router.put('/admins/change-password', protect, authorize('SUPER_ADMIN'), changeAdminPassword);
 
 // Store management: only the omnipotent Super Admin may create stores.
 // Read/update/delete are shared with Store Owners (ownership enforced in controllers).

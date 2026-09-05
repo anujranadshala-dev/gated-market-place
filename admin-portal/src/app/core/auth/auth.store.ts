@@ -2,6 +2,8 @@ import { Injectable, computed, signal, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { LoginCredentials, SignupPayload, User, UserRole, BackendLoginResponse, BackendMeResponse, BackendRegisterResponse } from './auth.models';
+import { hashPassword } from '../utils/crypto';
+import { ToastService } from '../services/toast.service';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -11,6 +13,7 @@ const API_BASE_URL = 'http://localhost:5000/api';
 export class AuthStore {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
+  private readonly toastService = inject(ToastService);
 
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isLoading = signal<boolean>(false);
@@ -42,41 +45,46 @@ export class AuthStore {
     this._authError.set(null);
 
     return new Promise((resolve) => {
-      this.http.post<BackendLoginResponse>(`${API_BASE_URL}/login`, {
-        email: credentials.email,
-        password: credentials.password,
-      }, { withCredentials: true }).subscribe({
-        next: () => {
-          this.http.get<BackendMeResponse>(`${API_BASE_URL}/me`, { withCredentials: true }).subscribe({
-            next: (meRes) => {
-              const user = meRes.user;
-              this._currentUser.set({
-                id: user._id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                assignedStoreId: user.assignedStoreId,
-                createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
-                lastLoginAt: user.lastLoginAt instanceof Date ? user.lastLoginAt.toISOString() : new Date().toISOString(),
-                isVerified: true,
-                avatarUrl: user.avatarUrl
-              });
-              this._isLoading.set(false);
-              this.navigateByRole(user.role);
-              resolve(true);
-            },
-            error: (err) => {
-              this._authError.set(err.error?.message || 'Failed to fetch user profile');
-              this._isLoading.set(false);
-              resolve(false);
-            },
-          });
-        },
-        error: (err) => {
-          this._authError.set(err.error?.message || 'Login failed');
-          this._isLoading.set(false);
-          resolve(false);
-        },
+      hashPassword(credentials.password!).then((hashedPassword) => {
+        this.http.post<BackendLoginResponse>(`${API_BASE_URL}/login`, {
+          email: credentials.email,
+          password: hashedPassword,
+        }, { withCredentials: true }).subscribe({
+          next: () => {
+            this.http.get<BackendMeResponse>(`${API_BASE_URL}/me`, { withCredentials: true }).subscribe({
+              next: (meRes) => {
+                const user = meRes.user;
+                this._currentUser.set({
+                  id: user._id,
+                  email: user.email,
+                  name: user.name,
+                  role: user.role,
+                  assignedStoreId: user.assignedStoreId,
+                  createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
+                  lastLoginAt: user.lastLoginAt instanceof Date ? user.lastLoginAt.toISOString() : new Date().toISOString(),
+                  isVerified: true,
+                  avatarUrl: user.avatarUrl
+                });
+                this._isLoading.set(false);
+                this.toastService.showSuccess(`Welcome back, ${user.name}!`);
+                this.navigateByRole(user.role);
+                resolve(true);
+              },
+              error: (err) => {
+                this._authError.set(err.error?.message || 'Failed to fetch user profile');
+                this._isLoading.set(false);
+                this.toastService.showError(err.error?.message || 'Login failed');
+                resolve(false);
+              },
+            });
+          },
+          error: (err) => {
+            this._authError.set(err.error?.message || 'Login failed');
+            this._isLoading.set(false);
+            this.toastService.showError(err.error?.message || 'Login failed');
+            resolve(false);
+          },
+        });
       });
     });
   }
@@ -86,26 +94,32 @@ export class AuthStore {
     this._authError.set(null);
 
     return new Promise((resolve) => {
-      this.http.post<BackendRegisterResponse>(`${API_BASE_URL}/register`, {
-        email: payload.email,
-        name: payload.name,
-        password: payload.password,
-        role: payload.role,
-      }, { withCredentials: true }).subscribe({
-        next: () => {
-          this.login({
-            email: payload.email,
-            password: payload.password,
-            role: payload.role,
-          }).then((success) => {
-            resolve(success);
-          });
-        },
-        error: (err) => {
-          this._authError.set(err.error?.message || 'Sign up failed');
-          this._isLoading.set(false);
-          resolve(false);
-        },
+      hashPassword(payload.password).then((hashedPassword) => {
+        this.http.post<BackendRegisterResponse>(`${API_BASE_URL}/register`, {
+          email: payload.email,
+          name: payload.name,
+          password: hashedPassword,
+          role: payload.role,
+        }, { withCredentials: true }).subscribe({
+          next: () => {
+            this.login({
+              email: payload.email,
+              password: payload.password,
+              role: payload.role,
+            }).then((success) => {
+              if (success) {
+                this.toastService.showSuccess('Account created successfully!');
+              }
+              resolve(success);
+            });
+          },
+          error: (err) => {
+            this._authError.set(err.error?.message || 'Sign up failed');
+            this._isLoading.set(false);
+            this.toastService.showError(err.error?.message || 'Sign up failed');
+            resolve(false);
+          },
+        });
       });
     });
   }
@@ -154,6 +168,7 @@ export class AuthStore {
     this.http.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true }).subscribe({
       next: () => {
         this._currentUser.set(null);
+        this.toastService.showSuccess('Logged out successfully');
         this.router.navigate(['/login']);
       },
       error: () => {

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import ClientUser, { IClientUser, IAddress } from '../models/clientUser.js';
 import { ClientAuthRequest } from '../middleware/clientAuth.js';
 
@@ -24,9 +25,11 @@ export async function clientLogin(req: Request, res: Response) {
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password || '');
+        let isMatch = await bcrypt.compare(password, user.password || '');
+
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials.' });
+            const hashedInput = crypto.createHash('sha256').update(password).digest('base64');
+            isMatch = await bcrypt.compare(hashedInput, user.password || '');
         }
 
         const payload = {
@@ -45,6 +48,7 @@ export async function clientLogin(req: Request, res: Response) {
             httpOnly: true,
             sameSite: 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/',
         });
 
         res.status(200).json({
@@ -82,8 +86,10 @@ export async function clientLogin(req: Request, res: Response) {
 export async function clientLogout(req: Request, res: Response) {
     res.cookie('clientToken', '', {
         httpOnly: true,
-        expires: new Date(0),
         sameSite: 'lax',
+        expires: new Date(0),
+        path: '/',
+        secure: false,
     });
 
     res.status(200).json({ message: 'Logout successful.' });
@@ -375,7 +381,11 @@ export async function changeClientPassword(req: ClientAuthRequest, res: Response
         }
 
         if (currentPassword) {
-            const isMatch = await bcrypt.compare(currentPassword, user.password || '');
+            let isMatch = await bcrypt.compare(currentPassword, user.password || '');
+            if (!isMatch) {
+                const hashedInput = crypto.createHash('sha256').update(currentPassword).digest('base64');
+                isMatch = await bcrypt.compare(hashedInput, user.password || '');
+            }
             if (!isMatch) {
                 return res.status(401).json({ message: 'Current password is incorrect.' });
             }

@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import bcrypt from 'bcryptjs';
 import ClientUser from '../models/clientUser.js';
+import AdminUser, { IAdminUser } from '../models/AdminUser.js';
 import store, { IStore } from '../models/store.js';
 import { protect, authorize, AuthRequest } from '../middleware/auth.js';
-import { sendClientCredentialsEmail } from '../utils/email.js';
+import { sendClientCredentialsEmail, sendPasswordChangedBySuperAdminEmail } from '../utils/email.js';
 
 function generateTempPassword(): string {
     const randomDigits = Math.floor(1000 + Math.random() * 9000);
@@ -137,6 +138,59 @@ export async function getClientUsers(req: AuthRequest, res: Response) {
     }
 }
 
+export async function getAllUsers(req: AuthRequest, res: Response) {
+    try {
+        const user = req.user!;
+        if (user.role !== 'SUPER_ADMIN') {
+            return res.status(403).json({ message: 'Only super admins can access all users.' });
+        }
+
+        const [clientUsers, adminUsers] = await Promise.all([
+            ClientUser.find().select('-password'),
+            AdminUser.find().select('-password'),
+        ]);
+
+        const mappedClientUsers = clientUsers.map((u) => ({
+            id: u._id.toString(),
+            type: 'CLIENT',
+            username: u.username,
+            email: u.email,
+            fullName: u.fullName,
+            role: 'SHOP_USER',
+            status: u.status,
+            assignedTier: u.assignedTier,
+            totalSpent: u.totalSpent,
+            hasVipBlackSubscription: u.hasVipBlackSubscription,
+            subscriptionPlan: u.subscriptionPlan,
+            createdAt: u.createdAt,
+            updatedAt: u.updatedAt,
+        }));
+
+        const mappedAdminUsers = adminUsers.map((u) => ({
+            id: u._id.toString(),
+            type: 'ADMIN',
+            username: u.email,
+            email: u.email,
+            fullName: u.name,
+            role: u.role,
+            status: u.assignedStoreId ? 'Active' : 'Pending',
+            assignedTier: u.role === 'SUPER_ADMIN' ? 'VIP_BLACK' : 'GOLD',
+            totalSpent: 0,
+            hasVipBlackSubscription: false,
+            subscriptionPlan: 'NONE',
+            createdAt: u.createdAt,
+            updatedAt: u.updatedAt,
+        }));
+
+        res.status(200).json({
+            users: [...mappedAdminUsers, ...mappedClientUsers],
+        });
+    } catch (error) {
+        console.error('Error fetching all users:', error);
+        res.status(500).json({ message: 'Server error while fetching users.' });
+    }
+}
+
 export async function updateClientUser(req: AuthRequest, res: Response) {
     try {
         const { clientUserId } = req.params;
@@ -227,6 +281,59 @@ export async function resetClientPassword(req: AuthRequest, res: Response) {
     } catch (error) {
         console.error('Error resetting password:', error);
         res.status(500).json({ message: 'Server error while resetting password.' });
+    }
+}
+
+export async function changeClientPassword(req: AuthRequest, res: Response) {
+    try {
+        const { clientUserId } = req.params;
+        const { newPassword, markAsTemp, sendEmail } = req.body;
+
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters.' });
+        }
+
+        const clientUser = await ClientUser.findById(clientUserId).select('+password');
+        if (!clientUser) {
+            return res.status(404).json({ message: 'Client user not found' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        clientUser.password = await bcrypt.hash(newPassword, salt);
+        clientUser.passwordLastChangedAt = new Date();
+        clientUser.status = markAsTemp ? 'Pending First Login' : 'Active';
+        await clientUser.save();
+
+        const isSuperAdmin = req.user?.role === 'SUPER_ADMIN';
+        const shouldEmail = sendEmail === true || isSuperAdmin;
+
+        if (shouldEmail) {
+            const storeDoc = await store.findOne({ _id: { $in: clientUser.accessibleStoresId } }).select('name');
+            const storeName = (storeDoc as IStore | null)?.name || 'Gated Marketplace';
+
+            sendPasswordChangedBySuperAdminEmail({
+                recipientEmail: clientUser.email,
+                recipientName: clientUser.fullName,
+                username: clientUser.username,
+                newPassword,
+                storeName,
+                isTemporary: !!markAsTemp,
+                superAdminName: req.user?.name,
+                superAdminEmail: req.user?.email,
+            }).catch((emailError) => {
+                console.error('Failed to send super-admin password-change email:', emailError);
+            });
+        }
+
+        res.status(200).json({
+            message: 'Password changed successfully.',
+            tempPassword: newPassword,
+            status: clientUser.status,
+            emailSent: shouldEmail,
+        });
+    } catch (error) {
+        console.error('Error changing client password:', error);
+        res.status(500).json({ message: 'Server error while changing password.' });
     }
 }
 

@@ -138,3 +138,121 @@ This is an automated message. Please do not reply to this email.
     html,
   });
 }
+
+export async function sendPasswordChangedBySuperAdminEmail({
+  recipientEmail,
+  recipientName,
+  username,
+  newPassword,
+  storeName,
+  isTemporary,
+  superAdminName,
+  superAdminEmail,
+}: {
+  recipientEmail: string;
+  recipientName?: string;
+  username: string;
+  newPassword: string;
+  storeName: string;
+  isTemporary: boolean;
+  superAdminName?: string;
+  superAdminEmail?: string;
+}) {
+  const subject = `Your ${storeName} account password was changed by a Super Admin`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1f2937;">
+      <div style="background: linear-gradient(135deg, #1e293b, #2988c8); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 22px;">Password Updated</h1>
+        <p style="color: #e2e8f0; margin: 8px 0 0; font-size: 14px;">${storeName} — Super Admin Action</p>
+      </div>
+
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="font-size: 16px; margin-bottom: 16px;">Hello ${recipientName || 'Valued Client'},</p>
+        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+          A Super Admin${superAdminName ? ` (<strong>${superAdminName}</strong>)` : ''} has changed the password on your
+          <strong>${storeName}</strong> account.
+          Please use the new credentials below to sign in.
+        </p>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h2 style="color: #1e293b; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px;">Your New Credentials</h2>
+          <table style="width: 100%; font-size: 14px;">
+            <tr>
+              <td style="padding: 8px 0; color: #64748b; font-weight: 600; width: 40%;">Username</td>
+              <td style="padding: 8px 0; font-family: monospace; font-size: 16px; font-weight: bold; color: #1e293b;">${username}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #64748b; font-weight: 600;">New Password</td>
+              <td style="padding: 8px 0; font-family: monospace; font-size: 16px; font-weight: bold; color: #dc2626;">${newPassword}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Password Type</td>
+              <td style="padding: 8px 0;">
+                <span style="background: ${isTemporary ? '#fef3c7' : '#dbeafe'}; color: ${isTemporary ? '#92400e' : '#1e40af'}; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
+                  ${isTemporary ? 'TEMPORARY (must change on first login)' : 'ACTIVE'}
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        ${isTemporary ? `
+        <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+          <p style="margin: 0; font-size: 13px; color: #92400e;">
+            <strong>Important:</strong> You will be required to change this temporary password on your next login.
+          </p>
+        </div>` : `
+        <div style="background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+          <p style="margin: 0; font-size: 13px; color: #065f46;">
+            You can continue using this password, or change it anytime from your profile settings.
+          </p>
+        </div>`}
+
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${clientPortalUrl}" style="background: #2988c8; color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block;">
+            Sign in to Client Portal
+          </a>
+        </div>
+
+        <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
+          If you did not request this change or have any concerns, please contact our team immediately.
+        </p>
+      </div>
+
+      <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; text-align: center;">
+        <p style="font-size: 12px; color: #94a3b8; margin: 0;">This is an automated security notification. Please do not reply to this email.</p>
+      </div>
+    </div>
+  `;
+
+  const text = `
+${storeName} — Password Changed by Super Admin
+
+Hello ${recipientName || 'Valued Client'},
+
+A Super Admin${superAdminName ? ` (${superAdminName})` : ''} has changed the password on your ${storeName} account.
+Please use the new credentials below to sign in:
+
+Username: ${username}
+New Password: ${newPassword}
+Password Type: ${isTemporary ? 'TEMPORARY (must change on first login)' : 'ACTIVE'}
+
+${isTemporary ? 'IMPORTANT: You will be required to change this temporary password on your next login.' : 'You can continue using this password, or change it anytime from your profile settings.'}
+
+Sign in: ${clientPortalUrl}
+
+If you did not request this change or have any concerns, please contact our team immediately.
+
+This is an automated security notification. Please do not reply to this email.
+  `;
+
+  await transporter.sendMail({
+    from: `"${fromName}" <${fromEmail}>`,
+    replyTo: superAdminEmail ? { name: superAdminName || 'Super Admin', address: superAdminEmail } : undefined,
+    to: recipientEmail,
+    subject,
+    text,
+    html,
+  });
+}

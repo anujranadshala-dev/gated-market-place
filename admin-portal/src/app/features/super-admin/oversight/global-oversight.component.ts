@@ -8,6 +8,7 @@ import { Store, StoreTier, StoreStatus, CreateStoreDto } from '../../../core/mod
 import { Product, GatedAccessTier } from '../../../core/models/product.model';
 import { CustomerInvitation } from '../../../core/models/invitation.model';
 import { StatusBadgeComponent } from '../../../shared/components/badge/status-badge.component';
+import template from './global-oversight.component.html?raw';
 
 /**
  * Super Admin Omnipotent Global Oversight Component
@@ -18,7 +19,7 @@ import { StatusBadgeComponent } from '../../../shared/components/badge/status-ba
   selector: 'app-global-oversight',
   standalone: true,
   imports: [CommonModule, FormsModule, StatusBadgeComponent],
-  templateUrl: './global-oversight.component.html',
+  template,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalOversightComponent {
@@ -43,6 +44,12 @@ export class GlobalOversightComponent {
   readonly modalIsTemp = signal<boolean>(true);
   readonly modalShowPassword = signal<boolean>(false);
   readonly revealedPasswords = signal<Record<string, boolean>>({});
+
+  // Store Admin Password Modal Signals
+  readonly isStoreAdminPasswordModalOpen = signal<boolean>(false);
+  readonly selectedStoreForAdminPassword = signal<Store | null>(null);
+  readonly storeAdminNewPassword = signal<string>('');
+  readonly storeAdminShowPassword = signal<boolean>(false);
 
   // Computed filtered products based on selected store and search query
   readonly filteredProducts = computed<Product[]>(() => {
@@ -73,7 +80,9 @@ export class GlobalOversightComponent {
     const query = this.clientSearchQuery().trim().toLowerCase();
     let list = this.invitationState.invitations();
 
-    if (storeFilter !== 'ALL') {
+    if (storeFilter === 'ADMIN') {
+      list = list.filter((inv) => inv.storeName === 'Admin Portal');
+    } else if (storeFilter !== 'ALL') {
       list = list.filter((inv) => inv.storeId === storeFilter);
     }
 
@@ -162,6 +171,36 @@ export class GlobalOversightComponent {
     this.selectedAccountForPassword.set(null);
   }
 
+  public openStoreAdminPasswordModal(store: Store): void {
+    this.selectedStoreForAdminPassword.set(store);
+    this.storeAdminNewPassword.set('');
+    this.storeAdminShowPassword.set(false);
+    this.isStoreAdminPasswordModalOpen.set(true);
+  }
+
+  public closeStoreAdminPasswordModal(): void {
+    this.isStoreAdminPasswordModalOpen.set(false);
+    this.selectedStoreForAdminPassword.set(null);
+  }
+
+  public async saveStoreAdminPassword(): Promise<void> {
+    const store = this.selectedStoreForAdminPassword();
+    const pwd = this.storeAdminNewPassword().trim();
+
+    if (!store || !pwd) {
+      this.showToast('Please enter a valid password.');
+      return;
+    }
+
+    try {
+      await this.storeState.changeAdminPassword(store.ownerEmail, pwd);
+      this.showToast(`Password for ${store.ownerName} updated successfully!`);
+      this.closeStoreAdminPasswordModal();
+    } catch (error: any) {
+      this.showToast(error.error?.message || 'Failed to update store admin password.');
+    }
+  }
+
   public generateModalTempPassword(): void {
     const account = this.selectedAccountForPassword();
     const newTemp = this.invitationState.generateSecureTempPassword(account?.storeName);
@@ -169,24 +208,36 @@ export class GlobalOversightComponent {
     this.modalIsTemp.set(true);
   }
 
-  public saveNewPassword(): void {
+  public async saveNewPassword(): Promise<void> {
     const account = this.selectedAccountForPassword();
     const pwd = this.modalNewPassword().trim();
 
-    if (!account || !pwd) {
+    if (!account || !pwd || !account.id) {
       this.showToast('Please enter a valid password.');
       return;
     }
 
-    this.invitationState.changeClientPassword(
-      account.id,
-      pwd,
-      this.modalIsTemp(),
-      false
-    );
-
-    this.showToast(`Password for ${account.username} successfully updated!`);
-    this.closePasswordModal();
+    try {
+      let emailSent = false;
+      if (account.storeName === 'Admin Portal') {
+        await this.storeState.changeAdminPassword(account.recipientEmail, pwd);
+        emailSent = true;
+      } else {
+        const result: any = await this.invitationState.changeClientPasswordApi(
+          account.id,
+          pwd,
+          this.modalIsTemp()
+        );
+        emailSent = result?.emailSent ?? true;
+      }
+      const emailSuffix = emailSent
+        ? ' Notification email with new credentials sent.'
+        : '';
+      this.showToast(`Password for ${account.username} updated.${emailSuffix}`);
+      this.closePasswordModal();
+    } catch (error: any) {
+      this.showToast(error.error?.message || 'Failed to update password.');
+    }
   }
 
   // --- Store Operations ---

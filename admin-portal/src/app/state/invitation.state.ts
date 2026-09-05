@@ -5,6 +5,7 @@ import {
   CustomerInvitation,
   CustomerTier,
   SendInvitationDto,
+  AccountRole,
   calculateCustomerTier,
   getCustomerTierProgress,
 } from '../core/models/invitation.model';
@@ -15,17 +16,19 @@ const API_BASE_URL = 'http://localhost:5000/api';
 
 export interface AdminClientUser {
   id: string;
+  type: 'CLIENT' | 'ADMIN';
   username: string;
   email: string;
   fullName: string;
-  accessibleStores: string[];
+  role: string;
+  status: string;
+  assignedTier: string;
   totalSpent: number;
   hasVipBlackSubscription: boolean;
   subscriptionPlan: string;
-  assignedTier: string;
-  status: string;
   tempPassword?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 @Injectable({
@@ -76,33 +79,35 @@ export class InvitationState {
 
     try {
       const response = await firstValueFrom(
-        this.http.get<{ clientUsers: AdminClientUser[] }>(`${API_BASE_URL}/admin/clients`, { withCredentials: true })
+        this.http.get<{ users: AdminClientUser[] }>(`${API_BASE_URL}/admin/users`, { withCredentials: true })
       );
 
-      if (response?.clientUsers) {
-        const mapped: CustomerInvitation[] = response.clientUsers.map((u) => ({
-          id: u.id,
-          storeId: '',
-          storeName: '',
-          recipientEmail: u.email,
-          recipientName: u.fullName,
-          username: u.username,
-          tempPassword: '',
-          isTempPassword: u.status === 'Pending First Login',
-          mustChangePassword: u.status === 'Pending First Login',
-          passwordLastChangedAt: undefined,
-          totalSpend: u.totalSpent,
-          hasVipBlackSubscription: u.hasVipBlackSubscription,
-          subscriptionPlan: u.subscriptionPlan as 'MONTHLY' | 'ANNUAL' | 'NONE',
-          assignedTier: u.assignedTier as CustomerTier,
-          inviteCode: u.username,
-          customMessage: undefined,
-          status: u.status as CustomerInvitation['status'],
-          sentByUserId: '',
-          sentAt: u.createdAt,
-        }));
-        this._invitations.set(mapped);
-      }
+if (response?.users) {
+      const mapped: CustomerInvitation[] = response.users.map((u) => ({
+        id: u.id,
+        storeId: '',
+        storeName: u.type === 'ADMIN' ? 'Admin Portal' : '',
+        recipientEmail: u.email,
+        recipientName: u.fullName,
+        username: u.username,
+        tempPassword: u.tempPassword || '',
+        isTempPassword: u.status === 'Pending First Login',
+        mustChangePassword: u.status === 'Pending First Login',
+        passwordLastChangedAt: undefined,
+        totalSpend: u.totalSpent,
+        hasVipBlackSubscription: u.hasVipBlackSubscription,
+        subscriptionPlan: u.subscriptionPlan as 'MONTHLY' | 'ANNUAL' | 'NONE',
+        assignedTier: u.assignedTier as CustomerTier,
+        inviteCode: u.username,
+        customMessage: undefined,
+        status: u.status as CustomerInvitation['status'],
+        sentByUserId: '',
+        sentAt: u.createdAt,
+        hasPlainPassword: !!u.tempPassword,
+        role: (u.role as AccountRole) || (u.type === 'ADMIN' ? 'SUPER_ADMIN' : 'CUSTOMER'),
+      }));
+      this._invitations.set(mapped);
+    }
     } catch (error) {
       console.error('Error fetching client users:', error);
       this._invitations.set([]);
@@ -151,6 +156,7 @@ export class InvitationState {
       status: 'Pending First Login',
       sentByUserId: this.authStore.user()?.id || 'usr_unknown',
       sentAt: new Date().toISOString(),
+      hasPlainPassword: !!(created.tempPassword || dto.tempPassword),
     };
 
     this._invitations.update((accounts) => [newAccount, ...accounts]);
@@ -221,6 +227,34 @@ export class InvitationState {
     );
   }
 
+  public async changeClientPasswordApi(accountId: string, newPassword: string, markAsTemp: boolean = false): Promise<{ emailSent: boolean }> {
+    const response = await firstValueFrom(
+      this.http.put<{ message: string; tempPassword: string; status: string; emailSent?: boolean }>(
+        `${API_BASE_URL}/admin/clients/${accountId}/change-password`,
+        { newPassword, markAsTemp, sendEmail: true },
+        { withCredentials: true }
+      )
+    );
+
+    this._invitations.update((accounts) =>
+      accounts.map((acc) => {
+        if (acc.id === accountId) {
+          return {
+            ...acc,
+            tempPassword: newPassword,
+            isTempPassword: markAsTemp,
+            passwordLastChangedAt: new Date().toISOString(),
+            status: markAsTemp ? ('Pending First Login' as const) : ('Active' as const),
+            hasPlainPassword: true,
+          };
+        }
+        return acc;
+      })
+    );
+
+    return { emailSent: response?.emailSent ?? true };
+  }
+
   public changeClientPassword(accountId: string, newPassword: string, markAsTemp: boolean = false): void {
     this._invitations.update((accounts) =>
       accounts.map((acc) => {
@@ -231,6 +265,7 @@ export class InvitationState {
             isTempPassword: markAsTemp,
             passwordLastChangedAt: new Date().toISOString(),
             status: 'Active' as const,
+            hasPlainPassword: true,
           };
         }
         return acc;

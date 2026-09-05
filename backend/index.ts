@@ -21,23 +21,15 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// Body parser
 app.use(express.json());
-
-// Cookie parser
 app.use(cookieParser());
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello World!");
 });
 
-// Mount admin routes
 app.use('/api', adminRoutes);
-
-// Mount admin client management routes
 app.use('/api/admin', adminClientRoutes);
-
-// Mount client user routes
 app.use('/api/client', clientRoutes);
 
 const PORT = process.env.PORT || 5000;

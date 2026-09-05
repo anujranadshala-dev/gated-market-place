@@ -12,7 +12,7 @@
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Omnipotent Global Oversight</h1>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Omnipotent Global Oversight Console</h1>
       <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
         Centralized multi-tenant administration: create, edit, or delete any Store, Product, or Client across the platform.
       </p>
@@ -106,34 +106,43 @@
             </div>
 
             <!-- Card Actions -->
-            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div class="flex items-center space-x-2">
-                <button
-                  (click)="toggleStoreStatus(store.id, store.status)"
-                  [class.text-rose-600]="store.status === 'ACTIVE'"
-                  [class.dark:text-rose-400]="store.status === 'ACTIVE'"
-                  [class.text-emerald-600]="store.status !== 'ACTIVE'"
-                  [class.dark:text-emerald-400]="store.status !== 'ACTIVE'"
-                  class="text-xs font-semibold hover:underline"
-                >
-                  {{ store.status === 'ACTIVE' ? 'Suspend Store' : 'Reactivate Store' }}
-                </button>
-                <span class="text-slate-300 dark:text-slate-700">•</span>
-                <button
-                  (click)="promptDelete('STORE', store.id, store.name)"
-                  class="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition"
-                >
-                  Delete
-                </button>
-              </div>
+              <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <button
+                    (click)="toggleStoreStatus(store.id, store.status)"
+                    [class.text-rose-600]="store.status === 'ACTIVE'"
+                    [class.dark:text-rose-400]="store.status === 'ACTIVE'"
+                    [class.text-emerald-600]="store.status !== 'ACTIVE'"
+                    [class.dark:text-emerald-400]="store.status !== 'ACTIVE'"
+                    class="text-xs font-semibold hover:underline"
+                  >
+                    {{ store.status === 'ACTIVE' ? 'Suspend Store' : 'Reactivate Store' }}
+                  </button>
+                  <span class="text-slate-300 dark:text-slate-700">•</span>
+                  <button
+                    (click)="promptDelete('STORE', store.id, store.name)"
+                    class="text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
 
-              <button
-                (click)="openEditStoreModal(store)"
-                class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition"
-              >
-                Edit Store Entity
-              </button>
-            </div>
+                <div class="flex items-center space-x-2">
+                  <button
+                    (click)="openStoreAdminPasswordModal(store)"
+                    class="px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 text-xs font-semibold transition"
+                    title="Change Store Admin Password"
+                  >
+                    Change Admin Password
+                  </button>
+                  <button
+                    (click)="openEditStoreModal(store)"
+                    class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition"
+                  >
+                    Edit Store Entity
+                  </button>
+                </div>
+              </div>
           </div>
         }
       </div>
@@ -281,8 +290,8 @@
     <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Gated VIP Patron Registry & Credentials</h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400">All registered verified patrons across all merchant storefronts with username & password oversight.</p>
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">All Users Registry & Credentials</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">All registered users across admin and client portals with username & password oversight.</p>
         </div>
         <div class="flex items-center space-x-2">
           <span class="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
@@ -306,7 +315,8 @@
             (change)="setClientStoreFilter($any($event.target).value)"
             class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-xs cursor-pointer"
           >
-            <option value="ALL">🌐 All Stores ({{ storeState.stores().length }})</option>
+            <option value="ALL">🌐 All Users ({{ invitationState.invitations().length }})</option>
+            <option value="ADMIN">👑 Admin Portal Users</option>
             @for (store of storeState.stores(); track store.id) {
               <option [value]="store.id">{{ store.name }}</option>
             }
@@ -336,8 +346,8 @@
       <!-- Clients Table -->
       @if (filteredInvitations().length === 0) {
         <div class="p-12 text-center text-slate-500 dark:text-slate-400 text-xs bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 space-y-2">
-          <p class="font-semibold text-slate-700 dark:text-slate-300">No client records found</p>
-          <p>No patrons match the selected store filter or search keyword.</p>
+          <p class="font-semibold text-slate-700 dark:text-slate-300">No user records found</p>
+          <p>No patrons or admins match the selected filter or search keyword.</p>
           @if (clientStoreFilter() !== 'ALL' || clientSearchQuery()) {
             <button
               (click)="setClientStoreFilter('ALL'); clientSearchQuery.set('')"
@@ -354,9 +364,9 @@
               <tr class="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                 <th class="py-3 px-4 font-semibold">Patron Name & Email</th>
                 <th class="py-3 px-4 font-semibold">Username</th>
+                <th class="py-3 px-4 font-semibold">Type</th>
                 <th class="py-3 px-4 font-semibold">Storefront Gating Access</th>
                 <th class="py-3 px-4 font-semibold">Dynamic Tier & Spend</th>
-                <th class="py-3 px-4 font-semibold">Password & Credential Status</th>
                 <th class="py-3 px-4 font-semibold">Account State</th>
                 <th class="py-3 px-4 font-semibold text-right">Super Admin Actions</th>
               </tr>
@@ -378,7 +388,23 @@
                   </td>
 
                   <td class="py-3.5 px-4">
-                    <p class="text-slate-800 dark:text-slate-200 font-medium">{{ invite.storeName }}</p>
+                    @if (invite.role === 'SUPER_ADMIN') {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                        SUPER ADMIN
+                      </span>
+                    } @else if (invite.role === 'STORE_OWNER' || invite.storeName === 'Admin Portal') {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                        STORE ADMIN
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        CLIENT
+                      </span>
+                    }
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <p class="text-slate-800 dark:text-slate-200 font-medium">{{ invite.storeName || 'N/A' }}</p>
                     <p class="text-[10px] font-mono text-slate-500 dark:text-slate-400">{{ invite.storeId }}</p>
                   </td>
 
@@ -397,50 +423,11 @@
                   </td>
 
                   <td class="py-3.5 px-4">
-                    <div class="space-y-1">
-                      <div class="flex items-center space-x-2">
-                        @if (revealedPasswords()[invite.id]) {
-                          <span class="font-mono text-[11px] text-amber-700 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800/60">
-                            {{ invite.tempPassword }}
-                          </span>
-                        } @else {
-                          <span class="font-mono text-slate-500 dark:text-slate-400 text-xs">••••••••</span>
-                        }
-                        <button
-                          (click)="toggleTableRowPassword(invite.id)"
-                          class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
-                          title="Toggle Password View"
-                        >
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                          </svg>
-                        </button>
-                      </div>
-                      @if (invite.isTempPassword) {
-                        <p class="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Temporary Password</p>
-                      } @else {
-                        <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Active Password</p>
-                      }
-                    </div>
-                  </td>
-
-                  <td class="py-3.5 px-4">
                     <app-status-badge [status]="invite.status"></app-status-badge>
                   </td>
 
                   <td class="py-3.5 px-4 text-right">
                     <div class="flex items-center justify-end space-x-2">
-                      <button
-                        (click)="copyFullCredentials(invite)"
-                        title="Copy Full Credentials"
-                        class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition"
-                      >
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
-                        </svg>
-                      </button>
-
                       <button
                         (click)="openPasswordModal(invite)"
                         title="Change / Reset Password"
@@ -723,7 +710,7 @@
               <span class="text-slate-700 dark:text-slate-300 font-medium">Mark as temporary credentials</span>
             </label>
             <p class="text-[11px] text-slate-500 dark:text-slate-400 px-1">
-              User can sign in immediately with these credentials and change password anytime later.
+              The new credentials will be emailed to <span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">{{ account.recipientEmail }}</span>. User can sign in immediately and change password anytime later.
             </p>
           </div>
         </div>
@@ -770,6 +757,81 @@
             class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm shadow-rose-600/20 transition"
           >
             Confirm Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal: Change Store Admin Password -->
+  @if (isStoreAdminPasswordModalOpen() && selectedStoreForAdminPassword(); as store) {
+    <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+      <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Change Store Admin Password</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Store: <span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">{{ store.name }}</span> ({{ store.ownerEmail }})</p>
+            </div>
+          </div>
+          <button
+            (click)="closeStoreAdminPasswordModal()"
+            class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">New Password</label>
+            <div class="relative">
+              <input
+                [type]="storeAdminShowPassword() ? 'text' : 'password'"
+                [value]="storeAdminNewPassword()"
+                (input)="storeAdminNewPassword.set($any($event.target).value)"
+                class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-3 pr-10 py-2.5 font-mono text-slate-900 dark:text-slate-100 font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              />
+              <button
+                type="button"
+                (click)="storeAdminShowPassword.update(v => !v)"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                @if (storeAdminShowPassword()) {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
+                  </svg>
+                } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268 2.943-9.542-7z"></path>
+                  </svg>
+                }
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Minimum 6 characters.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button
+            type="button"
+            (click)="closeStoreAdminPasswordModal()"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            (click)="saveStoreAdminPassword()"
+            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-sm shadow-indigo-600/20"
+          >
+            Update Password
           </button>
         </div>
       </div>

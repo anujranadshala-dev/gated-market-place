@@ -286,12 +286,14 @@ export const authSlice = createSlice({
         state.isAuthenticated = true;
         state.loginError = null;
         state.verificationError = null;
+        state.initializing = false;
         state.sessionExpiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
       })
       .addCase(loginWithCredentials.rejected, (state, action) => {
         state.loginLoading = false;
         state.loginError = action.payload as string;
         state.isAuthenticated = false;
+        state.initializing = false;
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.currentUser = null;

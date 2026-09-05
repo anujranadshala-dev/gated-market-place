@@ -24,12 +24,14 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { toggleTheme } from '../../store/slices/themeSlice';
 import { toggleCartDrawer } from '../../store/slices/cartSlice';
 import { setActiveStore } from '../../store/slices/tenantSlice';
-import { logout } from '../../store/slices/authSlice';
+import { logoutUser } from '../../store/slices/authSlice';
+import { useToast } from '../../hooks/useToast';
 import { getUserGatedTier, getUserLifetimeSpend, GATED_TIERS } from '../../utils/tierUtils';
 
 export const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { showSuccess } = useToast();
   const location = useLocation();
   const isDark = useAppSelector((state) => state.theme.isDark);
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -286,9 +288,10 @@ export const Header: React.FC = () => {
                       </button>
 
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           setIsUserMenuOpen(false);
-                          dispatch(logout());
+                          await dispatch(logoutUser()).unwrap();
+                          showSuccess('Logged out successfully');
                           navigate('/login');
                         }}
                         className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center space-x-2 cursor-pointer"

@@ -12,8 +12,9 @@ import { UserProfileView } from './components/profile/UserProfileView';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { CheckoutModal } from './components/checkout/CheckoutModal';
 import { OrderTrackingModal } from './components/orders/OrderTrackingModal';
+import { ToastContainer } from './components/ui/ToastContainer';
 import { setActiveStore } from './store/slices/tenantSlice';
-import { fetchCurrentUser, logout } from './store/slices/authSlice';
+import { fetchCurrentUser, logoutUser } from './store/slices/authSlice';
 import { fetchStores, fetchProducts } from './store/slices/tenantSlice';
 import { fetchOrders } from './store/slices/orderSlice';
 
@@ -82,8 +83,8 @@ export default function App() {
     }
   }, [isAuthenticated, currentUser, location.pathname, navigate]);
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    await dispatch(logoutUser()).unwrap();
     dispatch(setActiveStore(null));
     navigate('/login', { replace: true });
   };
@@ -149,6 +150,9 @@ export default function App() {
       <CartDrawer />
       <CheckoutModal />
       <OrderTrackingModal />
+
+      {/* Toast Notifications */}
+      <ToastContainer />
 
       {/* Corporate Footer */}
       <Footer />

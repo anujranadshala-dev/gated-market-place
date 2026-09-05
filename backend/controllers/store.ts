@@ -1,5 +1,7 @@
 import store, { IStore } from '../models/store.js'
 import AdminUser, { IAdminUser } from '../models/AdminUser.js';
+import product, { IProduct } from '../models/product.js';
+import ClientUser from '../models/clientUser.js';
 import { AuthRequest } from '../middleware/auth.js';
 import { Request, Response } from 'express'
 
@@ -110,6 +112,11 @@ export async function deleteStore(req: AuthRequest, res: Response) {
             }
         }
 
+        await product.deleteMany({ storeId });
+        await ClientUser.updateMany(
+            { accessibleStoresId: storeId },
+            { $pull: { accessibleStoresId: storeId } }
+        );
         await store.findByIdAndDelete(storeId);
 
         res.status(200).json({ message: 'Store deleted successfully.' });

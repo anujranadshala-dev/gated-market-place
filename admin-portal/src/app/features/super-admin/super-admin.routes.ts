@@ -18,19 +18,25 @@ export const SUPER_ADMIN_ROUTES: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./dashboard/super-admin-dashboard.component').then((m) => m.SuperAdminDashboardComponent),
+          import('./dashboard/super-admin-dashboard.component').then(
+            (m) => m.SuperAdminDashboardComponent
+          ),
         title: 'Super Admin Command - GatedPulse',
       },
       {
         path: 'oversight',
         loadComponent: () =>
-          import('./oversight/global-oversight.component').then((m) => m.GlobalOversightComponent),
+          import('./oversight/global-oversight.component').then(
+            (m) => m.GlobalOversightComponent
+          ),
         title: 'Global Oversight - GatedPulse',
       },
       {
         path: 'logistics',
         loadComponent: () =>
-          import('./logistics/logistics-board.component').then((m) => m.LogisticsBoardComponent),
+          import('./logistics/logistics-board.component').then(
+            (m) => m.LogisticsBoardComponent
+          ),
         title: 'Logistics Dispatch Board - GatedPulse',
       },
     ],

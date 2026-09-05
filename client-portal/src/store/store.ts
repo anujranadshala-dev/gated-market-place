@@ -5,6 +5,7 @@ import tenantReducer from './slices/tenantSlice';
 import cartReducer from './slices/cartSlice';
 import orderReducer from './slices/orderSlice';
 import themeReducer from './slices/themeSlice';
+import toastReducer from './slices/toastSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +13,8 @@ export const store = configureStore({
     tenant: tenantReducer,
     cart: cartReducer,
     order: orderReducer,
-    theme: themeReducer
+    theme: themeReducer,
+    toast: toastReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

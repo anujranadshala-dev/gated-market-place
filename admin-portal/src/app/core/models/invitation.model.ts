@@ -11,6 +11,7 @@
 
 export type InviteStatus = 'Active' | 'Password Changed' | 'Pending First Login' | 'Revoked' | 'Pending' | 'Accepted';
 export type CustomerTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'VIP_BLACK';
+export type AccountRole = 'SUPER_ADMIN' | 'STORE_OWNER' | 'CUSTOMER';
 
 export interface CustomerInvitation {
   id?: string;
@@ -23,7 +24,7 @@ export interface CustomerInvitation {
   isTempPassword: boolean;
   mustChangePassword: boolean;
   passwordLastChangedAt?: string;
-  
+
   // Spend & Subscription Based Tier Progression
   totalSpend: number;
   hasVipBlackSubscription: boolean;
@@ -40,6 +41,8 @@ export interface CustomerInvitation {
   acceptedAt?: string;
   allowedRedemptions?: number;
   redemptionCount?: number;
+  hasPlainPassword?: boolean;
+  role?: AccountRole;
 }
 
 export interface SendInvitationDto {

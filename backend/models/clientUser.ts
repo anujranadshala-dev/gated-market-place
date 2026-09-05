@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-// Interface for the nested Address object
 export interface IAddress {
   label: string;
   isDefault: boolean;
@@ -14,7 +13,6 @@ export interface IAddress {
   phone: string;
 }
 
-// Main User document interface
 export interface IClientUser extends Document {
   username: string;
   email: string;
@@ -37,7 +35,6 @@ export interface IClientUser extends Document {
   updatedAt: Date;
 }
 
-// Schema for the nested Address object
 const addressSchema = new Schema<IAddress>({
   label: { type: String, required: true },
   isDefault: { type: Boolean, default: false },

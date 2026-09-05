@@ -228,4 +228,14 @@ export class StoreState {
       throw error;
     }
   }
+
+  public async changeAdminPassword(adminEmail: string, newPassword: string): Promise<void> {
+    await firstValueFrom(
+      this.http.put<{ message: string }>(
+        `${API_BASE_URL}/admins/change-password`,
+        { email: adminEmail, newPassword },
+        { withCredentials: true }
+      )
+    );
+  }
 }

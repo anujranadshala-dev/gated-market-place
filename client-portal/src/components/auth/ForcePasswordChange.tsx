@@ -48,7 +48,6 @@ export const ForcePasswordChange: React.FC = () => {
 
     try {
       await dispatch(changeUserPasswordApi({
-        currentPassword: '',
         newPassword
       })).unwrap();
 

@@ -1,3 +1,5 @@
+import { hashPassword } from '../utils/crypto';
+
 const API_BASE = '/api/client';
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -8,15 +10,33 @@ async function handleResponse<T>(response: Response): Promise<T> {
     return response.json();
 }
 
+async function postWithHashedPassword<T>(url: string, data: any): Promise<T> {
+    const body = { ...data };
+    if (body.password) {
+        body.password = await hashPassword(body.password);
+    }
+    if (body.newPassword) {
+        body.newPassword = await hashPassword(body.newPassword);
+    }
+    if (body.currentPassword) {
+        body.currentPassword = await hashPassword(body.currentPassword);
+    }
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        credentials: 'include',
+    });
+    return handleResponse<T>(res);
+}
+
 export const api = {
     async login(usernameOrEmail: string, password: string) {
-        const res = await fetch(`${API_BASE}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usernameOrEmail, password }),
-            credentials: 'include',
-        });
-        return handleResponse<{ message: string; user: any }>(res);
+        return postWithHashedPassword<{ message: string; user: any }>(
+            `${API_BASE}/login`,
+            { usernameOrEmail, password }
+        );
     },
 
     async logout() {
@@ -45,13 +65,10 @@ export const api = {
     },
 
     async changePassword(currentPassword: string, newPassword: string) {
-        const res = await fetch(`${API_BASE}/password`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ currentPassword, newPassword }),
-            credentials: 'include',
-        });
-        return handleResponse<{ message: string }>(res);
+        return postWithHashedPassword<{ message: string }>(
+            `${API_BASE}/password`,
+            { currentPassword, newPassword }
+        );
     },
 
     async getStores() {

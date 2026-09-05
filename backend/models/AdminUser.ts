@@ -10,7 +10,7 @@ export interface IAdminUser extends Document {
     updatedAt: Date;
     lastLoginAt?: Date;
     passwordLastChangedAt?: Date;
-    avatarUrl: string
+    avatarUrl: string;
 }
 
 const adminUserSchema = new Schema<IAdminUser>({
@@ -27,7 +27,7 @@ const adminUserSchema = new Schema<IAdminUser>({
     passwordLastChangedAt: Date,
     avatarUrl: String
 }, {
-    timestamps: true, // Manages createdAt and updatedAt
+    timestamps: true,
 });
 
-export default mongoose.model<IAdminUser>('AdminUser', adminUserSchema);  
+export default mongoose.model<IAdminUser>('AdminUser', adminUserSchema);
