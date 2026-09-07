@@ -1,4 +1,3 @@
-import { hashPassword } from '../utils/crypto';
 
 const API_BASE = '/api/client';
 
@@ -10,22 +9,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
     return response.json();
 }
 
-async function postWithHashedPassword<T>(url: string, data: any): Promise<T> {
-    const body = { ...data };
-    if (body.password) {
-        body.password = await hashPassword(body.password);
-    }
-    if (body.newPassword) {
-        body.newPassword = await hashPassword(body.newPassword);
-    }
-    if (body.currentPassword) {
-        body.currentPassword = await hashPassword(body.currentPassword);
-    }
-
+async function postJson<T>(url: string, data: any): Promise<T> {
     const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(data),
         credentials: 'include',
     });
     return handleResponse<T>(res);
@@ -33,7 +21,7 @@ async function postWithHashedPassword<T>(url: string, data: any): Promise<T> {
 
 export const api = {
     async login(usernameOrEmail: string, password: string) {
-        return postWithHashedPassword<{ message: string; user: any }>(
+        return postJson<{ message: string; user: any }>(
             `${API_BASE}/login`,
             { usernameOrEmail, password }
         );
@@ -65,7 +53,7 @@ export const api = {
     },
 
     async changePassword(currentPassword: string, newPassword: string) {
-        return postWithHashedPassword<{ message: string }>(
+        return postJson<{ message: string }>(
             `${API_BASE}/password`,
             { currentPassword, newPassword }
         );

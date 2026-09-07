@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { AuthRequest } from '../middleware/auth.js';
-import { hashPassword } from '../utils/crypto.js';
 import { sendEmailVerificationEmail } from '../utils/email.js';
 import { logAudit } from '../utils/audit.js';
 import { isProduction } from '../utils/config.js';
@@ -35,7 +34,7 @@ export async function createAdminUser(req: Request, res: Response) {
         }
 
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(hashPassword(password), salt);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         const emailVerificationToken = crypto.randomBytes(32).toString('hex');
         const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -99,10 +98,18 @@ export async function loginAdminUser(req: Request, res: Response) {
         }
 
         let isMatch = await bcrypt.compare(password, user.password);
+        let isLegacyHash = false;
 
         if (!isMatch) {
             const hashedInput = crypto.createHash('sha256').update(password).digest('base64');
             isMatch = await bcrypt.compare(hashedInput, user.password);
+            isLegacyHash = isMatch;
+        }
+
+        if (!isMatch) {
+            const doubleHashedInput = crypto.createHash('sha256').update(crypto.createHash('sha256').update(password).digest('base64')).digest('base64');
+            isMatch = await bcrypt.compare(doubleHashedInput, user.password);
+            isLegacyHash = isLegacyHash || isMatch;
         }
 
         if (!isMatch) {
@@ -115,6 +122,12 @@ export async function loginAdminUser(req: Request, res: Response) {
             }
             await user.save({ timestamps: false });
             return res.status(401).json({ message: 'Invalid credentials.' });
+        }
+
+        if (isLegacyHash) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+            await user.save({ timestamps: false });
         }
 
         user.loginAttempts = 0;
@@ -259,7 +272,7 @@ export async function changeAdminPassword(req: AuthRequest, res: Response) {
         }
 
         const salt = await bcrypt.genSalt(10);
-        adminUser.password = await bcrypt.hash(hashPassword(newPassword), salt);
+        adminUser.password = await bcrypt.hash(newPassword, salt);
         await adminUser.save({ timestamps: false });
 
         logAudit('ADMIN_PASSWORD_CHANGED', adminUser._id.toString(), req.user!.role, {

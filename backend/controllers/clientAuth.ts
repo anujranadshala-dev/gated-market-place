@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import ClientUser, { IAddress } from '../models/clientUser.js';
 import { ClientAuthRequest } from '../middleware/clientAuth.js';
-import { hashPassword } from '../utils/crypto.js';
 import { isProduction } from '../utils/config.js';
 import { logAudit } from '../utils/audit.js';
 
@@ -30,10 +29,28 @@ export async function clientLogin(req: Request, res: Response) {
         }
 
         let isMatch = await bcrypt.compare(password, user.password || '');
+        let isLegacyHash = false;
 
         if (!isMatch) {
             const hashedInput = crypto.createHash('sha256').update(password).digest('base64');
             isMatch = await bcrypt.compare(hashedInput, user.password || '');
+            isLegacyHash = isMatch;
+        }
+
+        if (!isMatch) {
+            const doubleHashedInput = crypto.createHash('sha256').update(crypto.createHash('sha256').update(password).digest('base64')).digest('base64');
+            isMatch = await bcrypt.compare(doubleHashedInput, user.password || '');
+            isLegacyHash = isLegacyHash || isMatch;
+        }
+
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials.' });
+        }
+
+        if (isLegacyHash) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+            await user.save();
         }
 
         const payload = {
@@ -407,10 +424,17 @@ export async function changeClientPassword(req: ClientAuthRequest, res: Response
 
         if (currentPassword) {
             let isMatch = await bcrypt.compare(currentPassword, user.password || '');
+
             if (!isMatch) {
                 const hashedInput = crypto.createHash('sha256').update(currentPassword).digest('base64');
                 isMatch = await bcrypt.compare(hashedInput, user.password || '');
             }
+
+            if (!isMatch) {
+                const doubleHashedInput = crypto.createHash('sha256').update(crypto.createHash('sha256').update(currentPassword).digest('base64')).digest('base64');
+                isMatch = await bcrypt.compare(doubleHashedInput, user.password || '');
+            }
+
             if (!isMatch) {
                 return res.status(401).json({ message: 'Current password is incorrect.' });
             }
@@ -421,7 +445,7 @@ export async function changeClientPassword(req: ClientAuthRequest, res: Response
         }
 
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(hashPassword(newPassword), salt);
+        user.password = await bcrypt.hash(newPassword, salt);
         user.passwordLastChangedAt = new Date();
         await user.save();
 

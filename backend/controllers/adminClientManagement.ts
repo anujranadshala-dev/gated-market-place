@@ -5,7 +5,6 @@ import AdminUser from '../models/AdminUser.js';
 import store, { IStore } from '../models/store.js';
 import { AuthRequest } from '../middleware/auth.js';
 import { sendClientCredentialsEmail, sendPasswordChangedBySuperAdminEmail } from '../utils/email.js';
-import { hashPassword } from '../utils/crypto.js';
 import { logAudit } from '../utils/audit.js';
 
 function generateTempPassword(): string {
@@ -49,7 +48,7 @@ export async function createClientUser(req: AuthRequest, res: Response) {
         const finalUsername = username || suggestUsername(email, fullName);
         const tempPassword = generateTempPassword();
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(hashPassword(tempPassword), salt);
+        const hashedPassword = await bcrypt.hash(tempPassword, salt);
 
         const newClientUser = new ClientUser({
             username: finalUsername,
@@ -258,7 +257,7 @@ export async function resetClientPassword(req: AuthRequest, res: Response) {
 
         const newTempPassword = generateTempPassword();
         const salt = await bcrypt.genSalt(10);
-        clientUser.password = await bcrypt.hash(hashPassword(newTempPassword), salt);
+        clientUser.password = await bcrypt.hash(newTempPassword, salt);
         clientUser.passwordLastChangedAt = undefined;
         clientUser.status = 'Pending First Login';
         await clientUser.save();
@@ -313,7 +312,7 @@ export async function changeClientPassword(req: AuthRequest, res: Response) {
         }
 
         const salt = await bcrypt.genSalt(10);
-        clientUser.password = await bcrypt.hash(hashPassword(newPassword), salt);
+        clientUser.password = await bcrypt.hash(newPassword, salt);
         clientUser.passwordLastChangedAt = new Date();
         clientUser.status = markAsTemp ? 'Pending First Login' : 'Active';
         await clientUser.save();
