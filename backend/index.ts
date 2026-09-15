@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import helmet from 'helmet';
+import * as helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
-import rateLimit from 'express-rate-limit';
 import csrf from 'csurf';
 import adminRoutes from './routes/route.js';
 import clientRoutes from './routes/clientRoutes.js';
@@ -27,7 +27,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(helmet({
+app.use(helmet.default({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
