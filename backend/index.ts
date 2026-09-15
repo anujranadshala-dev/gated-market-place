@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import * as helmet from 'helmet';
+import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import csrf from 'csurf';
@@ -27,7 +27,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(helmet.default({
+app.use((helmet as any)({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
