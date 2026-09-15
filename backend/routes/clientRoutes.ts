@@ -22,7 +22,7 @@ import {
     getClientOrders,
     createClientOrder
 } from '../controllers/clientOrder.js';
-import rateLimit from 'express-rate-limit';
+import {rateLimit} from 'express-rate-limit';
 
 const router = Router();
 

@@ -15,7 +15,7 @@ import csrf from 'csurf';
 import { createStore, getStore, updateStore, deleteStore } from '../controllers/store.js'
 import { createProduct, getProduct, updateProduct, deleteProduct } from '../controllers/products.js'
 import { createOrder, getOrder, updateOrder, deleteOrder } from '../controllers/orders.js'
-import rateLimit from 'express-rate-limit';
+import {rateLimit} from 'express-rate-limit';
 
 const router = Router();
 
