@@ -11,7 +11,7 @@ export const config = {
         fromName: process.env.SMTP_FROM_NAME,
         fromEmail: process.env.SMTP_FROM_EMAIL,
     },
-    corsOrigins: process.env.CORS_ORIGINS?.split(',').map(o => o.trim()) || ['http://localhost:3000', 'http://localhost:3001'],
-    clientPortalUrl: process.env.CLIENT_PORTAL_URL || 'http://localhost:3001',
-    adminPortalUrl: process.env.ADMIN_PORTAL_URL || 'http://localhost:3000',
+    corsOrigins: process.env.CORS_ORIGINS?.split(',').map(o => o.trim()),
+    clientPortalUrl: process.env.CLIENT_PORTAL_URL,
+    adminPortalUrl: process.env.ADMIN_PORTAL_URL,
 };
