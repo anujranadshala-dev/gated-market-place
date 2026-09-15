@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { LoginCredentials, SignupPayload, User, UserRole, BackendLoginResponse, BackendMeResponse, BackendRegisterResponse } from './auth.models';
 import { ToastService } from '../services/toast.service';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 @Injectable({
   providedIn: 'root',
