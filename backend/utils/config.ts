@@ -17,6 +17,13 @@ function buildCorsOrigins(): string[] {
     return [...new Set(origins)];
 }
 
+export function getCookieOptions() {
+    if (!isProduction) {
+        return { httpOnly: true, sameSite: 'lax' as const, secure: false };
+    }
+    return { httpOnly: true, sameSite: 'none' as const, secure: true };
+}
+
 export const config = {
     jwtSecret: process.env.JWT_SECRET,
     mongoUri: process.env.MONGO_DB,

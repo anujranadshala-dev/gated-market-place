@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import { AuthRequest } from '../middleware/auth.js';
 import { sendEmailVerificationEmail } from '../utils/email.js';
 import { logAudit } from '../utils/audit.js';
-import { isProduction } from '../utils/config.js';
+import { getCookieOptions } from '../utils/config.js';
 
 const ACCOUNT_LOCKOUT_THRESHOLD = 5;
 const ACCOUNT_LOCKOUT_DURATION = 15 * 60 * 1000;
@@ -158,17 +158,15 @@ export async function loginAdminUser(req: Request, res: Response) {
         const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: accessTokenExpiresIn });
         const refreshToken = jwt.sign({ ...payload, type: 'refresh' }, process.env.JWT_SECRET, { expiresIn: refreshTokenExpiresIn });
 
+        const cookieOptions = getCookieOptions();
+
         res.cookie('token', accessToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: isProduction,
+            ...cookieOptions,
             maxAge: 15 * 60 * 1000,
         });
 
         res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: isProduction,
+            ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -215,17 +213,15 @@ export async function refreshAdminToken(req: Request, res: Response) {
         const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
         const newRefreshToken = jwt.sign({ ...payload, type: 'refresh' }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
+        const cookieOptions = getCookieOptions();
+
         res.cookie('token', newAccessToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: isProduction,
+            ...cookieOptions,
             maxAge: 15 * 60 * 1000,
         });
 
         res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: isProduction,
+            ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -237,18 +233,16 @@ export async function refreshAdminToken(req: Request, res: Response) {
 }
 
 export async function logoutAdminUser(req: Request, res: Response) {
+    const cookieOptions = getCookieOptions();
+
     res.cookie('token', '', {
-        httpOnly: true,
+        ...cookieOptions,
         expires: new Date(0),
-        sameSite: 'strict',
-        secure: isProduction,
     });
 
     res.cookie('refreshToken', '', {
-        httpOnly: true,
+        ...cookieOptions,
         expires: new Date(0),
-        sameSite: 'strict',
-        secure: isProduction,
     });
 
     res.status(200).json({ message: 'Logout successful.' });
