@@ -8,7 +8,6 @@ import { Store, StoreTier, StoreStatus, CreateStoreDto } from '../../../core/mod
 import { Product, GatedAccessTier } from '../../../core/models/product.model';
 import { CustomerInvitation } from '../../../core/models/invitation.model';
 import { StatusBadgeComponent } from '../../../shared/components/badge/status-badge.component';
-import template from './global-oversight.component.html?raw';
 
 /**
  * Super Admin Omnipotent Global Oversight Component
@@ -19,7 +18,7 @@ import template from './global-oversight.component.html?raw';
   selector: 'app-global-oversight',
   standalone: true,
   imports: [CommonModule, FormsModule, StatusBadgeComponent],
-  template,
+  templateUrl: './global-oversight.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalOversightComponent {
