@@ -18,6 +18,7 @@ export class AuthStore {
   private readonly _isLoading = signal<boolean>(false);
   private readonly _authError = signal<string | null>(null);
   private _autoLoginPromise: Promise<boolean> | null = null;
+  private _loggingOut = false;
 
   readonly user = this._currentUser.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
@@ -174,6 +175,8 @@ export class AuthStore {
   }
 
   public logout(): void {
+    if (this._loggingOut) return;
+    this._loggingOut = true;
     this.http.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true }).subscribe({
       next: () => {
         this._currentUser.set(null);
@@ -183,6 +186,9 @@ export class AuthStore {
       error: () => {
         this._currentUser.set(null);
         this.router.navigate(['/login']);
+      },
+      complete: () => {
+        this._loggingOut = false;
       },
     });
   }

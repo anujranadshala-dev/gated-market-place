@@ -81,6 +81,11 @@ app.use('/api/client', clientRoutes);
 
 app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error(`${new Date().toISOString()} - ${err.message}`, { stack: err.stack, method: req.method, path: req.path, ip: req.ip });
+    const origin = req.headers.origin;
+    if (origin && corsOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
     res.status(err.status || 500).json({ message: err.message || 'Internal server error.' });
 });
 
