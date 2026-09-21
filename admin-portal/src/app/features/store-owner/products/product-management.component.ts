@@ -106,8 +106,8 @@ export class ProductManagementComponent {
           images: [this.formImageUrl() || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80'],
         });
         this.showToast('Product specifications updated successfully.');
-      } catch (error) {
-        this.showToast('Failed to update product. Please try again.');
+      } catch (error: any) {
+        this.showToast(error?.error?.message || 'Failed to update product. Please try again.');
       }
     } else {
       const dto: CreateProductDto = {
@@ -126,8 +126,8 @@ export class ProductManagementComponent {
       try {
         await this.productState.addProduct(dto);
         this.showToast('New gated catalog product published.');
-      } catch (error) {
-        this.showToast('Failed to create product. Please try again.');
+      } catch (error: any) {
+        this.showToast(error?.error?.message || 'Failed to create product. Please try again.');
       }
     }
 
@@ -146,8 +146,8 @@ export class ProductManagementComponent {
     try {
       await this.productState.deleteProduct(id);
       this.showToast('Product successfully removed from catalog.');
-    } catch (error) {
-      this.showToast('Failed to delete product. Please try again.');
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to delete product. Please try again.');
     }
     this.deleteConfirmId.set(null);
   }

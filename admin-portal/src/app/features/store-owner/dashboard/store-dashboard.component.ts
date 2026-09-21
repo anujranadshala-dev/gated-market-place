@@ -49,8 +49,8 @@ export class StoreDashboardComponent {
       });
       this.isEditingGating.set(false);
       this.showToast('Gating access criteria updated successfully.');
-    } catch (error) {
-      this.showToast('Failed to update gating settings. Please try again.');
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to update gating settings. Please try again.');
     }
   }
 
@@ -60,7 +60,11 @@ export class StoreDashboardComponent {
   }
 
   public async onPackOrder(order: Order): Promise<void> {
-    await this.orderState.markAsPacked(order.id);
-    this.showToast(`Order ${order.orderNumber} marked as 'Packed'. Handoff sent to Super Admin Logistics.`);
+    try {
+      await this.orderState.markAsPacked(order.id);
+      this.showToast(`Order ${order.orderNumber} marked as 'Packed'. Handoff sent to Super Admin Logistics.`);
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to pack order. Please try again.');
+    }
   }
 }

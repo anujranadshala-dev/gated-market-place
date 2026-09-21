@@ -227,8 +227,12 @@ export class CustomerInvitationComponent {
   }
 
   public async revokeAccount(id: string): Promise<void> {
-    await this.invitationState.deleteInvitation(id);
-    this.showToast('Client access revoked.');
+    try {
+      await this.invitationState.deleteInvitation(id);
+      this.showToast('Client access revoked.');
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to revoke client access. Please try again.');
+    }
   }
 
   public showToast(msg: string): void {

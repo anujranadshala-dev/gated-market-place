@@ -44,25 +44,37 @@ export class LogisticsBoardComponent {
     const order = this.dispatchingOrder();
     if (!order) return;
 
-    await this.orderState.markOutForDelivery(order.id, {
-      carrierName: this.carrierName(),
-      trackingNumber: this.trackingNumber(),
-      driverName: this.driverName(),
-      driverPhone: this.driverPhone(),
-    });
+    try {
+      await this.orderState.markOutForDelivery(order.id, {
+        carrierName: this.carrierName(),
+        trackingNumber: this.trackingNumber(),
+        driverName: this.driverName(),
+        driverPhone: this.driverPhone(),
+      });
 
-    this.showToast(`Order ${order.orderNumber} dispatched! Status changed to 'Out_for_Delivery'.`);
-    this.closeDispatchModal();
+      this.showToast(`Order ${order.orderNumber} dispatched! Status changed to 'Out_for_Delivery'.`);
+      this.closeDispatchModal();
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to dispatch order. Please try again.');
+    }
   }
 
   public async markAsOnTheWay(orderId: string): Promise<void> {
-    await this.orderState.markAsOnTheWay(orderId);
-    this.showToast(`Order is now 'On the way'.`);
+    try {
+      await this.orderState.markAsOnTheWay(orderId);
+      this.showToast(`Order is now 'On the way'.`);
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to update order status. Please try again.');
+    }
   }
 
   public async markAsDelivered(orderId: string, orderNumber: string): Promise<void> {
-    await this.orderState.markDelivered(orderId);
-    this.showToast(`Order ${orderNumber} fulfilled and marked as 'Delivered'.`);
+    try {
+      await this.orderState.markDelivered(orderId);
+      this.showToast(`Order ${orderNumber} fulfilled and marked as 'Delivered'.`);
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to mark order as delivered. Please try again.');
+    }
   }
 
   public showToast(msg: string): void {

@@ -288,8 +288,8 @@ export class GlobalOversightComponent {
           },
         });
         this.showToast('Store settings updated.');
-      } catch (error) {
-        this.showToast('Failed to update store. Please try again.');
+      } catch (error: any) {
+        this.showToast(error?.error?.message || 'Failed to update store. Please try again.');
       }
     } else {
       const dto: CreateStoreDto = {
@@ -307,8 +307,8 @@ export class GlobalOversightComponent {
       try {
         await this.storeState.createStore(dto);
         this.showToast('New merchant storefront onboarded.');
-      } catch (error) {
-        this.showToast('Failed to create store. Please try again.');
+      } catch (error: any) {
+        this.showToast(error?.error?.message || 'Failed to create store. Please try again.');
       }
     }
 
@@ -317,8 +317,12 @@ export class GlobalOversightComponent {
 
   public async toggleStoreStatus(storeId: string, currentStatus: StoreStatus): Promise<void> {
     const nextStatus: StoreStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-    await this.storeState.updateStoreStatus(storeId, nextStatus);
-    this.showToast(`Store status updated to ${nextStatus}.`);
+    try {
+      await this.storeState.updateStoreStatus(storeId, nextStatus);
+      this.showToast(`Store status updated to ${nextStatus}.`);
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to update store status. Please try again.');
+    }
   }
 
   // --- Product Operations ---
@@ -352,8 +356,8 @@ export class GlobalOversightComponent {
       });
       this.isProductModalOpen.set(false);
       this.showToast('Product modified by Super Admin.');
-    } catch (error) {
-      this.showToast('Failed to update product. Please try again.');
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to update product. Please try again.');
     }
   }
 
@@ -378,8 +382,8 @@ export class GlobalOversightComponent {
         await this.productState.deleteProduct(entity.id);
         this.showToast(`Product ${entity.name} removed from catalog.`);
       }
-    } catch (error) {
-      this.showToast(`Failed to delete ${entity.type.toLowerCase()}. Please try again.`);
+    } catch (error: any) {
+      this.showToast(error?.error?.message || `Failed to delete ${entity.type.toLowerCase()}. Please try again.`);
     }
 
     this.deleteConfirmEntity.set(null);

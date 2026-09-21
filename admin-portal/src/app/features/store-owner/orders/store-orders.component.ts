@@ -41,13 +41,17 @@ export class StoreOrdersComponent implements OnInit {
     this.selectedOrder.set(null);
   }
 
-  public async packOrder(orderId: string): Promise<void> {
-    await this.orderState.markAsPacked(orderId, this.packingNotes());
-    this.showToast(`Order marked as 'Packed'. Handoff notification sent to Super Admin Logistics.`);
-    
-    const updated = this.orderState.orders().find((o) => o.id === orderId);
-    if (updated) {
-      this.selectedOrder.set(updated);
+public async packOrder(orderId: string): Promise<void> {
+    try {
+      await this.orderState.markAsPacked(orderId, this.packingNotes());
+      this.showToast(`Order marked as 'Packed'. Handoff notification sent to Super Admin Logistics.`);
+
+      const updated = this.orderState.orders().find((o) => o.id === orderId);
+      if (updated) {
+        this.selectedOrder.set(updated);
+      }
+    } catch (error: any) {
+      this.showToast(error?.error?.message || 'Failed to pack order. Please try again.');
     }
   }
 
