@@ -15,11 +15,12 @@ import csrf from 'csurf';
 import { createStore, getStore, updateStore, deleteStore } from '../controllers/store.js'
 import { createProduct, getProduct, updateProduct, deleteProduct } from '../controllers/products.js'
 import { createOrder, getOrder, updateOrder, deleteOrder } from '../controllers/orders.js'
-import {rateLimit} from 'express-rate-limit';
+import { getCookieOptions } from '../utils/config.js';
+import { rateLimit} from 'express-rate-limit';
 
 const router = Router();
 
-const csrfProtection = csrf({ cookie: { httpOnly: true, secure: true, sameSite: 'strict' } });
+const csrfProtection = csrf({ cookie: getCookieOptions() });
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,

@@ -10,7 +10,7 @@ import clientRoutes from './routes/clientRoutes.js';
 import adminClientRoutes from './routes/adminClientRoutes.js';
 import connectDB from './db.js';
 import cors from 'cors';
-import { isProduction, config } from './utils/config.js';
+import { config, getCookieOptions } from './utils/config.js';
 
 dotenv.config();
 
@@ -66,7 +66,7 @@ const apiLimiter = rateLimit({
 
 app.use('/api', apiLimiter);
 
-const csrfProtection = csrf({ cookie: { httpOnly: true, secure: isProduction, sameSite: 'strict' } });
+const csrfProtection = csrf({ cookie: getCookieOptions() });
 app.get('/api/csrf-token', csrfProtection, (req: Request, res: Response) => {
     res.json({ csrfToken: req.csrfToken() });
 });

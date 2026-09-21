@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || '/api';
+
 interface CsrfResponse {
     csrfToken: string;
 }
@@ -40,7 +42,7 @@ export class CsrfService {
         }
 
         this._fetching$.next(true);
-        return this.http.get<CsrfResponse>('/api/csrf-token', { withCredentials: true }).pipe(
+        return this.http.get<CsrfResponse>(`${API_BASE_URL}/csrf-token`, { withCredentials: true }).pipe(
             tap((res) => {
                 this._csrfToken$.next(res.csrfToken);
                 this._fetching$.next(false);
