@@ -55,19 +55,40 @@ export async function createAdminUser(req: Request, res: Response) {
         const frontendUrl = process.env.ADMIN_PORTAL_URL || 'http://localhost:3000';
         const verificationUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}&email=${encodeURIComponent(trimmedEmail)}`;
 
-        sendEmailVerificationEmail({
-            recipientEmail: trimmedEmail,
-            recipientName: name,
-            verificationUrl,
-        }).catch((emailError) => {
-            console.error('Failed to send verification email:', emailError);
-        });
+        let emailSent = false;
+        let emailError: string | undefined;
+        try {
+            await sendEmailVerificationEmail({
+                recipientEmail: trimmedEmail,
+                recipientName: name,
+                verificationUrl,
+            });
+            emailSent = true;
+        } catch (err) {
+            emailError = err instanceof Error ? err.message : String(err);
+            console.error('Failed to send verification email:', {
+                recipientEmail: trimmedEmail,
+                error: emailError,
+                stack: err instanceof Error ? err.stack : undefined,
+            });
+        }
 
-        res.status(201).json({
+        if (!emailSent) {
+            console.error('[Email] Verification email failed to send on registration. Check SMTP configuration and Gmail security settings.');
+        }
+
+        const response: any = {
             message: 'Admin user created successfully. Please verify your email before logging in.',
             requiresVerification: true,
             email: trimmedEmail,
-        });
+            emailSent,
+        };
+
+        if (!emailSent && emailError) {
+            response.emailError = emailError;
+        }
+
+        res.status(201).json(response);
     } catch (error) {
         console.error('Error creating admin user:', error);
         res.status(500).json({ message: 'Server error while creating admin user.' });
@@ -277,18 +298,24 @@ export async function changeAdminPassword(req: AuthRequest, res: Response) {
         const isSuperAdmin = req.user?.role === 'SUPER_ADMIN';
         if (isSuperAdmin && adminUser.email !== req.user?.email) {
             const { sendPasswordChangedBySuperAdminEmail } = await import('../utils/email.js');
-            sendPasswordChangedBySuperAdminEmail({
-                recipientEmail: adminUser.email,
-                recipientName: adminUser.name,
-                username: adminUser.email,
-                newPassword,
-                storeName: adminUser.assignedStoreId ? 'your store' : 'GatedPulse Admin Portal',
-                isTemporary: false,
-                superAdminName: req.user?.name,
-                superAdminEmail: req.user?.email,
-            }).catch((emailError) => {
-                console.error('Failed to send admin password-change email:', emailError);
-            });
+            try {
+                await sendPasswordChangedBySuperAdminEmail({
+                    recipientEmail: adminUser.email,
+                    recipientName: adminUser.name,
+                    username: adminUser.email,
+                    newPassword,
+                    storeName: adminUser.assignedStoreId ? 'your store' : 'GatedPulse Admin Portal',
+                    isTemporary: false,
+                    superAdminName: req.user?.name,
+                    superAdminEmail: req.user?.email,
+                });
+            } catch (emailError) {
+                console.error('Failed to send admin password-change email:', {
+                    recipientEmail: adminUser.email,
+                    error: emailError instanceof Error ? emailError.message : String(emailError),
+                    stack: emailError instanceof Error ? emailError.stack : undefined,
+                });
+            }
         }
 
         res.status(200).json({ message: 'Password changed successfully.' });
@@ -391,15 +418,32 @@ export async function resendVerificationEmail(req: Request, res: Response) {
         const frontendUrl = process.env.ADMIN_PORTAL_URL || 'http://localhost:3000';
         const verificationUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}&email=${encodeURIComponent(user.email)}`;
 
-        sendEmailVerificationEmail({
-            recipientEmail: user.email,
-            recipientName: user.name,
-            verificationUrl,
-        }).catch((emailError) => {
-            console.error('Failed to resend verification email:', emailError);
-        });
+        let emailSent = false;
+        let emailError: string | undefined;
+        try {
+            await sendEmailVerificationEmail({
+                recipientEmail: user.email,
+                recipientName: user.name,
+                verificationUrl,
+            });
+            emailSent = true;
+        } catch (err) {
+            emailError = err instanceof Error ? err.message : String(err);
+            console.error('Failed to resend verification email:', {
+                recipientEmail: user.email,
+                error: emailError,
+                stack: err instanceof Error ? err.stack : undefined,
+            });
+        }
 
-        res.status(200).json({ message: 'Verification email sent. Please check your inbox.' });
+        const response: any = { message: 'Verification email sent. Please check your inbox.' };
+        if (!emailSent) {
+            response.emailSent = false;
+            if (emailError) response.emailError = emailError;
+            response.message = 'Admin user exists but verification email failed to send. Check SMTP configuration and Gmail security settings.';
+        }
+
+        res.status(200).json(response);
     } catch (error) {
         console.error('Error resending verification email:', error);
         res.status(500).json({ message: 'Server error while resending verification email.' });

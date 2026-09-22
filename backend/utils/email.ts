@@ -16,6 +16,8 @@ if (!smtpUser || !smtpPass) {
   console.warn('[Email] SMTP_USER / SMTP_PASS are not configured. Email sending will fail until these are set in backend/.env');
 }
 
+export { smtpHost, smtpPort, smtpSecure, smtpUser, fromName, fromEmail };
+
 export const transporter = nodemailer.createTransport({
   host: smtpHost,
   port: smtpPort,
@@ -24,7 +26,63 @@ export const transporter = nodemailer.createTransport({
     user: smtpUser,
     pass: smtpPass,
   },
+  debug: process.env.NODE_ENV !== 'production',
+  logger: process.env.NODE_ENV !== 'production',
 });
+
+export interface SmtpConnectionTestResult {
+  success: boolean;
+  host?: string;
+  port?: number;
+  user?: string;
+  secure?: boolean;
+  error?: string;
+  detail?: string;
+}
+
+export async function testSmtpConnection(): Promise<SmtpConnectionTestResult> {
+  const result: SmtpConnectionTestResult = {
+    success: false,
+    host: smtpHost,
+    port: smtpPort,
+    user: smtpUser,
+    secure: smtpSecure,
+  };
+
+  if (!smtpUser || !smtpPass) {
+    result.error = 'SMTP_USER or SMTP_PASS is not configured. Set these environment variables in your Vercel project settings.';
+    return result;
+  }
+
+  try {
+    await transporter.verify();
+    result.success = true;
+  } catch (error: any) {
+    result.error = error.message || 'SMTP connection failed';
+    result.detail = error.code || '';
+  }
+
+  return result;
+}
+
+export async function sendTestEmail(recipientEmail: string): Promise<{ success: boolean; error?: string }> {
+  if (!smtpUser || !smtpPass) {
+    return { success: false, error: 'SMTP_USER or SMTP_PASS is not configured.' };
+  }
+
+  try {
+    await transporter.sendMail({
+      from: `"${fromName}" <${fromEmail}>`,
+      to: recipientEmail,
+      subject: 'Test Email - GatedPulse SMTP Configuration',
+      text: 'This is a test email to verify your SMTP configuration is working correctly.',
+      html: '<p>This is a test email to verify your SMTP configuration is working correctly.</p>',
+    });
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to send test email' };
+  }
+}
 
 export async function sendClientCredentialsEmail({
   recipientEmail,

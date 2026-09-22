@@ -78,8 +78,32 @@ export async function createClientUser(req: AuthRequest, res: Response) {
         const ownerName = (storeDoc as IStore | null)?.ownerName || 'Store Owner';
         const ownerEmail = (storeDoc as IStore | null)?.ownerEmail || '';
 
-        const responsePayload = {
+        let emailSent = false;
+        let emailError: string | undefined;
+        try {
+            await sendClientCredentialsEmail({
+                recipientEmail: newClientUser.email,
+                recipientName: newClientUser.fullName,
+                username: newClientUser.username,
+                temporaryPassword: tempPassword,
+                storeName,
+                ownerName,
+                ownerEmail,
+                assignedTier: newClientUser.assignedTier,
+            });
+            emailSent = true;
+        } catch (err) {
+            emailError = err instanceof Error ? err.message : String(err);
+            console.error('Failed to send credentials email:', {
+                recipientEmail: newClientUser.email,
+                error: emailError,
+                stack: err instanceof Error ? err.stack : undefined,
+            });
+        }
+
+        const responsePayload: any = {
             message: 'Client user created successfully.',
+            emailSent,
             clientUser: {
                 id: newClientUser._id,
                 username: newClientUser.username,
@@ -91,18 +115,9 @@ export async function createClientUser(req: AuthRequest, res: Response) {
             }
         };
 
-        sendClientCredentialsEmail({
-            recipientEmail: newClientUser.email,
-            recipientName: newClientUser.fullName,
-            username: newClientUser.username,
-            temporaryPassword: tempPassword,
-            storeName,
-            ownerName,
-            ownerEmail,
-            assignedTier: newClientUser.assignedTier,
-        }).catch((emailError) => {
-            console.error('Failed to send credentials email:', emailError);
-        });
+        if (!emailSent && emailError) {
+            responsePayload.emailError = emailError;
+        }
 
         res.status(201).json(responsePayload);
     } catch (error) {
@@ -272,25 +287,42 @@ export async function resetClientPassword(req: AuthRequest, res: Response) {
         const ownerName = (storeDoc as IStore | null)?.ownerName || 'Store Owner';
         const ownerEmail = (storeDoc as IStore | null)?.ownerEmail || '';
 
-        sendClientCredentialsEmail({
-            recipientEmail: clientUser.email,
-            recipientName: clientUser.fullName,
-            username: clientUser.username,
-            temporaryPassword: newTempPassword,
-            storeName,
-            ownerName,
-            ownerEmail,
-            assignedTier: clientUser.assignedTier,
-        }).catch((emailError) => {
-            console.error('Failed to send password reset email:', emailError);
-        });
+        let emailSent = false;
+        let emailError: string | undefined;
+        try {
+            await sendClientCredentialsEmail({
+                recipientEmail: clientUser.email,
+                recipientName: clientUser.fullName,
+                username: clientUser.username,
+                temporaryPassword: newTempPassword,
+                storeName,
+                ownerName,
+                ownerEmail,
+                assignedTier: clientUser.assignedTier,
+            });
+            emailSent = true;
+        } catch (err) {
+            emailError = err instanceof Error ? err.message : String(err);
+            console.error('Failed to send password reset email:', {
+                recipientEmail: clientUser.email,
+                error: emailError,
+                stack: err instanceof Error ? err.stack : undefined,
+            });
+        }
 
-        res.status(200).json({
+        const resetResponse: any = {
             message: 'Password reset successfully.',
             clientUserId: clientUser._id,
             username: clientUser.username,
             email: clientUser.email,
-        });
+            emailSent,
+        };
+
+        if (!emailSent && emailError) {
+            resetResponse.emailError = emailError;
+        }
+
+        res.status(200).json(resetResponse);
     } catch (error) {
         console.error('Error resetting password:', error);
         res.status(500).json({ message: 'Server error while resetting password.' });
@@ -330,18 +362,24 @@ export async function changeClientPassword(req: AuthRequest, res: Response) {
             const storeDoc = await store.findOne({ _id: { $in: clientUser.accessibleStoresId } }).select('name');
             const storeName = (storeDoc as IStore | null)?.name || 'Gated Marketplace';
 
-            sendPasswordChangedBySuperAdminEmail({
-                recipientEmail: clientUser.email,
-                recipientName: clientUser.fullName,
-                username: clientUser.username,
-                newPassword,
-                storeName,
-                isTemporary: !!markAsTemp,
-                superAdminName: req.user?.name,
-                superAdminEmail: req.user?.email,
-            }).catch((emailError) => {
-                console.error('Failed to send super-admin password-change email:', emailError);
-            });
+            try {
+                await sendPasswordChangedBySuperAdminEmail({
+                    recipientEmail: clientUser.email,
+                    recipientName: clientUser.fullName,
+                    username: clientUser.username,
+                    newPassword,
+                    storeName,
+                    isTemporary: !!markAsTemp,
+                    superAdminName: req.user?.name,
+                    superAdminEmail: req.user?.email,
+                });
+            } catch (emailError) {
+                console.error('Failed to send super-admin password-change email:', {
+                    recipientEmail: clientUser.email,
+                    error: emailError instanceof Error ? emailError.message : String(emailError),
+                    stack: emailError instanceof Error ? emailError.stack : undefined,
+                });
+            }
         }
 
         res.status(200).json({

@@ -17,6 +17,7 @@ import { createProduct, getProduct, updateProduct, deleteProduct } from '../cont
 import { createOrder, getOrder, updateOrder, deleteOrder } from '../controllers/orders.js'
 import { getCookieOptions } from '../utils/config.js';
 import { rateLimit} from 'express-rate-limit';
+import { testSmtpConnection, sendTestEmail } from '../utils/email.js';
 
 const router = Router();
 
@@ -52,6 +53,28 @@ router.post('/verify-email', verifyEmail);
 router.post('/resend-verification', resendVerificationEmail);
 
 router.post('/refresh', refreshLimiter, refreshAdminToken);
+
+router.get('/diagnostics/smtp', async (_req, res) => {
+    const result = await testSmtpConnection();
+    res.status(result.success ? 200 : 500).json(result);
+});
+
+router.post('/diagnostics/smtp-test-email', async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ success: false, error: 'Email is required in the request body.' });
+    }
+    try {
+        const result = await testSmtpConnection();
+        if (!result.success) {
+            return res.status(500).json({ smtp: result });
+        }
+        const sendResult = await sendTestEmail(email);
+        res.status(sendResult.success ? 200 : 500).json({ success: sendResult.success, error: sendResult.error, smtp: result });
+    } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message || 'Unexpected error.' });
+    }
+});
 
 // Registration is disabled by default in production.
 // Enable only in development by setting ALLOW_PUBLIC_REGISTRATION=true
