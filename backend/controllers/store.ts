@@ -8,32 +8,33 @@ import { logAudit } from '../utils/audit.js';
 
 export async function createStore(req: AuthRequest, res: Response) {
     const { ownerEmail, ...storeData } = req.body as IStore;
+    const trimmedOwnerEmail = ownerEmail.trim().toLowerCase();
 
     // Basic validation for required fields.
-    if (!ownerEmail || !storeData) {
+    if (!trimmedOwnerEmail || !storeData) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
     try {
         // Check if a user with the given email already exists.
-        const existingUser = await AdminUser.findOne({ email: ownerEmail });
+        const existingUser = await AdminUser.findOne({ email: trimmedOwnerEmail });
         if (!existingUser || existingUser.role !== 'STORE_OWNER') {
-            return res.status(409).json({ message: `There is no store owner with this email ${ownerEmail}.` });
+            return res.status(409).json({ message: `There is no store owner with this email ${trimmedOwnerEmail}.` });
         }
 
         // Create a new admin user instance.
         const newStore = new store({
-            ownerEmail: ownerEmail,
+            ownerEmail: trimmedOwnerEmail,
             ...storeData
         });
         await newStore.save();
 
         logAudit('STORE_CREATED', newStore._id.toString(), req.user!.role, {
-            ownerEmail,
+            ownerEmail: trimmedOwnerEmail,
             name: newStore.name,
         });
 
         await AdminUser.findOneAndUpdate(
-            { email: ownerEmail },
+            { email: trimmedOwnerEmail },
             { assignedStoreId: newStore._id.toString() }
         );
 
@@ -80,7 +81,9 @@ export async function updateStore(req: AuthRequest, res: Response) {
         }
 
         if (req.user?.role !== 'SUPER_ADMIN') {
-            if (existingStore.ownerEmail !== req.user!.email) {
+            const isOwner = existingStore._id.toString() === req.user!.assignedStoreId
+                || existingStore.ownerEmail.toLowerCase() === req.user!.email.toLowerCase();
+            if (!isOwner) {
                 return res.status(403).json({ message: 'You are not authorized to update this store' });
             }
         }
@@ -124,7 +127,9 @@ export async function deleteStore(req: AuthRequest, res: Response) {
         }
 
         if (req.user?.role !== 'SUPER_ADMIN') {
-            if (existingStore.ownerEmail !== req.user!.email) {
+            const isOwner = existingStore._id.toString() === req.user!.assignedStoreId
+                || existingStore.ownerEmail.toLowerCase() === req.user!.email.toLowerCase();
+            if (!isOwner) {
                 return res.status(403).json({ message: 'You are not authorized to delete this store' });
             }
         }

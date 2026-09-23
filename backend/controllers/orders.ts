@@ -54,14 +54,16 @@ export async function createOrder(req: AuthRequest, res: Response) {
         let storeName: string | undefined;
 
         if (req.user?.role !== 'SUPER_ADMIN') {
-            if (!req.user!.assignedStoreId) {
-                return res.status(403).json({ message: 'You are not authorized to create orders' });
+            let userStore = req.user!.assignedStoreId
+                ? await store.findById(req.user!.assignedStoreId)
+                : null;
+            if (!userStore) {
+                userStore = await store.findOne({ ownerEmail: { $regex: new RegExp(`^${req.user!.email}$`, 'i') } });
             }
-            const userStore = await store.findById(req.user!.assignedStoreId);
             if (!userStore) {
                 return res.status(403).json({ message: 'You are not authorized to create orders' });
             }
-            targetStoreId = req.user!.assignedStoreId;
+            targetStoreId = userStore._id.toString();
             storeName = userStore.name;
         } else {
             const existingStore = await store.findById(storeId);
@@ -115,10 +117,16 @@ export async function getOrder(req: AuthRequest, res: Response) {
         if (req.user.role === 'SUPER_ADMIN') {
             orders = await order.find();
         } else {
-            if (!req.user!.assignedStoreId) {
-                return res.status(404).json({ message: 'No store found for this user' });
+            const storeIdForUser = req.user!.assignedStoreId;
+            if (storeIdForUser) {
+                orders = await order.find({ storeId: storeIdForUser });
+            } else {
+                const userStore = await store.findOne({ ownerEmail: { $regex: new RegExp(`^${req.user!.email}$`, 'i') } });
+                if (!userStore) {
+                    return res.status(404).json({ message: 'No store found for this user' });
+                }
+                orders = await order.find({ storeId: userStore._id.toString() });
             }
-            orders = await order.find({ storeId: req.user!.assignedStoreId });
         }
 
         res.status(200).json({ orders });
@@ -143,7 +151,14 @@ export async function updateOrder(req: AuthRequest, res: Response) {
         }
 
         if (req.user?.role !== 'SUPER_ADMIN') {
-            if (!req.user!.assignedStoreId || existingOrder.storeId !== req.user!.assignedStoreId) {
+            let userStore: any = null;
+            if (req.user!.assignedStoreId) {
+                userStore = await store.findById(req.user!.assignedStoreId);
+            }
+            if (!userStore) {
+                userStore = await store.findOne({ ownerEmail: { $regex: new RegExp(`^${req.user!.email}$`, 'i') } });
+            }
+            if (!userStore || existingOrder.storeId !== userStore._id.toString()) {
                 return res.status(403).json({ message: 'You are not authorized to update this order' });
             }
         }
@@ -187,7 +202,14 @@ export async function deleteOrder(req: AuthRequest, res: Response) {
         }
 
         if (req.user?.role !== 'SUPER_ADMIN') {
-            if (!req.user!.assignedStoreId || existingOrder.storeId !== req.user!.assignedStoreId) {
+            let userStore: any = null;
+            if (req.user!.assignedStoreId) {
+                userStore = await store.findById(req.user!.assignedStoreId);
+            }
+            if (!userStore) {
+                userStore = await store.findOne({ ownerEmail: { $regex: new RegExp(`^${req.user!.email}$`, 'i') } });
+            }
+            if (!userStore || existingOrder.storeId !== userStore._id.toString()) {
                 return res.status(403).json({ message: 'You are not authorized to delete this order' });
             }
         }
