@@ -32,11 +32,14 @@ export async function createProduct(req: AuthRequest, res: Response) {
         let storeName: string | undefined;
 
         if (req.user?.role !== 'SUPER_ADMIN') {
-            const userStore = await store.findOne({ ownerEmail: req.user!.email });
+            if (!req.user!.assignedStoreId) {
+                return res.status(403).json({ message: 'You are not authorized to create products' });
+            }
+            const userStore = await store.findById(req.user!.assignedStoreId);
             if (!userStore) {
                 return res.status(403).json({ message: 'You are not authorized to create products' });
             }
-            targetStoreId = userStore._id.toString();
+            targetStoreId = req.user!.assignedStoreId;
             storeName = userStore.name;
         } else {
             const existingStore = await store.findById(storeId);
@@ -78,11 +81,10 @@ export async function getProduct(req: AuthRequest, res: Response) {
         if (req.user.role === 'SUPER_ADMIN') {
             products = await product.find();
         } else {
-            const userStore = await store.findOne({ ownerEmail: req.user.email });
-            if (!userStore) {
+            if (!req.user!.assignedStoreId) {
                 return res.status(404).json({ message: 'No store found for this user' });
             }
-            products = await product.find({ storeId: userStore._id.toString() });
+            products = await product.find({ storeId: req.user!.assignedStoreId });
         }
 
         res.status(200).json({ products });
@@ -107,8 +109,7 @@ export async function updateProduct(req: AuthRequest, res: Response) {
         }
 
         if (req.user?.role !== 'SUPER_ADMIN') {
-            const userStore = await store.findOne({ ownerEmail: req.user!.email });
-            if (!userStore || existingProduct.storeId !== userStore._id.toString()) {
+            if (!req.user!.assignedStoreId || existingProduct.storeId !== req.user!.assignedStoreId) {
                 return res.status(403).json({ message: 'You are not authorized to update this product' });
             }
         }
@@ -152,8 +153,7 @@ export async function deleteProduct(req: AuthRequest, res: Response) {
         }
 
         if (req.user?.role !== 'SUPER_ADMIN') {
-            const userStore = await store.findOne({ ownerEmail: req.user!.email });
-            if (!userStore || existingProduct.storeId !== userStore._id.toString()) {
+            if (!req.user!.assignedStoreId || existingProduct.storeId !== req.user!.assignedStoreId) {
                 return res.status(403).json({ message: 'You are not authorized to delete this product' });
             }
         }
