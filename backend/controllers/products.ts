@@ -1,5 +1,6 @@
 import store from '../models/store.js'
 import product from '../models/product.js'
+import AdminUser from '../models/AdminUser.js';
 import { AuthRequest } from '../middleware/auth.js';
 import { Response } from 'express'
 import { logAudit } from '../utils/audit.js';
@@ -35,9 +36,22 @@ export async function createProduct(req: AuthRequest, res: Response) {
             let userStore = req.user!.assignedStoreId
                 ? await store.findById(req.user!.assignedStoreId)
                 : null;
+
             if (!userStore) {
                 userStore = await store.findOne({ ownerEmail: { $regex: new RegExp(`^${req.user!.email}$`, 'i') } });
+                if (userStore) {
+                    await AdminUser.findByIdAndUpdate(req.user!._id, { assignedStoreId: userStore._id.toString() });
+                }
             }
+
+            if (!userStore && storeId) {
+                const clientStore = await store.findById(storeId);
+                if (clientStore && clientStore.ownerEmail?.toLowerCase() === req.user!.email.toLowerCase()) {
+                    userStore = clientStore;
+                    await AdminUser.findByIdAndUpdate(req.user!._id, { assignedStoreId: clientStore._id.toString() });
+                }
+            }
+
             if (!userStore) {
                 return res.status(403).json({ message: 'You are not authorized to create products' });
             }
@@ -90,6 +104,9 @@ export async function getProduct(req: AuthRequest, res: Response) {
                 const userStore = await store.findOne({ ownerEmail: { $regex: new RegExp(`^${req.user!.email}$`, 'i') } });
                 if (!userStore) {
                     return res.status(404).json({ message: 'No store found for this user' });
+                }
+                if (!req.user!.assignedStoreId) {
+                    await AdminUser.findByIdAndUpdate(req.user!._id, { assignedStoreId: userStore._id.toString() });
                 }
                 products = await product.find({ storeId: userStore._id.toString() });
             }
