@@ -29,7 +29,7 @@ export class StoreDashboardComponent {
   readonly invitationState = inject(InvitationState);
 
   readonly isEditingGating = signal<boolean>(false);
-  readonly toastMessage = signal<string | null>(null);
+  readonly toast = signal<{ message: string; type: 'success' | 'error' } | null>(null);
 
   public toggleGatingEditor(): void {
     this.isEditingGating.update((v) => !v);
@@ -50,13 +50,13 @@ export class StoreDashboardComponent {
       this.isEditingGating.set(false);
       this.showToast('Gating access criteria updated successfully.');
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to update gating settings. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to update gating settings. Please try again.', 'error');
     }
   }
 
-  public showToast(msg: string): void {
-    this.toastMessage.set(msg);
-    setTimeout(() => this.toastMessage.set(null), 3000);
+  public showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.toast.set({ message, type });
+    setTimeout(() => this.toast.set(null), 3000);
   }
 
   public async onPackOrder(order: Order): Promise<void> {
@@ -64,7 +64,7 @@ export class StoreDashboardComponent {
       await this.orderState.markAsPacked(order.id);
       this.showToast(`Order ${order.orderNumber} marked as 'Packed'. Handoff sent to Super Admin Logistics.`);
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to pack order. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to pack order. Please try again.', 'error');
     }
   }
 }

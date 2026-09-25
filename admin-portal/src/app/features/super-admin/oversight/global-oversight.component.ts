@@ -123,7 +123,7 @@ export class GlobalOversightComponent {
 
   // Delete Confirm State
   readonly deleteConfirmEntity = signal<{ type: 'STORE' | 'PRODUCT'; id: string; name: string } | null>(null);
-  readonly toastMessage = signal<string | null>(null);
+  readonly toast = signal<{ message: string; type: 'success' | 'error' } | null>(null);
 
   public setTab(tab: 'STORES' | 'PRODUCTS' | 'CLIENTS'): void {
     this.activeTab.set(tab);
@@ -196,7 +196,7 @@ export class GlobalOversightComponent {
       this.showToast(`Password for ${store.ownerName} updated successfully!`);
       this.closeStoreAdminPasswordModal();
     } catch (error: any) {
-      this.showToast(error.error?.message || 'Failed to update store admin password.');
+      this.showToast(error.error?.message || 'Failed to update store admin password.', 'error');
     }
   }
 
@@ -235,7 +235,7 @@ export class GlobalOversightComponent {
       this.showToast(`Password for ${account.username} updated.${emailSuffix}`);
       this.closePasswordModal();
     } catch (error: any) {
-      this.showToast(error.error?.message || 'Failed to update password.');
+      this.showToast(error.error?.message || 'Failed to update password.', 'error');
     }
   }
 
@@ -289,7 +289,7 @@ export class GlobalOversightComponent {
         });
         this.showToast('Store settings updated.');
       } catch (error: any) {
-        this.showToast(error?.error?.message || 'Failed to update store. Please try again.');
+        this.showToast(error?.error?.message || 'Failed to update store. Please try again.', 'error');
       }
     } else {
       const dto: CreateStoreDto = {
@@ -308,7 +308,7 @@ export class GlobalOversightComponent {
         await this.storeState.createStore(dto);
         this.showToast('New merchant storefront onboarded.');
       } catch (error: any) {
-        this.showToast(error?.error?.message || 'Failed to create store. Please try again.');
+        this.showToast(error?.error?.message || 'Failed to create store. Please try again.', 'error');
       }
     }
 
@@ -321,7 +321,7 @@ export class GlobalOversightComponent {
       await this.storeState.updateStoreStatus(storeId, nextStatus);
       this.showToast(`Store status updated to ${nextStatus}.`);
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to update store status. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to update store status. Please try again.', 'error');
     }
   }
 
@@ -357,7 +357,7 @@ export class GlobalOversightComponent {
       this.isProductModalOpen.set(false);
       this.showToast('Product modified by Super Admin.');
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to update product. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to update product. Please try again.', 'error');
     }
   }
 
@@ -383,14 +383,14 @@ export class GlobalOversightComponent {
         this.showToast(`Product ${entity.name} removed from catalog.`);
       }
     } catch (error: any) {
-      this.showToast(error?.error?.message || `Failed to delete ${entity.type.toLowerCase()}. Please try again.`);
+      this.showToast(error?.error?.message || `Failed to delete ${entity.type.toLowerCase()}. Please try again.`, 'error');
     }
 
     this.deleteConfirmEntity.set(null);
   }
 
-  public showToast(msg: string): void {
-    this.toastMessage.set(msg);
-    setTimeout(() => this.toastMessage.set(null), 3000);
+  public showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.toast.set({ message, type });
+    setTimeout(() => this.toast.set(null), 3000);
   }
 }

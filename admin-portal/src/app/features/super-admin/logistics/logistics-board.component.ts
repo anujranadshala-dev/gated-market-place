@@ -25,7 +25,7 @@ export class LogisticsBoardComponent {
   readonly trackingNumber = signal<string>('');
   readonly driverName = signal<string>('Matthias Berg');
   readonly driverPhone = signal<string>('+46 70 889 1234');
-  readonly toastMessage = signal<string | null>(null);
+  readonly toast = signal<{ message: string; type: 'success' | 'error' } | null>(null);
 
   public openDispatchModal(order: Order): void {
     const randomTrack = `TRK-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -55,7 +55,7 @@ export class LogisticsBoardComponent {
       this.showToast(`Order ${order.orderNumber} dispatched! Status changed to 'Out_for_Delivery'.`);
       this.closeDispatchModal();
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to dispatch order. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to dispatch order. Please try again.', 'error');
     }
   }
 
@@ -64,7 +64,7 @@ export class LogisticsBoardComponent {
       await this.orderState.markAsOnTheWay(orderId);
       this.showToast(`Order is now 'On the way'.`);
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to update order status. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to update order status. Please try again.', 'error');
     }
   }
 
@@ -73,12 +73,12 @@ export class LogisticsBoardComponent {
       await this.orderState.markDelivered(orderId);
       this.showToast(`Order ${orderNumber} fulfilled and marked as 'Delivered'.`);
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to mark order as delivered. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to mark order as delivered. Please try again.', 'error');
     }
   }
 
-  public showToast(msg: string): void {
-    this.toastMessage.set(msg);
-    setTimeout(() => this.toastMessage.set(null), 3500);
+  public showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.toast.set({ message, type });
+    setTimeout(() => this.toast.set(null), 3500);
   }
 }

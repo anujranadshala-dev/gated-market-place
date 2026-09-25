@@ -32,7 +32,7 @@ export class CustomerInvitationComponent {
 
   readonly isSubmitting = signal<boolean>(false);
   readonly lastDispatchedAccount = signal<CustomerInvitation | null>(null);
-  readonly toastMessage = signal<string | null>(null);
+  readonly toast = signal<{ message: string; type: 'success' | 'error' } | null>(null);
 
   readonly isPasswordModalOpen = signal<boolean>(false);
   readonly selectedAccountForPassword = signal<CustomerInvitation | null>(null);
@@ -130,7 +130,7 @@ export class CustomerInvitationComponent {
         `Credentials provisioned for ${account.recipientEmail}! Initial Tier: Bronze. An email has been sent with login details.`
       );
     } catch (error: any) {
-      this.showToast(error.error?.message || 'Failed to provision credentials.');
+      this.showToast(error.error?.message || 'Failed to provision credentials.', 'error');
     } finally {
       this.isSubmitting.set(false);
     }
@@ -220,7 +220,7 @@ export class CustomerInvitationComponent {
       this.showToast(`Password for ${account.username || 'client'} successfully updated!`);
       this.closePasswordModal();
     } catch (error: any) {
-      this.showToast(error.error?.message || 'Failed to reset password.');
+      this.showToast(error.error?.message || 'Failed to reset password.', 'error');
     } finally {
       this.resettingPasswordId.set(null);
     }
@@ -231,12 +231,12 @@ export class CustomerInvitationComponent {
       await this.invitationState.deleteInvitation(id);
       this.showToast('Client access revoked.');
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to revoke client access. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to revoke client access. Please try again.', 'error');
     }
   }
 
-  public showToast(msg: string): void {
-    this.toastMessage.set(msg);
-    setTimeout(() => this.toastMessage.set(null), 3500);
+  public showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.toast.set({ message, type });
+    setTimeout(() => this.toast.set(null), 3500);
   }
 }

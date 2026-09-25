@@ -27,7 +27,7 @@ export class ProductManagementComponent {
   readonly isModalOpen = signal<boolean>(false);
   readonly editingProductId = signal<string | null>(null);
   readonly deleteConfirmId = signal<string | null>(null);
-  readonly toastMessage = signal<string | null>(null);
+  readonly toast = signal<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Signal Form Model
   readonly formName = signal<string>('');
@@ -107,7 +107,7 @@ export class ProductManagementComponent {
         });
         this.showToast('Product specifications updated successfully.');
       } catch (error: any) {
-        this.showToast(error?.error?.message || 'Failed to update product. Please try again.');
+        this.showToast(error?.error?.message || 'Failed to update product. Please try again.', 'error');
       }
     } else {
       const dto: CreateProductDto = {
@@ -127,7 +127,7 @@ export class ProductManagementComponent {
         await this.productState.addProduct(dto);
         this.showToast('New gated catalog product published.');
       } catch (error: any) {
-        this.showToast(error?.error?.message || 'Failed to create product. Please try again.');
+        this.showToast(error?.error?.message || 'Failed to create product. Please try again.', 'error');
       }
     }
 
@@ -147,7 +147,7 @@ export class ProductManagementComponent {
       await this.productState.deleteProduct(id);
       this.showToast('Product successfully removed from catalog.');
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to delete product. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to delete product. Please try again.', 'error');
     }
     this.deleteConfirmId.set(null);
   }
@@ -156,8 +156,8 @@ export class ProductManagementComponent {
     await this.productState.updateStock(productId, currentStock + delta);
   }
 
-  public showToast(msg: string): void {
-    this.toastMessage.set(msg);
-    setTimeout(() => this.toastMessage.set(null), 3000);
+  public showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.toast.set({ message, type });
+    setTimeout(() => this.toast.set(null), 3000);
   }
 }

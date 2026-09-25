@@ -24,7 +24,7 @@ export class StoreOrdersComponent implements OnInit {
   // Selected Order for Inspection Drawer / Modal
   readonly selectedOrder = signal<Order | null>(null);
   readonly packingNotes = signal<string>('');
-  readonly toastMessage = signal<string | null>(null);
+  readonly toast = signal<{ message: string; type: 'success' | 'error' } | null>(null);
 
   constructor() {}
 
@@ -51,12 +51,12 @@ public async packOrder(orderId: string): Promise<void> {
         this.selectedOrder.set(updated);
       }
     } catch (error: any) {
-      this.showToast(error?.error?.message || 'Failed to pack order. Please try again.');
+      this.showToast(error?.error?.message || 'Failed to pack order. Please try again.', 'error');
     }
   }
 
-  public showToast(msg: string): void {
-    this.toastMessage.set(msg);
-    setTimeout(() => this.toastMessage.set(null), 3500);
+  public showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    this.toast.set({ message, type });
+    setTimeout(() => this.toast.set(null), 3500);
   }
 }
