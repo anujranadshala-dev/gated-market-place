@@ -53,10 +53,13 @@ export const api = {
     },
 
     async changePassword(currentPassword: string, newPassword: string) {
-        return postJson<{ message: string }>(
-            `${API_BASE}/password`,
-            { currentPassword, newPassword }
-        );
+        const res = await fetch(`${API_BASE}/password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword }),
+            credentials: 'include',
+        });
+        return handleResponse<{ message: string }>(res);
     },
 
     async getStores() {
