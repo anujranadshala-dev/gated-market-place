@@ -4,7 +4,6 @@ export interface ToastMessage {
   id: string;
   type: 'success' | 'error' | 'info';
   message: string;
-  _timeout?: boolean;
 }
 
 interface ToastState {

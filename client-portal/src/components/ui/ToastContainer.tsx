@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { removeToast } from '../../store/slices/toastSlice';
@@ -7,11 +7,14 @@ export const ToastContainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const toasts = useAppSelector((state) => state.toast.toasts);
 
+  const scheduledToasts = useRef(new Set<string>());
+
   useEffect(() => {
     toasts.forEach((toast) => {
-      if (!toast._timeout) {
-        toast._timeout = true;
+      if (!scheduledToasts.current.has(toast.id)) {
+        scheduledToasts.current.add(toast.id);
         setTimeout(() => {
+          scheduledToasts.current.delete(toast.id);
           dispatch(removeToast(toast.id));
         }, 4000);
       }
