@@ -254,17 +254,22 @@ export async function refreshAdminToken(req: Request, res: Response) {
 }
 
 export async function logoutAdminUser(req: Request, res: Response) {
+    // Logout must be idempotent and unauthenticated: clearing the session
+    // cookies has to work even when the access token is already expired or
+    // missing, otherwise the browser keeps a live session.
     const cookieOptions = getCookieOptions();
 
-    res.cookie('token', '', {
-        ...cookieOptions,
-        expires: new Date(0),
-    });
+    const clearCookie = (name: string) => {
+        res.cookie(name, '', {
+            ...cookieOptions,
+            path: '/',
+            maxAge: 0,
+            expires: new Date(0),
+        });
+    };
 
-    res.cookie('refreshToken', '', {
-        ...cookieOptions,
-        expires: new Date(0),
-    });
+    clearCookie('token');
+    clearCookie('refreshToken');
 
     res.status(200).json({ message: 'Logout successful.' });
 }

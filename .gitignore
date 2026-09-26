@@ -7,6 +7,9 @@ dist/
 build/
 coverage/
 
+# Temp / scratch
+.tmp/
+
 # Environment variables
 .env
 .env.local

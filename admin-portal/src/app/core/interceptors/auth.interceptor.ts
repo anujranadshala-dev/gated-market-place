@@ -1,4 +1,4 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable, throwError, of } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
@@ -11,30 +11,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   if (isMutating(req.method)) {
     return ensureCsrfToken(csrfService).pipe(
-      switchMap(() => {
-        const token = csrfService.getToken();
-        const csrfReq = token
-          ? req.clone({ setHeaders: { 'X-CSRF-Token': token } })
-          : req;
-        return next(csrfReq).pipe(
-          catchError((error) => {
-            if (error.status === 401) {
-              console.warn('[HTTP 401] Unauthorized request detected, invalidating session.');
-              authStore.logout();
-            }
-            return throwError(() => error);
-          })
-        );
+      switchMap(() => sendWithCsrf(req, next, csrfService)),
+      catchError((error) => {
+        handleUnauthorized(error, authStore);
+        return throwError(() => error);
       })
     );
   }
 
   return next(req).pipe(
     catchError((error) => {
-      if (error.status === 401) {
-        console.warn('[HTTP 401] Unauthorized request detected, invalidating session.');
-        authStore.logout();
-      }
+      handleUnauthorized(error, authStore);
       return throwError(() => error);
     })
   );
@@ -42,6 +29,38 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 function isMutating(method: string): boolean {
   return ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method);
+}
+
+function handleUnauthorized(error: any, authStore: AuthStore): void {
+  if (error?.status === 401) {
+    console.warn('[HTTP 401] Unauthorized request detected, invalidating session.');
+    authStore.logout();
+  }
+}
+
+function sendWithCsrf(
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn,
+  csrfService: CsrfService,
+  retried = false
+): Observable<any> {
+  const token = csrfService.getToken();
+  const csrfReq = token ? req.clone({ setHeaders: { 'X-CSRF-Token': token } }) : req;
+
+  return next(csrfReq).pipe(
+    catchError((error) => {
+      // A cached CSRF token can go stale (cookie rotated, cleared, or expired).
+      // Drop it and replay the request once so mutating calls - logout
+      // included - are not permanently rejected with 403.
+      if (error?.status === 403 && !retried) {
+        csrfService.clearToken();
+        return ensureCsrfToken(csrfService).pipe(
+          switchMap(() => sendWithCsrf(req, next, csrfService, true))
+        );
+      }
+      return throwError(() => error);
+    })
+  );
 }
 
 function ensureCsrfToken(csrfService: CsrfService): Observable<void> {

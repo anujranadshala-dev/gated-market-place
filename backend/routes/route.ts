@@ -83,7 +83,10 @@ if (process.env.ALLOW_PUBLIC_REGISTRATION === 'true') {
 }
 
 // Protected routes that require authentication
-router.post('/logout', protect, csrfProtection, logoutAdminUser);
+// Logout is intentionally NOT wrapped in `protect`: the access token cookie
+// expires in 15 minutes, and a guarded logout can never clear an already
+// expired/missing session, which leaves the user stuck "logged in".
+router.post('/logout', csrfProtection, logoutAdminUser);
 router.get('/me', protect, getMe);
 
 // Admin password management - only SUPER_ADMIN can change other admin passwords

@@ -21,6 +21,11 @@ export class CsrfService {
         return this._csrfToken$.getValue();
     }
 
+    clearToken(): void {
+        this._csrfToken$.next(null);
+        this._fetching$.next(false);
+    }
+
     fetchToken(): Observable<CsrfResponse> {
         if (this._csrfToken$.getValue()) {
             return new Observable((sub) => {
@@ -31,11 +36,21 @@ export class CsrfService {
 
         if (this._fetching$.getValue()) {
             return new Observable((sub) => {
-                const sub2 = this._csrfToken$.subscribe((token) => {
+                const tokenSub = this._csrfToken$.subscribe((token) => {
                     if (token) {
                         sub.next({ csrfToken: token });
                         sub.complete();
-                        sub2.unsubscribe();
+                        tokenSub.unsubscribe();
+                    }
+                });
+                // If the in-flight request fails, `_fetching$` flips back to
+                // false without ever emitting a token. Without this branch the
+                // caller would wait forever and the request would never be sent.
+                const fetchingSub = this._fetching$.subscribe((fetching) => {
+                    if (!fetching && !this._csrfToken$.getValue()) {
+                        sub.error(new Error('CSRF token request failed.'));
+                        tokenSub.unsubscribe();
+                        fetchingSub.unsubscribe();
                     }
                 });
             });

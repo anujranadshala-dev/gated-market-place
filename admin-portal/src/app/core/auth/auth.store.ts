@@ -1,8 +1,10 @@
 import { Injectable, computed, signal, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { finalize } from 'rxjs/operators';
 import { LoginCredentials, SignupPayload, User, UserRole, BackendLoginResponse, BackendMeResponse, BackendRegisterResponse } from './auth.models';
 import { ToastService } from '../services/toast.service';
+import { CsrfService } from '../services/csrf.service';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -13,12 +15,14 @@ export class AuthStore {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
   private readonly toastService = inject(ToastService);
+  private readonly csrfService = inject(CsrfService);
 
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isLoading = signal<boolean>(false);
   private readonly _authError = signal<string | null>(null);
   private _autoLoginPromise: Promise<boolean> | null = null;
   private _loggingOut = false;
+  private _sessionGeneration = 0;
 
   readonly user = this._currentUser.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
@@ -43,6 +47,8 @@ export class AuthStore {
   public login(credentials: LoginCredentials): Promise<boolean> {
     this._isLoading.set(true);
     this._authError.set(null);
+    this._sessionGeneration++;
+    this._autoLoginPromise = null;
 
     return new Promise((resolve) => {
       this.http.post<BackendLoginResponse>(`${API_BASE_URL}/login`, {
@@ -146,9 +152,16 @@ export class AuthStore {
       return this._autoLoginPromise;
     }
 
+    // Snapshot the session so a /me response that lands after an explicit
+    // login/logout cannot resurrect a stale session.
+    const generation = this._sessionGeneration;
+
     this._autoLoginPromise = new Promise((resolve) => {
       this.http.get<BackendMeResponse>(`${API_BASE_URL}/me`, { withCredentials: true }).subscribe({
         next: (meRes) => {
+          if (generation !== this._sessionGeneration) {
+            return resolve(false);
+          }
           const user = meRes.user;
           this._currentUser.set({
             id: user._id,
@@ -175,22 +188,27 @@ export class AuthStore {
   }
 
   public logout(): void {
+    // Drop local session state first and unconditionally. The guards read
+    // `_currentUser` plus the memoised auto-login promise, so both have to be
+    // reset for the navigation below to land on /login instead of bouncing
+    // straight back to the dashboard.
+    this._sessionGeneration++;
+    this._currentUser.set(null);
+    this._autoLoginPromise = Promise.resolve(false);
+    this.csrfService.clearToken();
+
     if (this._loggingOut) return;
     this._loggingOut = true;
-    this.http.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true }).subscribe({
-      next: () => {
-        this._currentUser.set(null);
-        this.toastService.showSuccess('Logged out successfully');
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        this._currentUser.set(null);
-        this.router.navigate(['/login']);
-      },
-      complete: () => {
-        this._loggingOut = false;
-      },
-    });
+
+    this.http
+      .post(`${API_BASE_URL}/logout`, {}, { withCredentials: true })
+      .pipe(finalize(() => (this._loggingOut = false)))
+      .subscribe({
+        next: () => this.toastService.showSuccess('Logged out successfully'),
+        error: () => {},
+      });
+
+    this.router.navigate(['/login']);
   }
 
   public verifyEmail(email: string, token: string): Promise<boolean> {
