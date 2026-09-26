@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import ClientUser, { IAddress } from '../models/clientUser.js';
 import { ClientAuthRequest } from '../middleware/clientAuth.js';
-import { isProduction } from '../utils/config.js';
+import { getCookieOptions } from '../utils/config.js';
 import { logAudit } from '../utils/audit.js';
 
 
@@ -70,17 +70,13 @@ export async function clientLogin(req: Request, res: Response) {
         });
 
         res.cookie('clientToken', token, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: isProduction,
+            ...getCookieOptions(),
             maxAge: 15 * 60 * 1000,
             path: '/',
         });
 
         res.cookie('clientRefreshToken', refreshToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: isProduction,
+            ...getCookieOptions(),
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/',
         });
@@ -119,18 +115,14 @@ export async function clientLogin(req: Request, res: Response) {
 
 export async function clientLogout(req: Request, res: Response) {
     res.cookie('clientToken', '', {
-        httpOnly: true,
+        ...getCookieOptions(),
         expires: new Date(0),
-        sameSite: 'strict',
-        secure: isProduction,
         path: '/',
     });
 
     res.cookie('clientRefreshToken', '', {
-        httpOnly: true,
+        ...getCookieOptions(),
         expires: new Date(0),
-        sameSite: 'strict',
-        secure: isProduction,
         path: '/',
     });
 
@@ -494,17 +486,13 @@ export async function refreshClientToken(req: Request, res: Response) {
         const newRefreshToken = jwt.sign({ ...payload, type: 'clientRefresh' }, process.env.JWT_SECRET!, { expiresIn: '7d' });
 
         res.cookie('clientToken', newAccessToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: isProduction,
+            ...getCookieOptions(),
             maxAge: 15 * 60 * 1000,
             path: '/',
         });
 
         res.cookie('clientRefreshToken', newRefreshToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: isProduction,
+            ...getCookieOptions(),
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/',
         });
